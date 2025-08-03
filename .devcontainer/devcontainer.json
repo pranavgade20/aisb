@@ -11,6 +11,11 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	//
+	// Mount SSH keys into the container
+	"mounts": [
+		"source=${localWorkspaceFolder}/ssh,target=/mnt/ssh,type=bind"
+	],
+	//
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "/bin/bash .devcontainer/setup-devcontainer.sh",
 	//
