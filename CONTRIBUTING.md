@@ -4,6 +4,7 @@ This file documents guidelines for authoring exercises.
 **This file is just for content authors and teaching assistants, not for participants.**
 
 ## Guide to Writing Directions
+- It is not recommended to contribute to this repo from the dev container. The ssh and git configuration may be wrong.
 - Keep these goals in mind:
     - Teach participants to see security vulnerabilities broadly in systems.
     - Promote the security mindset.
@@ -16,7 +17,6 @@ This file documents guidelines for authoring exercises.
     - Add increasingly helpful hints in spoiler blocks (`<details><summary>...</summary> ...</details>`) but don't give away the whole solution.
 - Provide relevant "Further reading" at the end of each day.
 - Add optional exercises (with less handholding) if there is a chance people will finish the day early.
-    
 
 
 ## Solution files
@@ -30,7 +30,8 @@ This file documents guidelines for authoring exercises.
 - Diagrams can be written using Mermaid notation. Docs and interactive editor are [here](https://mermaid.live/).
 
 
-## VulnHub VM setup
+## Day-specific instructions
+### VulnHub VM setup
 w1d4 uses a lab based on the [Corrosion: 2](https://www.vulnhub.com/entry/corrosion-2,745/) VM.
 However, running the x64 VM on M* Mac is problematic and extremely slow. For this reason, we chose to create the lab so that it can run on AWS EC2. 
 This has other problems: the VM is too old and an AMI cannot be created from it, therefore we had to do a couple of changes to the original VM:

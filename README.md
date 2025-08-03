@@ -114,7 +114,11 @@ git checkout master
 git pull
 ```
 
-Make a branch for the day: `git checkout -b <branch name>`, where your branch name should follow the convention `w#d#/<name>-and-<name>`. For example, if Tamera and Edmund were pairing on the week 1 day 3 content, the command would be `git checkout -b w1d3/tamera-and-edmund`. If you share a first name with someone else in the program, use a unique nickname of your choice for disambiguation. 
+Make a branch for the day: 
+```bash
+git checkout -b <branch name>
+```
+where your branch name should follow the convention `w#d#/<name>-and-<name>`. For example, if Tamera and Edmund were pairing on the week 1 day 3 content, the command would be `git checkout -b w1d3/tamera-and-edmund`. If you share a first name with someone else in the program, use a unique nickname of your choice for disambiguation. 
 
 Create a new file for your answers (see [completing exercises](#completing-exercises) above) and work through the material with your partner. 
 
