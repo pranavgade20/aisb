@@ -137,3 +137,10 @@ git pull
 
 ### Testing your setup
 If you'd like to try a sample exercise and test your setup, go ahead and complete [w1d0](./w1d0/w1d0_instructions.md)!
+
+### Using help during the bootcamp
+If you get stuck or have any questions regarding the exercises, please reach out to one of the teaching assistants (TAs) present.
+
+Unless stated otherwise, please do not use any LLM-based tools to help you complete the exercises.
+
+The repository also contains `*_solution.py` files which contain reference solutions. Please do not read them before you try the exercises yourself.
