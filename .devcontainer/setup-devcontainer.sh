@@ -30,3 +30,5 @@ chmod 600 ~/.ssh/config
 
 # Add GitHub to known hosts to avoid prompts
 ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+echo "Setup finished."

@@ -16,9 +16,10 @@ Make sure you have the prerequisites listed below, and open a cloned copy of thi
 ### Default setup: VS Code based IDE with Dev Containers
 If using VS Code base IDE, we recommend using the Dev Containers feature. This will start a Docker container with Python and all necessary dependencies already installed that your IDE will connect to. If you execute a file or open a terminal in your IDE, this will be executed inside the container while keeping the user experience of working locally (see more on [how it works](https://code.visualstudio.com/docs/devcontainers/tutorial#_how-it-works)).
 
-- Install [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension (`anysphere.remote-containers` if you're using Cursor)
+- Install [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+    - (Use `anysphere.remote-containers` if you're using Cursor)
 - Open Command Palette (press `F1` or select `View -> Command Palette`) and select `Dev Containers: Open Folder in Container`
-- Select the directory with cloned `pranavgade20/aisb` repo.
+- Select the directory with cloned `pranavgade20/aisb` repo. This step may take some time to complete.
 
 If you have problems with this setup on Windows, you can check out [these tips](https://code.visualstudio.com/docs/devcontainers/tips-and-tricks#_docker-desktop-for-windows-tips).
 
