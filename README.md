@@ -9,23 +9,14 @@ Make sure you have the prerequisites listed below, and open a cloned copy of thi
 ### Prerequisites
 1. **Download and install [Docker desktop](https://www.docker.com/products/docker-desktop/)**
 2. **Clone this repo**
-    - It is recommended that you save your progress (solution files you will create throughout the bootcamp) to a branch in this repo. For that you will need to:
-        - Make sure you have [an ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#adding-your-ssh-key-to-the-ssh-agent) registered [with your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account), and [configured](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=mac#adding-your-ssh-key-to-the-ssh-agent) in your `.ssh/config` or ssh-agent.
-        - You can test this is configured correctly with `ssh -T git@github.com`.
-        - Clone the [aisb repo](https://github.com/pranavgade20/aisb)
-            ```bash
-            git clone git@github.com:pranavgade20/aisb.git
-            ```
-    - Alternatively, if you don't want to save your progress to a branch or just you just want to get started quickly, clone the repo with
-
-        ```bash
-        git clone https://github.com/pranavgade20/aisb.git
-        ```
+    ```bash
+    git clone https://github.com/pranavgade20/aisb.git
+    ```
 
 ### Default setup: VS Code based IDE with Dev Containers
 If using VS Code base IDE, we recommend using the Dev Containers feature. This will start a Docker container with Python and all necessary dependencies already installed that your IDE will connect to. If you execute a file or open a terminal in your IDE, this will be executed inside the container while keeping the user experience of working locally (see more on [how it works](https://code.visualstudio.com/docs/devcontainers/tutorial#_how-it-works)).
 
-- Install [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+- Install [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension (`anysphere.remote-containers` if you're using Cursor)
 - Open Command Palette (press `F1` or select `View -> Command Palette`) and select `Dev Containers: Open Folder in Container`
 - Select the directory with cloned `pranavgade20/aisb` repo.
 
@@ -101,12 +92,46 @@ If you add more code at the bottom of the file and follow it with another `# %%`
 ### Using git
 We recommend you save your progress for each day (the answer files you will create with your assigned partner) to a branch in this repo. This will make it possible for you to switch between computers you will use while pair programming, and make your solution available for you to reference later.
 
-First, configure your git repo with:
+First, download an ssh key that will allow you to push and configure git:
 
-```bash
-git config pull.rebase true
-git config --type bool push.autoSetupRemote true
-```
+1. Download the `aisb_ssh` key file [from Discord](TODO) (FIXME: add link) and place it the `./ssh/` directory of your local clone of this repo (i.e., if you cloned into `~/aisb`, the save it to `~/aisb/ssh/aisb_ssh` file)
+2. If you are using Dev Containers, you're git config will be updated automatically. If you're not or the automatic configuration didn't work for any reason, run these commands manually:
+
+    ```bash
+    git remote set-url origin git@github.com:pranavgade20/aisb.git
+    git config pull.rebase true
+    git config --type bool push.autoSetupRemote true
+    git config user.name "AISB Account"
+    git config user.email "26707046+aisb-account@users.noreply.github.com"
+    ```
+
+    <details>
+    <summary>If you're not using Dev Containers, you may also need to configure your ssh to use the downloaded key for GitHub. Expand this section for an example.</summary>
+
+    
+    - SSH key on Linux of Mac
+        - Make an ssh directory (if you don't already have one): `mkdir -p ~/.ssh`
+        - Copy the downloaded key to `~/.ssh/aisb_ssh`
+        - Set permissions: `chmod 600 ~/.ssh/aisb_ssh`
+    - SSH key on Windows
+        - Make an ssh directory (if you don't already have one): `md -Force ~\.ssh`
+        - If that doesn't work, try `md -Force C:\Users\[your user name]\.ssh`
+        - If that doesn't work for you, confirm that this folder already exists for yourself, and if not make it in the file navigator application.
+        - Copy the downloaded key to the directory.
+        - [Set permissions on the key](https://superuser.com/a/1296046)
+        - If you still see permission denied errors, make sure that your aisb_ssh file is using LF line endings and has a final line break at the end (so there shouldn't be any text on the last line of the file).
+    - Set up your ssh config file
+        - Open or create file name `config` inside the `.ssh` folder from above (in VS Code, you can use the "Open SSH Configuration File..." action)
+        - Update it so that there is a record for github.com:
+            ```
+            Host github.com
+                HostName github.com
+                User git
+                IdentityFile ~/.ssh/aisb_ssh
+                IdentitiesOnly yes
+            ```
+            (update path to the IdentityFile as needed). If there's already stuff in the file, put this at the end.
+    </details>
 
 **Every day in the morning**, make sure you have the latest version of the repo:
 ```bash
