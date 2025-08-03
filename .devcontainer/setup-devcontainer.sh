@@ -10,14 +10,13 @@ git config --type bool push.autoSetupRemote true
 # Set up SSH for GitHub
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
-cat /mnt/ssh/aisb_ssh | tr -d '\r' > ~/.ssh/aisb_ssh && chmod 600 ~/.ssh/aisb_ssh
 
 # Create SSH config for GitHub
 cat > ~/.ssh/config << EOL
 Host github.com
     HostName github.com
     User git
-    IdentityFile ~/.ssh/aisb_ssh
+    IdentityFile /mnt/ssh/aisb_ssh
     IdentitiesOnly yes
 EOL
 
