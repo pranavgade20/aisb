@@ -1,6 +1,8 @@
 # Contributing exercises
 This file documents guidelines for authoring exercises.
 
+**This file is just for content authors and teaching assistants, not for participants.**
+
 ## Guide to Writing Directions
 - Keep these goals in mind:
     - Teach participants to see security vulnerabilities broadly in systems.
