@@ -95,6 +95,20 @@ def test_prerequisites():
                 print("   💡 Configure with: git config --type bool push.autoSetupRemote true")
                 return False, "Git missing recommended configurations"
 
+            # Check if remote origin is set to the correct repository
+            result = subprocess.run(["git", "remote", "get-url", "origin"], capture_output=True, text=True, timeout=5)
+            if result.returncode != 0:
+                print("   💡 Add remote with: git remote add origin git@github.com:pranavgade20/aisb.git")
+                return False, "Git remote origin not configured"
+
+            expected_remote = "git@github.com:pranavgade20/aisb.git"
+            actual_remote = result.stdout.strip()
+            if actual_remote != expected_remote:
+                print(f"   💡 Current remote: {actual_remote}")
+                print(f"   💡 Expected remote: {expected_remote}")
+                print("   💡 Fix with: git remote set-url origin git@github.com:pranavgade20/aisb.git")
+                return False, "Git remote origin URL incorrect"
+
             return True, "Git properly configured"
 
         except (subprocess.TimeoutExpired, FileNotFoundError):
@@ -129,6 +143,32 @@ def test_prerequisites():
     else:
         all_good = False
         print("❌ Not all Python packages are installed")
+
+    # Check SSH access to GitHub
+    def check_github_ssh_access() -> tuple[bool, str]:
+        """Check if SSH access to GitHub is working."""
+        try:
+            result = subprocess.run(["ssh", "-T", "git@github.com"], capture_output=True, text=True, timeout=10)
+            # Print the output for debugging
+            if result.stdout.strip():
+                print(f"   SSH stdout: {result.stdout.strip()}")
+            if result.stderr.strip():
+                print(f"   SSH stderr: {result.stderr.strip()}")
+
+            # SSH to GitHub returns 1 on successful authentication (not 0)
+            if result.returncode == 1 and "successfully authenticated" in result.stderr:
+                return True, "GitHub SSH access working"
+            else:
+                return False, f"GitHub SSH authentication failed (return code: {result.returncode})"
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            return False, f"SSH not available or GitHub unreachable: {str(e)}"
+
+    ssh_ok, ssh_msg = check_github_ssh_access()
+    status = "✅" if ssh_ok else "❌"
+    print(f"{status} GitHub SSH: {ssh_msg}")
+    if not ssh_ok:
+        all_good = False
+        print("   💡 Configure your SSH according to the instructions in README.md")
 
     # Final verdict
     print("\n" + "=" * 50)
