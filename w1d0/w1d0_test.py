@@ -8,46 +8,11 @@ import sys
 from aisb_utils import report
 import requests
 from typing import Callable
-from dataclasses import dataclass
 import subprocess
 import importlib
 import sys
 import platform
-
-
-
-@report
-def test_analyze_user_behavior(solution: Callable[[str], object]):
-    """Test GitHub user analysis implementation."""
-    result = solution("pranavgade20")
-
-    # Basic structure tests
-    assert type(result).__name__ == "UserIntel", f"Expected UserIntel object, got {type(result)}"
-    assert result.username == "pranavgade20", f"Username should be 'pranavgade20', got {result.username}"
-
-    # Name should be populated for this public user
-    assert result.name is not None, "Expected name to be found for karpathy"
-    assert "Pranav" in result.name, f"Name is not correct, got {type(result.name)}"
-
-    # Repository list tests
-    assert isinstance(result.repo_names, list), f"repo_names should be list, got {type(result.repo_names)}"
-    assert len(result.repo_names) <= 5, f"Should return at most 5 repos, got {len(result.repo_names)}"
-    assert len(result.repo_names) > 0, "karpathy should have at least some public repositories"
-
-    # All repo names should be non-empty strings
-    for repo_name in result.repo_names:
-        assert isinstance(repo_name, str), f"Repo name should be string, got {type(repo_name)}"
-        assert len(repo_name) > 0, "Repo names should not be empty"
-
-    # Test with non-existent user
-    nonexistent_result = solution("this_user_definitely_does_not_exist_12345")
-    assert type(result).__name__ == "UserIntel", "Should return UserIntel even for non-existent users"
-    assert nonexistent_result.username == "this_user_definitely_does_not_exist_12345"
-    assert nonexistent_result.name is None, "Non-existent user should have None for name"
-    assert nonexistent_result.location is None, "Non-existent user should have None for location"
-    assert nonexistent_result.email is None, "Non-existent user should have None for email"
-    assert nonexistent_result.repo_names == [], "Non-existent user should have empty repo_names"
-
+from dataclasses import dataclass
 
 
 
@@ -172,3 +137,39 @@ def test_prerequisites():
     else:
         print("⚠️  Some prerequisites are missing. Please install them before proceeding.")
         print("💡 If using Dev Containers, make sure Docker is running and try reopening in container.")
+        assert False, "Prerequisites check failed. Please fix the issues above."
+
+
+
+
+@report
+def test_analyze_user_behavior(solution: Callable[[str], object]):
+    """Test GitHub user analysis implementation."""
+    result = solution("pranavgade20")
+
+    # Basic structure tests
+    assert type(result).__name__ == "UserIntel", f"Expected UserIntel object, got {type(result)}"
+    assert result.username == "pranavgade20", f"Username should be 'pranavgade20', got {result.username}"
+
+    # Name should be populated for this public user
+    assert result.name is not None, "Expected name to be found for karpathy"
+    assert "Pranav" in result.name, f"Name is not correct, got {type(result.name)}"
+
+    # Repository list tests
+    assert isinstance(result.repo_names, list), f"repo_names should be list, got {type(result.repo_names)}"
+    assert len(result.repo_names) <= 5, f"Should return at most 5 repos, got {len(result.repo_names)}"
+    assert len(result.repo_names) > 0, "karpathy should have at least some public repositories"
+
+    # All repo names should be non-empty strings
+    for repo_name in result.repo_names:
+        assert isinstance(repo_name, str), f"Repo name should be string, got {type(repo_name)}"
+        assert len(repo_name) > 0, "Repo names should not be empty"
+
+    # Test with non-existent user
+    nonexistent_result = solution("this_user_definitely_does_not_exist_12345")
+    assert type(result).__name__ == "UserIntel", "Should return UserIntel even for non-existent users"
+    assert nonexistent_result.username == "this_user_definitely_does_not_exist_12345"
+    assert nonexistent_result.name is None, "Non-existent user should have None for name"
+    assert nonexistent_result.location is None, "Non-existent user should have None for location"
+    assert nonexistent_result.email is None, "Non-existent user should have None for email"
+    assert nonexistent_result.repo_names == [], "Non-existent user should have empty repo_names"

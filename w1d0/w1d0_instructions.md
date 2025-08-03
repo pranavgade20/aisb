@@ -9,8 +9,8 @@ Welcome to the AI Security Bootcamp! Let's try a super simple exercise to test y
     - [2️⃣ Git Workflow Practice](#-git-workflow-practice)
 - [Exercise 1: Create a file](#exercise--create-a-file)
     - [Common code](#common-code)
-- [Exercise 2: Use requests library to make a GET request](#exercise--use-requests-library-to-make-a-get-request)
-- [Exercise 3: Test Prerequisites](#exercise--test-prerequisites)
+- [Exercise 2: Test Prerequisites](#exercise--test-prerequisites)
+- [Exercise 3: Use requests library to make a GET request](#exercise--use-requests-library-to-make-a-get-request)
 - [Exercise 4: Git Workflow Practice](#exercise--git-workflow-practice)
     - [Instructions](#instructions)
     - [Expected Results](#expected-results)
@@ -61,7 +61,25 @@ print("It works!")
 
 After you paste the code snippet above to your answer file, **run the cell to ensure it works.**
 
-## Exercise 2: Use requests library to make a GET request
+
+## Exercise 2: Test Prerequisites
+> **Difficulty**: 🔴⚪⚪⚪⚪
+> **Importance**: 🔵🔵🔵🔵🔵
+
+Let's verify that your development environment is properly set up with all the required tools and dependencies.
+
+Copy-paste the code snippet below and run it to check your setup.
+
+
+```python
+from w1d0_test import test_prerequisites
+
+
+# Run the prerequisite checks
+test_prerequisites()
+```
+
+## Exercise 3: Use requests library to make a GET request
 > **Difficulty**: 🔴⚪⚪⚪⚪
 > **Importance**: 🔵🔵⚪⚪⚪
 
@@ -164,23 +182,6 @@ return UserIntel(
 ```
 </blockquote></details>
 
-
-## Exercise 3: Test Prerequisites
-> **Difficulty**: 🔴⚪⚪⚪⚪
-> **Importance**: 🔵🔵🔵🔵🔵
-
-Let's verify that your development environment is properly set up with all the required tools and dependencies.
-
-Copy-paste the code snippet below and run it to check your setup.
-
-
-```python
-from w1d0_test import test_prerequisites
-
-
-# Run the prerequisite checks
-test_prerequisites()
-```
 
 ## Exercise 4: Git Workflow Practice
 > **Difficulty**: 🔴⚪⚪⚪⚪

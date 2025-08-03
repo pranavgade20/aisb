@@ -47,8 +47,148 @@ print("It works!")
 # %%
 """
 After you paste the code snippet above to your answer file, **run the cell to ensure it works.**
+"""
+# %%
+"""
+## Exercise 2: Test Prerequisites
+> **Difficulty**: 🔴⚪⚪⚪⚪
+> **Importance**: 🔵🔵🔵🔵🔵
 
-## Exercise 2: Use requests library to make a GET request
+Let's verify that your development environment is properly set up with all the required tools and dependencies.
+
+Copy-paste the code snippet below and run it to check your setup.
+"""
+
+
+def test_prerequisites():
+    import subprocess
+    import importlib
+    import sys
+    import platform
+
+    print("🔧 AI Security Bootcamp - Prerequisites Check")
+    print("=" * 50)
+
+    all_good = True
+
+    # Check Python version
+    def check_python_version() -> tuple[bool, str]:
+        """Check if Python version is >= 3.11."""
+        version = sys.version_info
+        current_version = f"{version.major}.{version.minor}.{version.micro}"
+        is_valid = version.major == 3 and version.minor >= 11
+        return is_valid, current_version
+
+    python_ok, python_version = check_python_version()
+    status = "✅" if python_ok else "❌"
+    print(f"{status} Python {python_version} {'(OK)' if python_ok else '(Need >= 3.11)'}")
+    if not python_ok:
+        all_good = False
+
+    # Check Docker
+    def check_docker_installed() -> bool:
+        """Check if Docker is installed and accessible or if we're running in a Dev Container."""
+        # Check if we're in a Dev Container (by checking if /workspaces exists)
+        if os.path.isdir("/workspaces"):
+            return True
+
+        # If not in a Dev Container, check if Docker is installed
+        try:
+            result = subprocess.run(["docker", "--version"], capture_output=True, text=True, timeout=10)
+            return result.returncode == 0
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return False
+
+    docker_ok = check_docker_installed()
+    status = "✅" if docker_ok else "❌"
+    print(f"{status} Docker {'installed' if docker_ok else 'NOT FOUND'}")
+    if not docker_ok:
+        all_good = False
+        print("   💡 Install Docker Desktop from https://www.docker.com/products/docker-desktop/")
+
+    # Check Git
+    def check_git_configured() -> tuple[bool, str]:
+        """Check if git is installed and has basic configuration."""
+        try:
+            # Check if git is installed
+            result = subprocess.run(["git", "--version"], capture_output=True, text=True, timeout=5)
+            if result.returncode != 0:
+                return False, "Git not installed"
+
+            # # Check if user name is configured
+            # result = subprocess.run(['git', 'config', 'user.name'], capture_output=True, text=True, timeout=5)
+            # if result.returncode != 0 or not result.stdout.strip():
+            #     return False, "Git user.name not configured"
+
+            # # Check if user email is configured
+            # result = subprocess.run(['git', 'config', 'user.email'], capture_output=True, text=True, timeout=5)
+            # if result.returncode != 0 or not result.stdout.strip():
+            #     return False, "Git user.email not configured"
+
+            # Check if pull.rebase is set to true
+            result = subprocess.run(["git", "config", "pull.rebase"], capture_output=True, text=True, timeout=5)
+            if result.returncode != 0 or result.stdout.strip().lower() != "true":
+                print("   💡 Configure with: git config pull.rebase true")
+                return False, "Git missing recommended configurations"
+
+            # Check if push.autoSetupRemote is set to true
+            result = subprocess.run(
+                ["git", "config", "push.autoSetupRemote"], capture_output=True, text=True, timeout=5
+            )
+            if result.returncode != 0 or result.stdout.strip().lower() != "true":
+                print("   💡 Configure with: git config --type bool push.autoSetupRemote true")
+                return False, "Git missing recommended configurations"
+
+            return True, "Git properly configured"
+
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return False, "Git not found"
+
+    git_ok, git_msg = check_git_configured()
+    status = "✅" if git_ok else "❌"
+    print(f"{status} Git: {git_msg}")
+    if not git_ok:
+        all_good = False
+    #     if "not installed" in git_msg:
+    #         print("   💡 Install Git from https://git-scm.com/downloads")
+    #     else:
+    #         print("   💡 Configure with: git config --global user.name 'Your Name'")
+    #         print("   💡 Configure with: git config --global user.email 'your.email@example.com'")
+
+    # Check Python packages
+    def check_required_packages() -> bool:
+        """Check if Python packages are installed."""
+        required_packages = ["requests", "cryptography"]
+        for package in required_packages:
+            try:
+                importlib.import_module(package)
+            except ImportError:
+                return False
+
+        return True
+
+    python_packages_installed = check_required_packages()
+    if python_packages_installed:
+        print("✅ Python requirements are installed")
+    else:
+        all_good = False
+        print("❌ Not all Python packages are installed")
+
+    # Final verdict
+    print("\n" + "=" * 50)
+    if all_good:
+        print("🎉 All prerequisites satisfied! You're ready for the bootcamp!")
+    else:
+        print("⚠️  Some prerequisites are missing. Please install them before proceeding.")
+        print("💡 If using Dev Containers, make sure Docker is running and try reopening in container.")
+        assert False, "Prerequisites check failed. Please fix the issues above."
+
+
+# Run the prerequisite checks
+test_prerequisites()
+# %%
+"""
+## Exercise 3: Use requests library to make a GET request
 > **Difficulty**: 🔴⚪⚪⚪⚪
 > **Importance**: 🔵🔵⚪⚪⚪
 
@@ -205,144 +345,6 @@ return UserIntel(
 ```
 </details>
 """
-# %%
-"""
-## Exercise 3: Test Prerequisites
-> **Difficulty**: 🔴⚪⚪⚪⚪
-> **Importance**: 🔵🔵🔵🔵🔵
-
-Let's verify that your development environment is properly set up with all the required tools and dependencies.
-
-Copy-paste the code snippet below and run it to check your setup.
-"""
-
-
-def test_prerequisites():
-    import subprocess
-    import importlib
-    import sys
-    import platform
-
-    print("🔧 AI Security Bootcamp - Prerequisites Check")
-    print("=" * 50)
-
-    all_good = True
-
-    # Check Python version
-    def check_python_version() -> tuple[bool, str]:
-        """Check if Python version is >= 3.11."""
-        version = sys.version_info
-        current_version = f"{version.major}.{version.minor}.{version.micro}"
-        is_valid = version.major == 3 and version.minor >= 11
-        return is_valid, current_version
-
-    python_ok, python_version = check_python_version()
-    status = "✅" if python_ok else "❌"
-    print(f"{status} Python {python_version} {'(OK)' if python_ok else '(Need >= 3.11)'}")
-    if not python_ok:
-        all_good = False
-
-    # Check Docker
-    def check_docker_installed() -> bool:
-        """Check if Docker is installed and accessible or if we're running in a Dev Container."""
-        # Check if we're in a Dev Container (by checking if /workspaces exists)
-        if os.path.isdir("/workspaces"):
-            return True
-
-        # If not in a Dev Container, check if Docker is installed
-        try:
-            result = subprocess.run(["docker", "--version"], capture_output=True, text=True, timeout=10)
-            return result.returncode == 0
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            return False
-
-    docker_ok = check_docker_installed()
-    status = "✅" if docker_ok else "❌"
-    print(f"{status} Docker {'installed' if docker_ok else 'NOT FOUND'}")
-    if not docker_ok:
-        all_good = False
-        print("   💡 Install Docker Desktop from https://www.docker.com/products/docker-desktop/")
-
-    # Check Git
-    def check_git_configured() -> tuple[bool, str]:
-        """Check if git is installed and has basic configuration."""
-        try:
-            # Check if git is installed
-            result = subprocess.run(["git", "--version"], capture_output=True, text=True, timeout=5)
-            if result.returncode != 0:
-                return False, "Git not installed"
-
-            # # Check if user name is configured
-            # result = subprocess.run(['git', 'config', 'user.name'], capture_output=True, text=True, timeout=5)
-            # if result.returncode != 0 or not result.stdout.strip():
-            #     return False, "Git user.name not configured"
-
-            # # Check if user email is configured
-            # result = subprocess.run(['git', 'config', 'user.email'], capture_output=True, text=True, timeout=5)
-            # if result.returncode != 0 or not result.stdout.strip():
-            #     return False, "Git user.email not configured"
-
-            # Check if pull.rebase is set to true
-            result = subprocess.run(["git", "config", "pull.rebase"], capture_output=True, text=True, timeout=5)
-            if result.returncode != 0 or result.stdout.strip().lower() != "true":
-                print("   💡 Configure with: git config pull.rebase true")
-                return False, "Git missing recommended configurations"
-
-            # Check if push.autoSetupRemote is set to true
-            result = subprocess.run(
-                ["git", "config", "push.autoSetupRemote"], capture_output=True, text=True, timeout=5
-            )
-            if result.returncode != 0 or result.stdout.strip().lower() != "true":
-                print("   💡 Configure with: git config --type bool push.autoSetupRemote true")
-                return False, "Git missing recommended configurations"
-
-            return True, "Git properly configured"
-
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            return False, "Git not found"
-
-    git_ok, git_msg = check_git_configured()
-    status = "✅" if git_ok else "❌"
-    print(f"{status} Git: {git_msg}")
-    if not git_ok:
-        all_good = False
-    #     if "not installed" in git_msg:
-    #         print("   💡 Install Git from https://git-scm.com/downloads")
-    #     else:
-    #         print("   💡 Configure with: git config --global user.name 'Your Name'")
-    #         print("   💡 Configure with: git config --global user.email 'your.email@example.com'")
-
-    # Check Python packages
-    def check_required_packages() -> bool:
-        """Check if Python packages are installed."""
-        required_packages = ["requests", "cryptography"]
-        for package in required_packages:
-            try:
-                importlib.import_module(package)
-            except ImportError:
-                return False
-
-        return True
-
-    python_packages_installed = check_required_packages()
-    if python_packages_installed:
-        print("✅ Python requirements are installed")
-    else:
-        all_good = False
-        print("❌ Not all Python packages are installed")
-
-    # Final verdict
-    print("\n" + "=" * 50)
-    if all_good:
-        print("🎉 All prerequisites satisfied! You're ready for the bootcamp!")
-    else:
-        print("⚠️  Some prerequisites are missing. Please install them before proceeding.")
-        print("💡 If using Dev Containers, make sure Docker is running and try reopening in container.")
-        assert False, "Prerequisites check failed. Please fix the issues above."
-
-
-# Run the prerequisite checks
-test_prerequisites()
 
 # %%
 """
