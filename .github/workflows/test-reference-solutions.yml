@@ -1,0 +1,59 @@
+name: Test Reference Solutions
+
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+
+jobs:
+  test-references:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        
+    - name: Setup prerequisites
+      run: |
+        python -m pip install --upgrade pip
+        bash .devcontainer/setup-devcontainer.sh
+        
+    - name: Build reference solutions
+      run: python aisb_utils/build_instructions.py --reference --force
+      
+    - name: Test all reference solutions
+      timeout-minutes: 15
+      run: |
+        failed_files=()
+        for ref_file in $(find . -name "*_reference.py" -type f | sort); do
+          if echo "$ref_file" | grep -q -E "(w2d2|w2d4|w1d5)/"; then
+            echo "Skipping $ref_file" # Tested separately
+            continue
+          fi
+          echo "Testing $ref_file"
+          if timeout 300 python "$ref_file"; then
+            echo "✓ $ref_file passed"
+          else
+            echo "✗ $ref_file failed"
+            failed_files+=("$ref_file")
+          fi
+        done
+        
+        echo ""
+        echo "=== Test Results ==="
+        if [ ${#failed_files[@]} -eq 0 ]; then
+          echo "All reference files passed!"
+        else
+          echo "Failed files:"
+          for file in "${failed_files[@]}"; do
+            echo "  - $file"
+          done
+          echo ""
+          echo "Total failures: ${#failed_files[@]}"
+          exit 1
+        fi
