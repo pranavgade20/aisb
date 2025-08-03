@@ -95,7 +95,7 @@ We recommend you save your progress for each day (the answer files you will crea
 
 First, download an ssh key that will allow you to push and configure git:
 
-1. Download the `aisb_ssh` key file [from Discord](https://discord.com/channels/1392326887677886615/1395487509341016114/1401621235116277832) and place it the `./ssh/` directory of your local clone of this repo (i.e., if you cloned into `~/aisb`, the save it to `~/aisb/ssh/aisb_ssh` file)
+1. Download the `aisb_ssh` key file [from Discord](https://discord.com/channels/1392326887677886615/1395487509341016114/1401621235116277832) (the `aisb_ssh` attachment) and place it the `./ssh/` directory of your local clone of this repo (i.e., if you cloned into `~/aisb`, the save it to `~/aisb/ssh/aisb_ssh` file)
 2. If you are using Dev Containers, you're git config will be updated automatically. If you're not or the automatic configuration didn't work for any reason, run these commands manually:
 
     ```bash
