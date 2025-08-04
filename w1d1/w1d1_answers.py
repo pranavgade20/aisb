@@ -368,3 +368,62 @@ test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
 
 
 # %%
+# Excercise 2.5
+
+
+def des_encrypt(key: int, plaintext: bytes) -> bytes:
+    """Encrypt bytes using DES"""
+    k1, k2 = key_schedule(key, P10, P8)
+    return bytes(encrypt_byte(b, k1, k2, IP, IP_INV, EP, S0, S1, P4) for b in plaintext)
+
+
+def des_decrypt(key: int, ciphertext: bytes) -> bytes:
+    """Decrypt bytes using DES."""
+    k1, k2 = key_schedule(key, P10, P8)
+    # Note: reversed key order for decryption!
+    return bytes(encrypt_byte(b, k2, k1, IP, IP_INV, EP, S0, S1, P4) for b in ciphertext)
+
+
+def double_encrypt(key1: int, key2: int, plaintext: bytes) -> bytes:
+    """Encrypt twice with different keys."""
+    temp = des_encrypt(key1, plaintext)
+    return des_encrypt(key2, temp)
+
+
+def double_decrypt(key1: int, key2: int, ciphertext: bytes) -> bytes:
+    """Decrypt twice with different keys (reverse order)."""
+    temp = des_decrypt(key2, ciphertext)
+    return des_decrypt(key1, temp)
+
+
+def meet_in_the_middle_attack(plaintext: bytes, ciphertext: bytes) -> List[Tuple[int, int]]:
+    """
+    Find all key pairs (k1, k2) such that:
+    double_encrypt(k1, k2, plaintext) == ciphertext
+
+    Strategy:
+    1. Build table: for each k1, compute encrypt(k1, plaintext)
+    2. For each k2, compute decrypt(k2, ciphertext)
+    3. If decrypt(k2, ciphertext) is in our table, we found a match!
+
+    Args:
+        plaintext: Known plaintext
+        ciphertext: Corresponding ciphertext from double encryption
+
+    Returns:
+        List of (key1, key2) pairs that work
+    """
+    # TODO: Implement meet-in-the-middle attack
+    #    - Build table of all encrypt(k1, plaintext)
+    #    - For each k2, check if decrypt(k2, ciphertext) is in table
+    #    - Return all matching (k1, k2) pairs
+
+    forward_table = {}
+    for k1 in range(1024):
+        intermediate = des_encrypt(k1, plaintext)
+        # Store k1 values that produce this intermediate
+        forward_table[k1] = intermediate
+    for k2 in range(1024):
+        intermediate = des_decrypt(k2, ciphertext)
+
+    pass
