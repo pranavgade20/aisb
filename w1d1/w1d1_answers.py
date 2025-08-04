@@ -501,9 +501,11 @@ test_sbox_lookup(sbox_lookup, S0, S1)
 
 
 # %%
+
+
 def fk(
-    left: int, right: int, subkey: int, ep: list[int], s0: list[list[int]], s1: list[list[int]], p4: list[int]
-) -> tuple[int, int]:
+    left: int, right: int, subkey: int, ep: List[int], s0: List[List[int]], s1: List[List[int]], p4: List[int]
+) -> Tuple[int, int]:
     """
     Apply the Feistel function to one round of DES.
 
@@ -527,26 +529,28 @@ def fk(
     Returns:
         Tuple of (new_left, right) - right is unchanged
     """
-    # TODO: Implement Feistel function
-    #    - Expand right using E/P
-    #    - XOR with subkey
-    #    - Apply S-boxes to each half
-    #    - Combine outputs and apply P4
-    #    - XOR with left to get new left
-    exp_right = permute_expand(right, ep, 4)
-    xor_exp_right = exp_right ^ subkey
-    l = xor_exp_right >> 4
-    r = xor_exp_right - (l << 4)
+    # Step 1: Expand right half
+    expanded = permute_expand(right, ep, 4)
 
-    sbox_left = sbox_lookup(s0, l)
-    sbox_right = sbox_lookup(s1, r)
+    # Step 2: XOR with subkey
+    expanded ^= subkey
 
-    combined_sbox = (sbox_left << 4) + sbox_right
-    p4_combined_sbox = permute_expand(combined_sbox, p4, 8)
+    # Step 3: Split for S-boxes
+    left_half = expanded >> 4  # Upper 4 bits
+    right_half = expanded & 0xF  # Lower 4 bits
 
-    new_left = left ^ p4_combined_sbox
+    # Step 4: S-box substitution
+    s0_out = sbox_lookup(s0, left_half)
+    s1_out = sbox_lookup(s1, right_half)
 
-    return (new_left, right)
+    # Step 5: Combine and permute
+    combined = (s0_out << 2) | s1_out  # S0 output is upper 2 bits
+    p4_out = permute_expand(combined, p4, 4)
+
+    # Step 6: XOR with left half
+    new_left = left ^ p4_out
+
+    return new_left, right
 
 
 from w1d1_test import test_feistel
