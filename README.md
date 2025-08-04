@@ -18,7 +18,7 @@ If using VS Code base IDE, we recommend using the Dev Containers feature. This w
 
 - Install [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
     - (Use `anysphere.remote-containers` if you're using Cursor)
-- Open Command Palette (press `F1` or select `View -> Command Palette`) and select `Dev Containers: Open Folder in Container`
+- In the VS Code IDE, open Command Palette (press `F1` or select `View -> Command Palette`) and select `Dev Containers: Open Folder in Container`
 - Select the directory with cloned `pranavgade20/aisb` repo. This step may take some time to complete.
 
 If you have problems with this setup on Windows, you can check out [these tips](https://code.visualstudio.com/docs/devcontainers/tips-and-tricks#_docker-desktop-for-windows-tips).

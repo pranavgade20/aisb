@@ -149,8 +149,6 @@ We'll use the parameters from Numerical Recipes (a popular choice):
 Implement the `lcg_keystream` function that generates a stream of bytes using the LCG algorithm.
 """
 
-from typing import Generator
-
 
 def lcg_keystream(seed: int) -> Generator[int, None, None]:
     """
@@ -951,7 +949,6 @@ You will also implement 2DES and an attack that demonstrates why doubling the ro
 - **Key Schedule**: Derives two 8-bit subkeys from the 10-bit main key
 """
 import random
-from typing import List, Tuple
 
 _params_rng = random.Random(0)
 P10 = list(range(10))
@@ -2284,7 +2281,7 @@ test_ecb_mode(aes_encrypt, aes_decrypt, SBOX, PBOX, INV_SBOX, INV_PBOX)
 # %%
 """
 ## Further reading
-If you'd like to learn more about real-world attacks, you can read, e.g., about [attacks on the RC4 stream cipher](https://en.wikipedia.org/wiki/RC4#Security). This algorithm was widely used in protocols like TLS and WEP, but it has several vulnerabilities that make it insecure for modern use. A notable attack on RC4 is the [Fluhrer, Mantin, and Shamir attack](https://en.wikipedia.org/wiki/Fluhrer,_Mantin_and_Shamir_attack), which exploits the surprising finding thatthe statistics for the first few bytes of output keystream are strongly non-random.
+If you'd like to learn more about real-world attacks, you can read, e.g., about [attacks on the RC4 stream cipher](https://en.wikipedia.org/wiki/RC4#Security). This algorithm was widely used in protocols like TLS and WEP, but it has several vulnerabilities that make it insecure for modern use. A notable attack on RC4 is the [Fluhrer, Mantin, and Shamir attack](https://en.wikipedia.org/wiki/Fluhrer,_Mantin_and_Shamir_attack), which exploits the surprising finding that the statistics for the first few bytes of output keystream are strongly non-random.
 
 
 
