@@ -214,3 +214,117 @@ from w1d1_test import test_crib_drag
 correct_position = test_crib_drag(crib_drag, ciphertext1, ciphertext2)
 
 # %%
+
+
+def recover_seed(ciphertext: bytes, known_plaintext: bytes, position: int) -> int:
+    """
+    Recover the original LCG seed from a known plaintext fragment at a specific position.
+
+    This function recovers keystream bytes at the given position, finds the LCG state
+    that produced them, then reverses the LCG to find the original seed.
+
+    Args:
+        ciphertext: The ciphertext containing the known plaintext
+        known_plaintext: The known plaintext fragment
+        position: The position where known_plaintext appears in the original message
+
+    Returns:
+        The original seed used to encrypt the message
+    """
+    a = 1664525
+    c = 1013904223
+    m = 2**32
+    # TODO: Implement seed recovery
+    #   - Use the known plaintext to recover keystream bytes at the given position
+    #   - Call recover_lcg_state(keystream_bytes) to get the seed that produces these bytes
+    #   - note that the seed at this position is the same as the state - so you can reverse the LCG 'position' times to get back to the original seed
+    #
+    # Hints:
+    # 1. Recover keystream bytes at position:
+    #    keystream[i] = ciphertext[position+i] XOR known_plaintext[i]
+    # 2. Call recover_lcg_state(keystream) to get the seed that produces these bytes
+    # 3. Reverse the LCG 'position' times to get back to the original seed:
+    #    - a_inv = pow(a, -1, m)
+    #    - state = ((state - c) * a_inv) % m
+    # 4. Return the original seed
+
+    keystream = []
+
+    for i in range(len(known_plaintext) - position):
+        keystream.append(ciphertext[position + i] ^ known_plaintext[i])
+
+    keystream = bytes(keystream)
+
+    state = recover_lcg_state(keystream)
+
+    for i in range(position):
+        a_inv = pow(a, -1, m)
+        state = ((state - c) * a_inv) % m
+
+    return state
+
+
+from w1d1_test import test_recover_seed
+
+
+test_recover_seed(recover_seed, lcg_decrypt, ciphertext1, correct_position)
+
+# %%
+
+
+def recover_messages(
+    ciphertext1: bytes, ciphertext2: bytes, known_plaintext: bytes, position: int
+) -> tuple[bytes, bytes]:
+    """
+    Recover both messages using a known plaintext fragment.
+
+    Args:
+        ciphertext1: First ciphertext (contains known_plaintext)
+        ciphertext2: Second ciphertext
+        known_plaintext: Known fragment from message1
+        position: Position of known_plaintext in message1
+
+    Returns:
+        Tuple of (recovered_message1, recovered_message2)
+    """
+    # TODO: Implement message recovery using recover_seed
+    #   - Call recover_seed to get the original seed
+    #   - Use decrypt to get both messages
+    #
+    # Hints:
+    # 1. Call recover_seed(ciphertext1, known_plaintext, position) to get the original seed
+    # 2. Use decrypt(seed, ciphertext1) and decrypt(seed, ciphertext2) to decrypt both messages
+    # 3. Verify that known_plaintext appears in msg1 at the expected position:
+    #    msg1[position:position+len(known_plaintext)] == known_plaintext
+    # 4. Return (msg1, msg2) if successful, or (b"", b"") if verification fails
+
+    # positions = crib_drag(ciphertext1, ciphertext2, known_plaintext)
+
+    seed = recover_seed(ciphertext1, known_plaintext, position)
+    msg1 = lcg_decrypt(seed, ciphertext1)
+    msg2 = lcg_decrypt(seed, ciphertext2)
+
+    if msg1[position : position + len(known_plaintext)] == known_plaintext:
+        return msg1, msg2
+
+    return b"", b""
+
+
+# Perform the full attack
+print("\nPerforming full message recovery...")
+recovered_msg1, recovered_msg2 = recover_messages(
+    ciphertext1, ciphertext2, b"linear congruential generator", correct_position
+)
+
+if recovered_msg1 and recovered_msg2:
+    print("\n" + "=" * 60)
+    print("RECOVERED MESSAGES:")
+    print("\nMessage 1:")
+    print(recovered_msg1.decode())
+    print("\nMessage 2:")
+    print(recovered_msg2.decode())
+    print("\n" + "=" * 60)
+else:
+    print("\nMessage recovery failed!")
+
+# %%
