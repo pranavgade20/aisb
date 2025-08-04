@@ -158,7 +158,6 @@ from w1d1_test import test_lcg_state_recovery
 
 test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
 # %%
-# %%
 
 
 from w1d1_stream_cipher_secrets import intercept_messages
@@ -167,7 +166,10 @@ ciphertext1, ciphertext2 = intercept_messages(lcg_encrypt)
 print(f"Intercepted ciphertext 1 ({len(ciphertext1)} bytes): {ciphertext1[:50].hex()}...")
 print(f"Intercepted ciphertext 2 ({len(ciphertext2)} bytes): {ciphertext2[:50].hex()}...")
 
+
 # %%
+def byte_xor(byte1: bytes, byte2: bytes):
+    return bytes(a ^ b for a, b in zip(byte1, byte2))
 
 
 def crib_drag(ciphertext1: bytes, ciphertext2: bytes, crib: bytes) -> list[tuple[int, bytes]]:
@@ -194,10 +196,21 @@ def crib_drag(ciphertext1: bytes, ciphertext2: bytes, crib: bytes) -> list[tuple
     #    b. Check if result is readable (all bytes are printable ASCII: 32-126)
     #    c. If readable, add (position, recovered_text) to results
     # 3. Return results list
-    pass
+    xor_c = byte_xor(ciphertext1, ciphertext2)
+    delta = len(crib)
+    output = []
+
+    for i in range(len(xor_c) - delta):
+        slice = xor_c[i : i + delta]
+        xor_slice = byte_xor(slice, crib)
+        if all(32 <= c <= 126 for c in xor_slice):
+            output.append((i, xor_slice))
+    return output
 
 
 from w1d1_test import test_crib_drag
 
 
 correct_position = test_crib_drag(crib_drag, ciphertext1, ciphertext2)
+
+# %%
