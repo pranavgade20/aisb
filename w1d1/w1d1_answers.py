@@ -389,4 +389,63 @@ from w1d1_test import test_des_complete
 
 # Run the test
 test_des_complete(encrypt_byte, des_encrypt, des_decrypt, key_schedule, P10, P8, IP, IP_INV, EP, S0, S1, P4)
+
+
+# %%
+def double_encrypt(key1: int, key2: int, plaintext: bytes) -> bytes:
+    """Encrypt twice with different keys."""
+    temp = des_encrypt(key1, plaintext)
+    return des_encrypt(key2, temp)
+
+
+def double_decrypt(key1: int, key2: int, ciphertext: bytes) -> bytes:
+    """Decrypt twice with different keys (reverse order)."""
+    temp = des_decrypt(key2, ciphertext)
+    return des_decrypt(key1, temp)
+
+
+def meet_in_the_middle_attack(plaintext: bytes, ciphertext: bytes) -> List[Tuple[int, int]]:
+    """
+    Find all key pairs (k1, k2) such that:
+    double_encrypt(k1, k2, plaintext) == ciphertext
+
+    Strategy:
+    1. Build table: for each k1, compute encrypt(k1, plaintext)
+    2. For each k2, compute decrypt(k2, ciphertext)
+    3. If decrypt(k2, ciphertext) is in our table, we found a match!
+
+    Args:
+        plaintext: Known plaintext
+        ciphertext: Corresponding ciphertext from double encryption
+
+    Returns:
+        List of (key1, key2) pairs that work
+    """
+    # Implement meet-in-the-middle attack:
+    working_pairs = []
+    #    - Build table of all encrypt(k1, plaintext)
+    table = {}
+    for k1 in range(2**10):
+        e_bytes = des_encrypt(k1, plaintext)
+        e = int.from_bytes(e_bytes, "big")
+        if e not in table:
+            table[e] = []
+        table[e].append(k1)
+    #    - For each k2, check if decrypt(k2, ciphertext) is in table
+    for k2 in range(2**10):
+        d_bytes = des_decrypt(k2, ciphertext)
+        d = int.from_bytes(d_bytes, "big")
+        if d in table:
+            k1s = table[d]
+            for k1 in k1s:
+                working_pairs.append((k1, k2))
+    #    - Return all matching (k1, k2) pairs
+    return working_pairs
+
+# %%
+from w1d1_test import test_meet_in_the_middle
+
+
+# Run the test
+test_meet_in_the_middle(meet_in_the_middle_attack, double_encrypt)
 # %%
