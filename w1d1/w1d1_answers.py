@@ -882,3 +882,124 @@ from w1d1_test import test_block_cipher
 
 # Run the test
 test_block_cipher(encrypt_block, decrypt_block, round_keys, SBOX, PBOX, INV_SBOX, INV_PBOX)
+
+# %%
+
+
+def aes_encrypt(key: int, plaintext: bytes, sbox: List[int], pbox: List[int]) -> bytes:
+    """
+    Encrypt a message using ECB mode with our 16-bit block cipher.
+
+    Process:
+    1. Generate round keys from the main key
+    2. Pad the message if necessary (with null bytes)
+    3. Split into 2-byte blocks
+    4. Encrypt each block
+    5. Concatenate results (truncate padding if needed)
+
+    Args:
+        key: Encryption key (used as seed for round key generation)
+        plaintext: Bytes to encrypt
+        sbox: S-box for substitution
+        pbox: P-box for permutation
+
+    Returns:
+        Encrypted bytes (same length as plaintext)
+    """
+    # TODO: Implement ECB encryption
+    #    - Generate round keys using round_keys()
+    #    - Handle padding if message length is odd
+    #    - Process each 2-byte block
+    #    - Return result truncated to original length
+    keys = round_keys(key)
+    result = bytes()
+    padding = False
+    if len(plaintext) % 2 != 0:
+        plaintext = bytes([0]) + plaintext
+        padding = True
+
+    blocks = []
+    for i in range(0, len(plaintext), 2):
+        blocks.append(int.from_bytes(plaintext[i : i + 2]))
+
+    encrypted_blocks = []
+    for block in blocks:
+        encrypted_blocks.append(
+            encrypt_block(
+                block,
+                keys,
+                sbox,
+                pbox,
+            )
+        )
+
+    for block in encrypted_blocks:
+        result += bytes([block >> 8, block - ((block >> 8) << 8)])
+
+    if padding:
+        result = result[1:]
+
+    return result
+
+
+def aes_decrypt(key: int, ciphertext: bytes, inv_sbox: List[int], inv_pbox: List[int]) -> bytes:
+    """
+    Decrypt a message using ECB mode with our 16-bit block cipher.
+
+    Process:
+    1. Generate round keys from the main key
+    2. Pad the ciphertext if necessary
+    3. Split into 2-byte blocks
+    4. Decrypt each block
+    5. Concatenate results (truncate padding if needed)
+
+    Args:
+        key: Decryption key (same as encryption key)
+        ciphertext: Bytes to decrypt
+        inv_sbox: Inverse S-box for substitution
+        inv_pbox: Inverse P-box for permutation
+
+    Returns:
+        Decrypted bytes (same length as ciphertext)
+    """
+    # TODO: Implement ECB decryption
+    #    - Similar to encryption but use decrypt_block
+    #    - Remember to use inverse S-box and P-box
+    keys = round_keys(key)
+    result = bytes()
+    padding = False
+    if len(ciphertext) % 2 != 0:
+        ciphertext = bytes([0]) + ciphertext
+        padding = True
+
+    blocks = []
+    for i in range(0, len(ciphertext), 2):
+        blocks.append(int.from_bytes(ciphertext[i : i + 2]))
+
+    encrypted_blocks = []
+    for block in blocks:
+        encrypted_blocks.append(
+            decrypt_block(
+                block,
+                keys,
+                inv_sbox,
+                inv_pbox,
+            )
+        )
+
+    for block in encrypted_blocks:
+        result += bytes([block >> 8, block - ((block >> 8) << 8)])
+
+    if padding:
+        result = result[1:]
+
+    return result
+
+
+from w1d1_test import test_ecb_mode
+
+
+# Run the test
+test_ecb_mode(aes_encrypt, aes_decrypt, SBOX, PBOX, INV_SBOX, INV_PBOX)
+
+# %%
