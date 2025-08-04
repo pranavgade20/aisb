@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Install requirements
-pip3 install --user -r requirements.txt
-
 # Configure Git
 git remote set-url origin git@github.com:pranavgade20/aisb.git
 git config pull.rebase true
@@ -16,6 +13,7 @@ EOF
 # Set up SSH for GitHub
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
+[ -f "/mnt/ssh/aisb_ssh" ] && chmod 600 /mnt/ssh/aisb_ssh
 
 # Create SSH config for GitHub
 cat > ~/.ssh/config << EOL
@@ -27,6 +25,7 @@ Host github.com
 EOL
 
 chmod 600 ~/.ssh/config
+
 
 # Add GitHub to known hosts to avoid prompts
 ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts

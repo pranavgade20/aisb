@@ -1,0 +1,7 @@
+.git/
+__pycache__/
+.mypy_cache/
+.venv/
+.pytest_cache/
+__pycache__
+ssh/
