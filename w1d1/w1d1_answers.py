@@ -3,6 +3,7 @@
 import os
 import sys
 from typing import Generator, List, Tuple, Callable
+import numpy as np
 
 # Allow imports from parent directory
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -37,7 +38,7 @@ def lcg_keystream(seed: int) -> Generator[int, None, None]:
     m = 2**32
     while True:
         seed = (a * seed + c) % m
-        print(seed)
+        seed = seed & 0xFF
         yield seed
 
 
@@ -45,4 +46,57 @@ from w1d1_test import test_lcg_keystream
 
 
 test_lcg_keystream(lcg_keystream)
+
+
+def lcg_encrypt(seed: int, plaintext: bytes) -> bytes:
+    """
+    Encrypt plaintext using the LCG keystream.
+
+    Stream cipher encryption: ciphertext = plaintext XOR keystream
+
+    Args:
+        seed: Seed for the keystream generator.
+        plaintext: Data to encrypt.
+
+    Returns:
+        Ciphertext as bytes.
+    """
+    # TODO: Implement stream cipher encryption
+    #   - XOR each byte of plaintext with the bytes from lcg_keystream
+    #   - return the resulting ciphertext as bytes
+    keystream = lcg_keystream(seed)
+    return bytes(byte ^ next(keystream) for byte in plaintext)
+
+
+from w1d1_test import test_encrypt
+
+
+test_encrypt(lcg_encrypt)
+
+
 # %%
+def lcg_decrypt(seed: int, ciphertext: bytes) -> bytes:
+    """
+    Decrypt ciphertext using the same LCG keystream.
+
+    In stream ciphers, decryption is the same operation as encryption!
+
+    Args:
+        seed: Seed for the keystream generator.
+        ciphertext: Data to decrypt.
+
+    Returns:
+        Decrypted plaintext.
+    """
+    # TODO: Implement stream cipher decryption
+    pass
+
+
+from w1d1_test import test_decrypt
+
+
+test_decrypt(lcg_decrypt)
+from w1d1_test import test_stream_cipher
+
+
+test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
