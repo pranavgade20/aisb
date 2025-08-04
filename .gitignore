@@ -107,3 +107,5 @@ cython_debug/
 .venv/
 *_reference.py
 db.sqlite3
+
+ssh
