@@ -196,19 +196,28 @@ def permute_expand(value: int, table: List[int], in_width: int) -> int:
         - Output bit 2 comes from input bit 3 (which is 0)
         - Output bit 3 comes from input bit 1 (which is 0)
     """
+    # out = 0
+    # for output_pos, input_bit in enumerate(table):
+    #     # Extract bit from source position
+    #     amount_to_shift_value_right = in_width - 1 - input_bit
+    #     value_shifted_right = value >> amount_to_shift_value_right
+    #     bit = value_shifted_right & 1
+
+    #     # Place it at destination position
+    #     amount_to_shift_bit_left = len(table) - 1 - output_pos
+    #     bit_shifted_left = bit << amount_to_shift_bit_left
+    #     out |= bit_shifted_left
+
+    # return out
+
     out = 0
-    for output_pos, input_bit in enumerate(table):
+    for i, src in enumerate(table):
         # Extract bit from source position
-        amount_to_shift_value_right = in_width - 1 - input_bit
-        value_shifted_right = value >> amount_to_shift_value_right
-        bit = value_shifted_right & 1
-
+        bit = (value >> (in_width - 1 - src)) & 1
         # Place it at destination position
-        amount_to_shift_bit_left = len(table) - 1 - output_pos
-        bit_shifted_left = bit << amount_to_shift_bit_left
-        out |= bit_shifted_left
-
+        out |= bit << (len(table) - 1 - i)
     return out
+
     # result = 0
     # for output_pos, input_bit in enumerate(table):
     #     print(f"     {value:032b}")
@@ -285,21 +294,29 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
     #    - Apply P10 permutation
     permuted = permute_expand(key, p10, 10)
     #    - Split into 5-bit halves
-    left_half = 0b1111100000 | key
-    right_half = 0b0000011111 | key
+    left_half = (0b1111100000 | permuted) >> 5
+    right_half = 0b0000011111 | permuted
     #    - Generate K1
     #       - Left shift both halves by 1 (LS-1)
     shifted_left_half = left_shift(left_half, 1, 5)
-    shifted_right_half
+    shifted_right_half = left_shift(right_half, 1, 5)
     #       - Combine and apply P8
+    combined = (shifted_left_half << 5) | shifted_right_half
+    K1 = permute_expand(combined, p8, 8)
     #    - Generate K2
     #       - Left shift both halves by 2 (LS-2, for total LS-3)
+    shifted_left_half = left_shift(shifted_left_half, 2, 5)
+    shifted_right_half = left_shift(shifted_right_half, 2, 5)
     #       - Combine and apply P8
+    combined = (shifted_left_half << 5) | shifted_right_half
+    K2 = permute_expand(combined, p8, 8)
     #    - you might want to implement left_shift as a helper function
     #       - for example, left_shift 0b10101 by 1 gives 0b01011
-    pass
+    return(K1, K2)
 from w1d1_test import test_key_schedule
 
 
 # Run the test
-# test_key_schedule(key_schedule, P10, P8)
+test_key_schedule(key_schedule, P10, P8)
+
+# %%
