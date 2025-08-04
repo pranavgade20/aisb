@@ -1,4 +1,3 @@
-
 # %%
 
 # Ensure the root directory is in the path for imports
@@ -14,9 +13,61 @@ from typing import Callable
 
 print("It works!")
 
-#%%
+# %%
 from w1d0_test import test_prerequisites
-
 
 # Run the prerequisite checks
 test_prerequisites()
+
+# %%
+
+from dataclasses import dataclass
+
+
+@dataclass
+class UserIntel:
+    username: str
+    name: str | None
+    location: str | None
+    email: str | None
+    repo_names: list[str]
+
+
+def analyze_user_behavior(username: str = "karpathy") -> UserIntel:
+    """
+    Analyze a user's GitHub activity patterns.
+    This is the kind of profiling attackers might do for social engineering.
+
+    Returns:
+        The user's name, location, email, and 5 most recently updated repos.
+    """
+    # TODO: Return information about the given GitHub user
+    # 1. Make a GET request to: https://api.github.com/users/{username}
+    # 2. Extract name, location, and email from the response
+    # 3. Make another GET request to: https://api.github.com/users/{username}/repos?sort=updated&per_page=5
+    # 4. Extract repository names (limit to 5)
+    # 5. Return a UserIntel object with the gathered information
+
+    user_response = requests.get(f"https://api.github.com/users/{username}")
+    if user_response.status_code != 200:
+        return UserIntel(username=username, name=None, location=None, email=None, repo_names=[])
+    user_dict = user_response.json()
+
+    name = user_dict.get("name")
+    location = user_dict.get("location")
+    email = user_dict.get("email")
+    repos_response = requests.get(f"https://api.github.com/users/{username}/repos?sort=updated&per_page=5")
+    if repos_response.status_code != 200:
+        return UserIntel(username=username, name=name, location=location, email=email, repo_names=[])
+    repos_dicts = repos_response.json()[:5]
+    repo_names = [repo['name'] for repo in repos_dicts]
+    return UserIntel(username=username, name=name,   location=location, email=email, repo_names=repo_names)
+
+
+from w1d0_test import test_analyze_user_behavior
+
+# analyze_user_behavior()
+
+test_analyze_user_behavior(analyze_user_behavior)
+
+# %%
