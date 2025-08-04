@@ -238,7 +238,7 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
     #    - Apply P10 permutation
     key_p10 = permute_expand(key, p10, 10)
     #    - Split into 5-bit halves
-    left_raw = key_p10 & (31 << 5)
+    left_raw = (key_p10 >> 5) & 31
     right_raw = key_p10 & 31
     #    - Generate K1
     #       - Left shift both halves by 1 (LS-1)
@@ -340,7 +340,7 @@ def fk(
     rl_sbox = sbox_lookup(s0, rl)
     rr_sbox = sbox_lookup(s1, rr)
     #    - Combine outputs and apply P4
-    r_combined = (rl << 15) | rr
+    r_combined = (rl_sbox << 15) | rr_sbox
     r_p4 = permute_expand(r_combined, p4, 4)
     #    - XOR with left to get new left
     new_left = left ^ r_p4
