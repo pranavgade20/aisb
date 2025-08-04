@@ -370,4 +370,84 @@ from w1d1_test import test_permute_expand
 # Run the test
 test_permute_expand(permute_expand)
 
+
+# %%
+import random
+
+_params_rng = random.Random(0)
+P10 = list(range(10))
+_params_rng.shuffle(P10)
+
+_p8_idx = list(range(10))
+_params_rng.shuffle(_p8_idx)
+P8 = _p8_idx[:8]
+
+IP = list(range(8))
+_params_rng.shuffle(IP)
+IP_INV = [IP.index(i) for i in range(8)]
+
+EP = [_params_rng.randrange(4) for _ in range(8)]
+P4 = list(range(4))
+_params_rng.shuffle(P4)
+
+S0 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
+S1 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
+
+
+def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
+    """
+    Generate two 8-bit subkeys from a 10-bit key.
+
+    Process:
+    1. Apply P10 permutation to the key
+    2. Split into left (5 bits) and right (5 bits) halves
+    3. Circular left shift both halves by 1 - to get left_half and right_half
+    4. Combine the halves and apply P8 to get K1
+    5. Circular left shift left_half and right_half (the halves before applying P8) by 2 more (total shift of 3)
+    6. Combine the halves and apply P8 to get K2
+
+    Args:
+        key: 10-bit encryption key
+        p10: Initial permutation table (10 → 10 bits)
+        p8: Selection permutation table (10 → 8 bits)
+
+    Returns:
+        Tuple of (K1, K2) - the two 8-bit subkeys
+    """
+    # TODO: Implement key schedule
+    #    - Apply P10 permutation
+    #    - Split into 5-bit halves
+    #    - Generate K1
+    #       - Left shift both halves by 1 (LS-1)
+    #       - Combine and apply P8
+    #    - Generate K2
+    #       - Left shift both halves by 2 (LS-2, for total LS-3)
+    #       - Combine and apply P8
+    #    - you might want to implement left_shift as a helper function
+    #       - for example, left_shift 0b10101 by 1 gives 0b01011
+    permuted_key = permute_expand(key, p10, 10)
+    left = permuted_key >> 5
+    right = permuted_key - (left << 5)
+
+    left = permute_expand(left, [1, 2, 3, 4, 0], 5)
+    right = permute_expand(right, [1, 2, 3, 4, 0], 5)
+
+    K1 = (left << 5) | right
+    K1 = permute_expand(K1, p8, 10)
+
+    left = permute_expand(left, [2, 3, 4, 0, 1], 5)
+    right = permute_expand(right, [2, 3, 4, 0, 1], 5)
+
+    K2 = (left << 5) | right
+    K2 = permute_expand(K2, p8, 10)
+
+    return K1, K2
+
+
+from w1d1_test import test_key_schedule
+
+
+# Run the test
+test_key_schedule(key_schedule, P10, P8)
+
 # %%
