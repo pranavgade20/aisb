@@ -442,14 +442,12 @@ def fk(
     step4_lhs = sbox_lookup(s0, step3_lhs)
     step4_rhs = sbox_lookup(s1, step3_rhs)
 
-    step5_1 = (step4_lhs << 4) | step4_rhs
-    step5 = permute_expand(step5_1, p4, 8)
+    step5_1 = (step4_lhs << 2) | step4_rhs
+    step5 = permute_expand(step5_1, p4, 4)
 
-    step6 = step5 ^ step4_lhs
+    step6 = step5 ^ left
     return step6, right
 
-
-# %%
 from w1d1_test import test_feistel
 test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
 
