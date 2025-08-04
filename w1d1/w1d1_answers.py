@@ -120,7 +120,6 @@ test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
 
 # %%
 
-
 def recover_lcg_state(keystream_bytes: list[int]) -> int:
     """
     Recover the LCG seed from consecutive keystream bytes.
@@ -164,3 +163,59 @@ from w1d1_test import test_lcg_state_recovery
 
 
 test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
+
+# %% 
+
+def permute_expand(value: int, table: List[int], in_width: int) -> int:
+    """
+    Apply a permutation table to rearrange bits. Note that the bits are numbered from left to right (MSB first).
+
+    Args:
+        value: Integer containing the bits to permute
+        table: List where table[i] is the source position for output bit i
+        in_width: Number of bits in the input value
+
+    Returns:
+        Integer with bits rearranged according to table
+
+    Example:
+        permute(0b0110, [2, 0, 3, 1], 4) = 0b1100
+        Because:
+        - Output bit 0 comes from input bit 2 (which is 1)
+        - Output bit 1 comes from input bit 0 (which is 1)
+        - Output bit 2 comes from input bit 3 (which is 0)
+        - Output bit 3 comes from input bit 1 (which is 0)
+    """
+    # TODO: Implement permutation
+    #    - For each position i in the output
+    #    - Get the source bit position from table[i]
+    #    - Extract that bit from the input
+    #    - Place it at position i in the output
+    byte_value = value.to_bytes(in_width)
+    
+    # print(value)
+    # print(table)
+    # print(in_width)
+
+    out = [0]*in_width
+
+    for i in range(in_width):
+        # out.append(byte_value[table[i]])
+        index = table[i]
+        bit = (value >> index) & 1
+        out[i] = (out[i] | bit)
+
+    out = out[::-1]
+    res = 0
+    for bit in out:
+        res = (res << 1) | bit
+
+    print(bin(res))
+    return bin(res)
+
+from w1d1_test import test_permute_expand
+
+# Run the test
+test_permute_expand(permute_expand)
+
+# %%
