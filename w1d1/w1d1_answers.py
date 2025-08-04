@@ -5,8 +5,6 @@ import sys
 from turtle import left
 from typing import Generator, List, Tuple, Callable
 
-import tqdm
-
 # %%
 # Allow imports from parent directory
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -140,26 +138,88 @@ def recover_lcg_state(keystream_bytes: list[int]) -> int:
     #   - brute-force through all possible upper 24 bits - this will let you try all possible starting states
     #   - for each state, check if it produces the correct bytes
     #   - if it does, calculate the seed by rearranging the LCG formula to get a formula for the seed
-    for i in tqdm.tqdm(range(2**24)):
-        keystream = lcg_keystream(i)
+    # for i in tqdm.tqdm(range(2**24)):
+    #     keystream = lcg_keystream(i)
 
-        broken = False
-        for j in range(len(keystream_bytes)):
-            nextval = next(keystream)
-            if nextval != keystream_bytes[j]:
-                broken = True
+    #     broken = False
+    #     for j in range(len(keystream_bytes)):
+    #         nextval = next(keystream)
+    #         if nextval != keystream_bytes[j]:
+    #             broken = True
+    #             break
+
+    #     if not broken:
+    #         return i
+    # return None
+
+    for upper_24_bits in range(2**24):
+        # The state that produced keystream_bytes[0] has lower 8 bits = keystream_bytes[0]
+        state_0 = (upper_24_bits << 8) | keystream_bytes[0]
+
+        # Check if this state produces the subsequent bytes correctly
+        state = state_0
+        valid = True
+
+        for i in range(1, len(keystream_bytes)):
+            state = (a * state + c) % m
+            if (state & 0xFF) != keystream_bytes[i]:
+                valid = False
                 break
 
-        if not broken:
-            return i
-    return None
+        if valid:
+            # We found the state that produced the first byte
+            # Now find the seed (previous state)
+            # We need to solve: state_0 = (a * seed + c) % m
+            # This gives us: seed = (state_0 - c) * a^{-1} mod m
 
+            # Calculate modular inverse of a modulo m
+            a_inv = pow(a, -1, m)
+            seed = ((state_0 - c) * a_inv) % m
+            return seed
 
 from w1d1_test import test_lcg_state_recovery
 
+test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
+
+# %%
+from w1d1_stream_cipher_secrets import intercept_messages
+
+ciphertext1, ciphertext2 = intercept_messages(lcg_encrypt)
+print(f"Intercepted ciphertext 1 ({len(ciphertext1)} bytes): {ciphertext1[:50].hex()}...")
+print(f"Intercepted ciphertext 2 ({len(ciphertext2)} bytes): {ciphertext2[:50].hex()}...")
+
+# %%
 
 
+def crib_drag(ciphertext1: bytes, ciphertext2: bytes, crib: bytes) -> list[tuple[int, bytes]]:
+    """
+    Perform crib-dragging attack on two ciphertexts encrypted with the same keystream.
 
+    Args:
+        ciphertext1: First intercepted ciphertext
+        ciphertext2: Second intercepted ciphertext
+        crib: Known plaintext fragment to try
+
+    Returns:
+        List of (position, recovered_text) tuples for further analysis.
+    """
+    # TODO: Implement crib-dragging
+    #   - Use the xor_texts = C1 XOR C2 to find M1 XOR M2
+    #   - For each position in xor_texts, XOR the crib with the text at that position
+    #   - return a list of tuples (position, recovered_text)
+
+    # Hint:
+    # 1. Calculate xor_texts = C1 XOR C2 (which equals M1 XOR M2)
+    # 2. For each position from 0 to len(xor_texts) - len(crib):
+    #    a. XOR the crib with xor_texts at this position
+    #    b. Check if result is readable (all bytes are printable ASCII: 32-126)
+    #    c. If readable, add (position, recovered_text) to results
+    # 3. Return results list
+    pass
+from w1d1_test import test_crib_drag
+# correct_position = test_crib_drag(crib_drag, ciphertext1, ciphertext2)
+
+# ---------------------------------------------------------------------------
 # %%
 import random
 from typing import List, Tuple
@@ -238,6 +298,7 @@ def permute_expand(value: int, table: List[int], in_width: int) -> int:
     return out
 
 from w1d1_test import test_permute_expand
+test_permute_expand(permute_expand)
 
 # Run the test
 
@@ -297,6 +358,7 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
 
 
 from w1d1_test import test_key_schedule
+test_key_schedule(key_schedule, P10, P8)
 
 
 # Run the test
@@ -340,12 +402,11 @@ def sbox_lookup(sbox: List[List[int]], bits: int) -> int:
 
 
 from w1d1_test import test_sbox_lookup
+test_sbox_lookup(sbox_lookup, S0, S1)
 
 
 
 # %%
-
-
 def fk(
     left: int, right: int, subkey: int, ep: List[int], s0: List[List[int]], s1: List[List[int]], p4: List[int]
 ) -> Tuple[int, int]:
@@ -388,16 +449,14 @@ def fk(
     return step6, right
 
 
-
+# %%
 from w1d1_test import test_feistel
+test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
 
 
 # Run the test
 
-
-
-
-
+# %%
 def encrypt_byte(
     byte: int,
     k1: int,
@@ -441,18 +500,39 @@ def encrypt_byte(
     #    - Two rounds with swap in between
     #    - Apply IP⁻¹
     #    - Same function for encrypt/decrypt!
-    step1 = permute_expand(byte, ip, 8)
-    step2_lhs = step1 >> 4
-    step2_rhs = step1 & 0b1111
+#     step1 = permute_expand(byte, ip, 8)
+#     step2_lhs = step1 >> 4
+#     step2_rhs = step1 & 0b1111
 
-    step3_lhs, step3_rhs = fk(left=step2_lhs, right=step2_rhs, subkey=k1, ep=ep, s0=s0, s1=s1, p4=p4)
-    step4_lhs, step4_rhs = step3_rhs, step3_lhs
-    step5_lhs, step5_rhs = fk(left=step4_lhs, right=step4_rhs, subkey=k2, ep=ep, s0=s0, s1=s1, p4=p4)
+#     step3_lhs, step3_rhs = fk(left=step2_lhs, right=step2_rhs, subkey=k1, ep=ep, s0=s0, s1=s1, p4=p4)
+#     step4_lhs, step4_rhs = step3_rhs, step3_lhs
+#     step5_lhs, step5_rhs = fk(left=step4_lhs, right=step4_rhs, subkey=k2, ep=ep, s0=s0, s1=s1, p4=p4)
 
-    step6_1 = (step5_lhs << 4) | step5_rhs
-    step6 = permute_expand(step6_1, ip_inv, 8)
-    return step6
+#     step6_1 = (step5_lhs << 4) | step5_rhs
+#     step6 = permute_expand(step6_1, ip_inv, 8)
+#     return step6
 
+    # Step 1: Initial permutation
+    bits = permute_expand(byte, ip, 8)
+
+    # Step 2: Split into halves
+    left = bits >> 4  # Upper 4 bits
+    right = bits & 0xF  # Lower 4 bits
+
+    # Step 3: First round
+    left, right = fk(left, right, k1, ep, s0, s1, p4)
+
+    # Step 4: Swap
+    left, right = right, left
+
+    # Step 5: Second round
+    left, right = fk(left, right, k2, ep, s0, s1, p4)
+
+    # Step 6: Combine and final permutation
+    combined = (left << 4) | right
+    result = permute_expand(combined, ip_inv, 8)
+
+    return result
 
 def des_encrypt(key: int, plaintext: bytes) -> bytes:
     """Encrypt bytes using DES"""
@@ -465,8 +545,9 @@ def des_decrypt(key: int, ciphertext: bytes) -> bytes:
     k1, k2 = key_schedule(key, P10, P8)
     # Note: reversed key order for decryption!
     return bytes(encrypt_byte(b, k2, k1, IP, IP_INV, EP, S0, S1, P4) for b in ciphertext)
+
 from w1d1_test import test_des_complete
-
-
 # Run the test
 test_des_complete(encrypt_byte, des_encrypt, des_decrypt, key_schedule, P10, P8, IP, IP_INV, EP, S0, S1, P4)
+
+# %%
