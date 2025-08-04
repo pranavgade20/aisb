@@ -327,4 +327,47 @@ if recovered_msg1 and recovered_msg2:
 else:
     print("\nMessage recovery failed!")
 
+
+# %%
+def permute_expand(value: int, table: list[int], in_width: int) -> int:
+    """
+    Apply a permutation table to rearrange bits. Note that the bits are numbered from left to right (MSB first).
+
+    Args:
+        value: Integer containing the bits to permute
+        table: List where table[i] is the source position for output bit i
+        in_width: Number of bits in the input value
+
+    Returns:
+        Integer with bits rearranged according to table
+
+    Example:
+        permute(0b1010, [2, 0, 3, 1], 4) = 0b1100
+        Because:
+        - Output bit 0 comes from input bit 2 (which is 1)
+        - Output bit 1 comes from input bit 0 (which is 1)
+        - Output bit 2 comes from input bit 3 (which is 0)
+        - Output bit 3 comes from input bit 1 (which is 0)
+    """
+    # TODO: Implement permutation
+    #    - For each position i in the output
+    #    - Get the source bit position from table[i]
+    #    - Extract that bit from the input
+    #    - Place it at position i in the output
+
+    out = 0
+    for i, src in enumerate(table):
+        # Extract bit from source position
+        bit = (value >> (in_width - 1 - src)) & 1
+        # Place it at destination position
+        out |= bit << (len(table) - 1 - i)
+    return out
+
+
+from w1d1_test import test_permute_expand
+
+
+# Run the test
+test_permute_expand(permute_expand)
+
 # %%
