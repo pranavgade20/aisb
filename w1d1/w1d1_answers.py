@@ -99,4 +99,73 @@ from w1d1_test import test_stream_cipher
 
 
 test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
+
+
+
+
+
+# %%
+import random
+from typing import List, Tuple
+
+_params_rng = random.Random(0)
+P10 = list(range(10))
+_params_rng.shuffle(P10)
+
+_p8_idx = list(range(10))
+_params_rng.shuffle(_p8_idx)
+P8 = _p8_idx[:8]
+
+IP = list(range(8))
+_params_rng.shuffle(IP)
+IP_INV = [IP.index(i) for i in range(8)]
+
+EP = [_params_rng.randrange(4) for _ in range(8)]
+P4 = list(range(4))
+_params_rng.shuffle(P4)
+
+S0 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
+S1 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
+
+# %%
+def permute_expand(value: int, table: List[int], in_width: int) -> int:
+    """
+    Apply a permutation table to rearrange bits. Note that the bits are numbered from left to right (MSB first).
+
+    Args:
+        value: Integer containing the bits to permute
+        table: List where table[i] is the source position for output bit i
+        in_width: Number of bits in the input value
+
+    Returns:
+        Integer with bits rearranged according to table
+
+    Example:
+        permute(0b1010, [2, 0, 3, 1], 4) = 0b1100
+        Because:
+        - Output bit 0 comes from input bit 2 (which is 1)
+        - Output bit 1 comes from input bit 0 (which is 1)
+        - Output bit 2 comes from input bit 3 (which is 0)
+        - Output bit 3 comes from input bit 1 (which is 0)
+    """
+    # TODO: Implement permutation
+    #    - For each position i in the output
+    #    - Get the source bit position from table[i]
+    #    - Extract that bit from the input
+    #    - Place it at position i in the output
+    permuted = 0
+    target_len = len(table)
+
+    for i in range(target_len):
+        pos = table[i]
+        value_bit = (value >> (in_width - pos - 1)) & 1
+        permuted |= (value_bit << (target_len - i - 1))
+
+    return permuted
+# %%
+from w1d1_test import test_permute_expand
+
+
+# Run the test
+test_permute_expand(permute_expand)
 # %%
