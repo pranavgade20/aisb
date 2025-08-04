@@ -175,4 +175,12 @@ Unless stated otherwise, please do not use any LLM-based tools to help you compl
 
 The repository also contains `*_solution.py` files which contain reference solutions. Please do not read them before you try the exercises yourself.
 
+## Troubleshooting
 
+<details>
+<summary><b>The configuration of my Dev Container doesn't seem right</b></summary>
+
+Make sure you have the latest version of this repo.
+Then execute action `Dev Containers: Rebuild and Reopen in Container` in VS Code.
+
+</details>

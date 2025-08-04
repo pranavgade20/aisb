@@ -31,7 +31,7 @@ jobs:
       run: |
         failed_files=()
         for ref_file in $(find . -name "*_reference.py" -type f | sort); do
-          if echo "$ref_file" | grep -q -E "(w2d2|w2d4|w1d5)/"; then
+          if echo "$ref_file" | grep -q -E "(w2d2|w2d4)/"; then
             echo "Skipping $ref_file" # Tested separately
             continue
           fi
