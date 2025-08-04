@@ -9,8 +9,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from aisb_utils import report
 
-from typing import Generator
-
 
 def lcg_keystream(seed: int) -> Generator[int, None, None]:
     """
@@ -34,14 +32,78 @@ def lcg_keystream(seed: int) -> Generator[int, None, None]:
 
     a = 1664525
     c = 1013904223
-    m = 2 ** 32
+    m = 2**32
 
     current_state = seed
     while True:
         current_state = (a * current_state + c) % m
         yield int(bin(current_state)[-8:], 2)
 
+
 from w1d1_test import test_lcg_keystream
 
 
-test_lcg_keystream(lcg_keystream)
+# test_lcg_keystream(lcg_keystream)
+
+
+# %%
+def lcg_encrypt(seed: int, plaintext: bytes) -> bytes:
+    """
+    Encrypt plaintext using the LCG keystream.
+
+    Stream cipher encryption: ciphertext = plaintext XOR keystream
+
+    Args:
+        seed: Seed for the keystream generator.
+        plaintext: Data to encrypt.
+
+    Returns:
+        Ciphertext as bytes.
+    """
+    # TODO: Implement stream cipher encryption
+    #   - XOR each byte of plaintext with the bytes from lcg_keystream
+    #   - return the resulting ciphertext as bytes
+
+    byte_list = []
+    for byte, code in zip(plaintext, lcg_keystream(seed=seed)):
+        byte_list.extend([byte ^ code])
+
+    return bytes(byte_list)
+
+
+from w1d1_test import test_encrypt
+
+
+test_encrypt(lcg_encrypt)
+
+
+# %%
+def lcg_decrypt(seed: int, ciphertext: bytes) -> bytes:
+    """
+    Decrypt ciphertext using the same LCG keystream.
+
+    In stream ciphers, decryption is the same operation as encryption!
+
+    Args:
+        seed: Seed for the keystream generator.
+        ciphertext: Data to decrypt.
+
+    Returns:
+        Decrypted plaintext.
+    """
+    # TODO: Implement stream cipher decryption
+    byte_list = []
+    for byte, code in zip(ciphertext, lcg_keystream(seed=seed)):
+        byte_list.extend([byte ^ code])
+
+    return bytes(byte_list)
+
+
+from w1d1_test import test_decrypt
+
+
+test_decrypt(lcg_decrypt)
+from w1d1_test import test_stream_cipher
+
+
+test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
