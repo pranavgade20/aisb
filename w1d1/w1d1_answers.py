@@ -4,6 +4,8 @@ import os
 import sys
 from typing import Generator, List, Tuple, Callable
 
+import tqdm
+
 # %%
 # Allow imports from parent directory
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -32,6 +34,9 @@ def lcg_keystream(seed: int) -> Generator[int, None, None]:
     # TODO: Implement the LCG keystream generator
     #    - Update state using the LCG formula
     #    - Yield the lowest 8 bits of state as a byte
+    if seed is None:
+        return
+
     X_N = seed
     while True:
         X_N = (1664525 * X_N + 1013904223) % 2**32
@@ -42,6 +47,11 @@ def lcg_keystream(seed: int) -> Generator[int, None, None]:
 from w1d1_test import test_lcg_keystream
 
 
+
+
+111111111111111111111110000010
+----------------------11111111
+----------------------10000010
 test_lcg_keystream(lcg_keystream)
 
 # %%
@@ -109,3 +119,48 @@ from w1d1_test import test_stream_cipher
 test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
 
 # %%
+
+
+def recover_lcg_state(keystream_bytes: list[int]) -> int:
+    """
+    Recover the LCG seed from consecutive keystream bytes.
+
+    The key insight is that we observe the OUTPUT of states, not the states themselves.
+    If we see byte b0, that was produced by some state s0.
+    We need to find s_{-1} (the seed) such that s0 = (a * s_{-1} + c) % m and s0 & 0xFF = b0.
+
+    Args:
+        keystream_bytes: At least 2 consecutive bytes from the keystream.
+
+    Returns:
+        A seed (initial state) that generates this keystream.
+    """
+    if len(keystream_bytes) < 2:
+        raise ValueError("Need at least 2 keystream bytes")
+
+    a = 1664525
+    c = 1013904223
+    m = 2**32
+    # TODO: Implement LCG state recovery
+    #   - brute-force through all possible upper 24 bits - this will let you try all possible starting states
+    #   - for each state, check if it produces the correct bytes
+    #   - if it does, calculate the seed by rearranging the LCG formula to get a formula for the seed
+    for i in tqdm.tqdm(range(2**24)):
+        keystream = lcg_keystream(i)
+
+        broken = False
+        for j in range(len(keystream_bytes)):
+            nextval = next(keystream)
+            if nextval != keystream_bytes[j]:
+                broken = True
+                break
+
+        if not broken:
+            return i
+    return None
+
+
+from w1d1_test import test_lcg_state_recovery
+
+
+test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
