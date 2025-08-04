@@ -66,6 +66,8 @@ def test_prerequisites():
     import sys
     import platform
 
+    is_in_ci = os.getenv("CI") == "true"
+
     print("🔧 AI Security Bootcamp - Prerequisites Check")
     print("=" * 50)
 
@@ -210,7 +212,7 @@ def test_prerequisites():
     ssh_ok, ssh_msg = check_github_ssh_access()
     status = "✅" if ssh_ok else "❌"
     print(f"{status} GitHub SSH: {ssh_msg}")
-    if not ssh_ok:
+    if not ssh_ok and not is_in_ci:
         all_good = False
         print("   💡 Configure your SSH according to the instructions in README.md")
 
