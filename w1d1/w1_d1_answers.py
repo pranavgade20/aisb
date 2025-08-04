@@ -44,6 +44,7 @@ test_lcg_keystream(lcg_keystream)
 
 # %%
 
+
 def lcg_encrypt(seed: int, plaintext: bytes) -> bytes:
     """
     Encrypt plaintext using the LCG keystream.
@@ -72,7 +73,6 @@ def lcg_encrypt(seed: int, plaintext: bytes) -> bytes:
 
 from w1d1_test import test_encrypt
 
-
 test_encrypt(lcg_encrypt)
 
 
@@ -96,11 +96,50 @@ def lcg_decrypt(seed: int, ciphertext: bytes) -> bytes:
 
 from w1d1_test import test_decrypt
 
-
 test_decrypt(lcg_decrypt)
 from w1d1_test import test_stream_cipher
 
-
 test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
+
+# %%
+
+
+def recover_lcg_state(keystream_bytes: list[int]) -> int:
+    """
+    Recover the LCG seed from consecutive keystream bytes.
+
+    The key insight is that we observe the OUTPUT of states, not the states themselves.
+    If we see byte b0, that was produced by some state s0.
+    We need to find s_{-1} (the seed) such that s0 = (a * s_{-1} + c) % m and s0 & 0xFF = b0.
+
+    Args:
+        keystream_bytes: At least 2 consecutive bytes from the keystream.
+
+    Returns:
+        A seed (initial state) that generates this keystream.
+    """
+    if len(keystream_bytes) < 2:
+        raise ValueError("Need at least 2 keystream bytes")
+
+    a = 1664525
+    c = 1013904223
+    m = 2**32
+
+    for upper_24_bits in range(2**24):
+        s_0 = (upper_24_bits << 8) | keystream_bytes[0]
+
+        keystream = lcg_keystream(s_0)
+        keys = [next(keystream) for _ in range(len(keystream_bytes) - 1)]
+        if keys == keystream_bytes[1:]:
+            break
+
+    a_inv = pow(a, -1, m)
+    seed = ((s_0 - c) * a_inv) % m
+    return seed
+
+
+from w1d1_test import test_lcg_state_recovery
+
+test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
 
 # %%
