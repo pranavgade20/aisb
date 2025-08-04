@@ -168,4 +168,58 @@ from w1d1_test import test_permute_expand
 
 # Run the test
 test_permute_expand(permute_expand)
+
+#%%
+# For example, left_shift 0b10101 by 1 gives 0b01011
+def left_shift(num: int, num_len: int, shift_by: int) -> int:
+    return ((num << shift_by) % (1 << num_len)) | (num >> (num_len - shift_by))
+# %%
+def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
+    """
+    Generate two 8-bit subkeys from a 10-bit key.
+
+    Process:
+    1. Apply P10 permutation to the key
+    2. Split into left (5 bits) and right (5 bits) halves
+    3. Circular left shift both halves by 1 - to get left_half and right_half
+    4. Combine the halves and apply P8 to get K1
+    5. Circular left shift left_half and right_half (the halves before applying P8) by 2 more (total shift of 3)
+    6. Combine the halves and apply P8 to get K2
+
+    Args:
+        key: 10-bit encryption key
+        p10: Initial permutation table (10 → 10 bits)
+        p8: Selection permutation table (10 → 8 bits)
+
+    Returns:
+        Tuple of (K1, K2) - the two 8-bit subkeys
+    """
+    # Steps:
+    #    - Apply P10 permutation
+    key_p10 = permute_expand(key, p10, 10)
+    #    - Split into 5-bit halves
+    left_raw = key_p10 & (31 << 5)
+    right_raw = key_p10 & 31
+    #    - Generate K1
+    #       - Left shift both halves by 1 (LS-1)
+    left_half_1 = left_shift(left_raw, 5, 1)
+    right_half_1 = left_shift(right_raw, 5, 1)
+    #       - Combine and apply P8
+    combined_lr_1 = (left_half_1 << 5) | right_half_1
+    k1 = permute_expand(combined_lr_1, p8, 10)
+    #    - Generate K2
+    #       - Left shift both halves by 2 (LS-2, for total LS-3)
+    left_half_2 = left_shift(left_raw, 5, 3)
+    right_half_2 = left_shift(right_raw, 5, 3)
+    #       - Combine and apply P8
+    combined_lr_2 = (left_half_2 << 5) | right_half_2
+    k2 = permute_expand(combined_lr_2, p8, 10)
+
+    return k1, k2
+
+from w1d1_test import test_key_schedule
+
+
+# Run the test
+test_key_schedule(key_schedule, P10, P8)
 # %%
