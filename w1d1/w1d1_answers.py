@@ -1,4 +1,26 @@
+# %%
+import random
 from typing import List, Tuple
+
+_params_rng = random.Random(0)
+P10 = list(range(10))
+_params_rng.shuffle(P10)
+
+_p8_idx = list(range(10))
+_params_rng.shuffle(_p8_idx)
+P8 = _p8_idx[:8]
+
+IP = list(range(8))
+_params_rng.shuffle(IP)
+IP_INV = [IP.index(i) for i in range(8)]
+
+EP = [_params_rng.randrange(4) for _ in range(8)]
+P4 = list(range(4))
+_params_rng.shuffle(P4)
+
+S0 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
+S1 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
+# %%
 from w1d1_test import test_permute_expand
 
 """
@@ -24,17 +46,21 @@ Example:
 To expand the number, make the table larger than the number of digits in
 the binary number. 
 """
+
+
+# %%
 def permute_expand(value: int, table: List[int], in_width: int) -> int:
-   # Convert to binary string without '0b' prefix, padded to in_width
+    # Convert to binary string without '0b' prefix, padded to in_width
     binary_str_input = bin(value)[2:]
-    
+
     binary_str_output = ""
-    
+
     for source_pos in table:
         binary_str_output += binary_str_input[source_pos]
-    
+
     # Convert binary string back to integer
     return int(binary_str_output, 2)
+
 
 test_permute_expand(permute_expand)
 
@@ -51,7 +77,7 @@ Process:
 
 Args:
     key: 10-bit encryption key
-    p10: Initial permutation table (10 → 10 bits)
+    P10: Initial permutation table (10 → 10 bits)
     p8: Selection permutation table (10 → 8 bits)
 
 Returns:
@@ -82,11 +108,14 @@ steps of DES:
 3. s boxes
 4. p4 permutation
 5. key schedule 
+
 """
+
+
+# %%
 def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
-    
     # TODO: Implement key schedule
-    #    - 
+    #    -
     #    - Split into 5-bit halves
     #    - Generate K1
     #       - Left shift both halves by 1 (LS-1)
@@ -96,12 +125,31 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
     #       - Combine and apply P8
     #    - you might want to implement left_shift as a helper function
     #       - for example, left_shift 0b10101 by 1 gives 0b01011
-    
 
-    # Apply P10 permutation - permute a 10 digit binary number
-    num = permute_expand(key, p10, 10)
+    # Apply P10 permutation - permute a 10 digit binary number
+    num = bin(permute_expand(key, p10, 10))[2:]
+
+    firsthalf = num[0:5]
+    secondhalf = num[5:]
+
+    def circ_left_shift(value: int, n: int, width: int) -> int:
+        n %= width
+        mask = (1 << width) - 1
+        return ((value << n) & mask) | (value >> (width - n))
+
+    # generating k1
+    firsthalf = circ_left_shift(firsthalf, 1, 5)
+    secondhalf = circ_left_shift(secondhalf, 1, 5)
+    k1 = permute_expand(firsthalf << 5 | secondhalf, p8, 10)
+    # generating k2
+    firsthalf = circ_left_shift(firsthalf, 2, 5)
+    secondhalf = circ_left_shift(secondhalf, 2, 5)
+    k2 = permute_expand(firsthalf << 5 | secondhalf, p8, 10)
+    return [k1, k2]
 
     # Split into 5-bit halves
-    first_half, second_half = num[]
+
 
 from w1d1_test import test_key_schedule
+
+test_key_schedule(key_schedule, P10, P8)
