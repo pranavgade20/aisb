@@ -372,13 +372,23 @@ def fk(
     Returns:
         Tuple of (new_left, right) - right is unchanged
     """
-    # TODO: Implement Feistel function
-    #    - Expand right using E/P
-    #    - XOR with subkey
-    #    - Apply S-boxes to each half
-    #    - Combine outputs and apply P4
-    #    - XOR with left to get new left
-    pass
+    step1 = permute_expand(right, ep, 4)
+    step2 = subkey ^ step1
+
+    step3_lhs = step2 >> 4
+    step3_rhs = step2 & 0b1111
+
+    step4_lhs = sbox_lookup(s0, step3_lhs)
+    step4_rhs = sbox_lookup(s1, step3_rhs)
+
+    step5_1 = (step4_lhs << 4) | step4_rhs
+    step5 = permute_expand(step5_1, p4, 8)
+
+    step6 = step5 ^ step4_lhs
+    return step6, right
+
+
+
 from w1d1_test import test_feistel
 
 
