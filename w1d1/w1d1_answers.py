@@ -106,3 +106,55 @@ from w1d1_test import test_stream_cipher
 test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
 
 # %%
+
+
+def recover_lcg_state(keystream_bytes: list[int]) -> int:
+    """
+    Recover the LCG seed from consecutive keystream bytes.
+
+    The key insight is that we observe the OUTPUT of states, not the states themselves.
+    If we see byte b0, that was produced by some state s0.
+    We need to find s_{-1} (the seed) such that s0 = (a * s_{-1} + c) % m and s0 & 0xFF = b0.
+
+    Args:
+        keystream_bytes: At least 2 consecutive bytes from the keystream.
+
+    Returns:
+        A seed (initial state) that generates this keystream.
+    """
+    if len(keystream_bytes) < 2:
+        raise ValueError("Need at least 2 keystream bytes")
+
+    a = 1664525
+    c = 1013904223
+    m = 2**32
+
+    # TODO: Implement LCG state recovery
+    #   - brute-force through all possible upper 24 bits - this will let you try all possible starting states
+    #   - for each state, check if it produces the correct bytes
+    #   - if it does, calculate the seed by rearranging the LCG formula to get a formula for the seed
+
+    b0 = keystream_bytes[0]
+
+    for upper_bits in range(2**24):
+        state_0 = (upper_bits << 8) | b0
+        state = state_0
+
+        valid = True
+
+        for i in range(1, len(keystream_bytes)):
+            state = (a * state + c) % m
+            if (state & 0xFF) != keystream_bytes[i]:
+                valid = False
+                break
+
+        if valid:
+            a_inv = pow(a, -1, m)
+            seed = ((state_0 - c) * a_inv) % m
+            return seed
+
+
+from w1d1_test import test_lcg_state_recovery
+
+test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
+# %%
