@@ -42,33 +42,43 @@ def analyze_user_behavior(username: str = "karpathy") -> UserIntel:
         The user's name, location, email, and 5 most recently updated repos.
     """
     # TODO: Return information about the given GitHub user
+
     # 1. Make a GET request to: https://api.github.com/users/{username}
-    # 2. Extract name, location, and email from the response
-    # 3. Make another GET request to: https://api.github.com/users/{username}/repos?sort=updated&per_page=5
-    # 4. Extract repository names (limit to 5)
-    # 5. Return a UserIntel object with the gathered information
-
+    url = f"https://api.github.com/users/{username}"
     # Get user info
-    user_response = requests.get(f"https://api.github.com/users/{username}")
+    user_response = requests.get(url)
 
+    # Error Handling
     if user_response.status_code != 200:
         # Return empty intel if user not found
         return UserIntel(username=username, name=None, location=None, email=None, repo_names=[])
 
+    # 2. Extract name, location, and email from the response
     user_data = user_response.json()
+    name = user_data.get("name")
+    location = user_data.get("location")
+    email = user_data.get("email")
 
+    # 3. Make another GET request to: https://api.github.com/users/{username}/repos?sort=updated&per_page=5
+    url = f"https://api.github.com/users/{username}/repos?sort=updated&per_page=5"
+
+    # 4. Extract repository names (limit to 5)
     # Get user's repositories (sorted by most recently updated)
-    repos_response = requests.get(f"https://api.github.com/users/{username}/repos?sort=updated&per_page=5")
+    repos_response = requests.get(url)
     repo_names = []
+
+    # More error handling
     if repos_response.status_code == 200:
         repos = repos_response.json()
+        # use list comprehension
         repo_names = [repo["name"] for repo in repos[:5]]  # Limit to 5 repos
 
+    # 5. Return a UserIntel object with the gathered information
     return UserIntel(
         username=username,
-        name=user_data.get("name"),
-        location=user_data.get("location"),
-        email=user_data.get("email"),
+        name=name,
+        location=location,
+        email=email,
         repo_names=repo_names,
     )
 
