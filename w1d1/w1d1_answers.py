@@ -514,6 +514,19 @@ def meet_in_the_middle_attack(plaintext: bytes, ciphertext: bytes) -> List[Tuple
     """
     # TODO: Implement meet-in-the-middle attack
     #    - Build table of all encrypt(k1, plaintext)
-    #    - For each k2, check if decrypt(k2, ciphertext) is in table
-    #    - Return all matching (k1, k2) pairs
-    pass
+    all_keys = list(range(2**10))
+    forward_table = {des_encrypt(key, plaintext): key for key in all_keys}
+    reverse_table = {des_decrypt(key, ciphertext): key for key in all_keys}
+
+    intersection = forward_table.keys() & reverse_table.keys()
+
+    return [
+        (forward_table[txt], reverse_table[txt])
+        for txt in intersection
+    ]
+
+from w1d1_test import test_meet_in_the_middle
+
+
+# Run the test
+test_meet_in_the_middle(meet_in_the_middle_attack, double_encrypt)
