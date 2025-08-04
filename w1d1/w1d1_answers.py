@@ -409,6 +409,7 @@ from w1d1_test import test_feistel
 # Run the test
 test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
 
+
 # %%
 def encrypt_byte(
     byte: int,
@@ -474,8 +475,9 @@ def des_decrypt(key: int, ciphertext: bytes) -> bytes:
     k1, k2 = key_schedule(key, P10, P8)
     # Note: reversed key order for decryption!
     return bytes(encrypt_byte(b, k2, k1, IP, IP_INV, EP, S0, S1, P4) for b in ciphertext)
-from w1d1_test import test_des_complete
 
+
+from w1d1_test import test_des_complete
 
 # Run the test
 test_des_complete(encrypt_byte, des_encrypt, des_decrypt, key_schedule, P10, P8, IP, IP_INV, EP, S0, S1, P4)
@@ -520,13 +522,84 @@ def meet_in_the_middle_attack(plaintext: bytes, ciphertext: bytes) -> List[Tuple
 
     intersection = forward_table.keys() & reverse_table.keys()
 
-    return [
-        (forward_table[txt], reverse_table[txt])
-        for txt in intersection
-    ]
+    return [(forward_table[txt], reverse_table[txt]) for txt in intersection]
+
 
 from w1d1_test import test_meet_in_the_middle
 
-
 # Run the test
 test_meet_in_the_middle(meet_in_the_middle_attack, double_encrypt)
+
+
+import random
+from typing import List
+
+
+def _generate_sbox(seed: int = 1):
+    rng = random.Random(seed)
+    sbox = list(range(16))
+    rng.shuffle(sbox)
+    inv = [0] * 16
+    for i, v in enumerate(sbox):
+        inv[v] = i
+    return sbox, inv
+
+
+SBOX, INV_SBOX = _generate_sbox()
+
+
+def substitute(x: int, sbox: List[int]) -> int:
+    """
+    Apply S-box substitution to a 16-bit value.
+
+    The 16-bit input is divided into four 4-bit nibbles.
+    Each nibble is substituted using the provided S-box.
+
+    Args:
+        x: 16-bit integer to substitute
+        sbox: List of 16 integers (0-15) defining the substitution
+
+    Returns:
+        16-bit integer after substitution
+    """
+    print(sbox)
+    # TODO: Implement S-box substitution
+    #    - Extract each 4-bit nibble from x
+    first_nibble = (x & 0b1111000000000000) >> 12
+    second_nibble = (x & 0b0000111100000000) >> 8
+    third_nibble = (x & 0b0000000011110000) >> 4
+    fourth_nibble = (x & 0b0000000000001111)
+
+
+    nibbles = [first_nibble, second_nibble, third_nibble, fourth_nibble]
+
+    substituted_nibbles = []
+    for nibble in nibbles:
+        substituted_nibbles.append(sbox[nibble])
+    
+    result = 0
+    for i, substituted_nibble in enumerate(reversed(substituted_nibbles)):
+        to_add = substituted_nibble << (i * 4)
+        result |= (substituted_nibble << (i * 4))
+    return result
+
+
+
+    # for nibble, substitution in zip(nibbles, sbox):
+    #     print(f"Nibble={nibble:016b}, Substitution={substitution}")
+    #     shifted_nibble = nibble >> (4 * substitution)
+    #     print(f"Shifted={shifted_nibble:016b}")
+    #     shifted_nibbles.append(shifted_nibble)
+
+    #    - Combine the substituted nibbles into the output
+    # result = 0
+    # for shifted_nibble in shifted_nibbles:
+    #     result |= shifted_nibble
+
+    # return result
+
+from w1d1_test import test_substitute
+
+
+# Run the test
+test_substitute(substitute, SBOX)
