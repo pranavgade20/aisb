@@ -2,6 +2,7 @@
 
 import os
 import sys
+from turtle import left
 from typing import Generator, List, Tuple, Callable
 
 import tqdm
@@ -47,11 +48,6 @@ def lcg_keystream(seed: int) -> Generator[int, None, None]:
 from w1d1_test import test_lcg_keystream
 
 
-
-
-111111111111111111111110000010
-----------------------11111111
-----------------------10000010
 test_lcg_keystream(lcg_keystream)
 
 # %%
@@ -164,6 +160,29 @@ from w1d1_test import test_lcg_state_recovery
 
 test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
 
+# %%
+import random
+from typing import List, Tuple
+
+_params_rng = random.Random(0)
+P10 = list(range(10))
+_params_rng.shuffle(P10)
+
+_p8_idx = list(range(10))
+_params_rng.shuffle(_p8_idx)
+P8 = _p8_idx[:8]
+
+IP = list(range(8))
+_params_rng.shuffle(IP)
+IP_INV = [IP.index(i) for i in range(8)]
+
+EP = [_params_rng.randrange(4) for _ in range(8)]
+P4 = list(range(4))
+_params_rng.shuffle(P4)
+
+S0 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
+S1 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
+
 # %% 
 
 def permute_expand(value: int, table: List[int], in_width: int) -> int:
@@ -191,31 +210,96 @@ def permute_expand(value: int, table: List[int], in_width: int) -> int:
     #    - Get the source bit position from table[i]
     #    - Extract that bit from the input
     #    - Place it at position i in the output
-    byte_value = value.to_bytes(in_width)
+
+    # byte_value = value.to_bytes(in_width)
+    # out = [0]*in_width
+
+    # for i in range(in_width):
+    #     # out.append(byte_value[table[i]])
+    #     index = table[i]
+    #     bit = (value >> index) & 1
+    #     out[i] = (out[i] | bit)
+
+    # out = out[::-1]
+    # res = 0
+    # for bit in out:
+    #     res = (res << 1) | bit
+
     
-    # print(value)
-    # print(table)
-    # print(in_width)
+    # # return int(bin(res), 2)
+    # return res
 
-    out = [0]*in_width
-
-    for i in range(in_width):
-        # out.append(byte_value[table[i]])
-        index = table[i]
-        bit = (value >> index) & 1
-        out[i] = (out[i] | bit)
-
-    out = out[::-1]
-    res = 0
-    for bit in out:
-        res = (res << 1) | bit
-
-    print(bin(res))
-    return bin(res)
+    out = 0
+    for i, src in enumerate(table):
+        # Extract bit from source position
+        bit = (value >> (in_width - 1 - src)) & 1
+        # Place it at destination position
+        out |= bit << (len(table) - 1 - i)
+    return out
 
 from w1d1_test import test_permute_expand
 
 # Run the test
 test_permute_expand(permute_expand)
+
+# %%
+def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
+    """
+    Generate two 8-bit subkeys from a 10-bit key.
+
+    Process:
+    1. Apply P10 permutation to the key
+    2. Split into left (5 bits) and right (5 bits) halves
+    3. Circular left shift both halves by 1 - to get left_half and right_half
+    4. Combine the halves and apply P8 to get K1
+    5. Circular left shift left_half and right_half (the halves before applying P8) by 2 more (total shift of 3)
+    6. Combine the halves and apply P8 to get K2
+
+    Args:
+        key: 10-bit encryption key
+        p10: Initial permutation table (10 → 10 bits)
+        p8: Selection permutation table (10 → 8 bits)
+
+    Returns:
+        Tuple of (K1, K2) - the two 8-bit subkeys
+    """
+    # TODO: Implement key schedule
+    #    - Apply P10 permutation
+    #    - Split into 5-bit halves
+    #    - Generate K1
+    #       - Left shift both halves by 1 (LS-1)
+    #       - Combine and apply P8
+    #    - Generate K2
+    #       - Left shift both halves by 2 (LS-2, for total LS-3)
+    #       - Combine and apply P8
+    #    - you might want to implement left_shift as a helper function
+    #       - for example, left_shift 0b10101 by 1 gives 0b01011
+
+    # step 1
+    key = permute_expand(key, p10, 10)
+    # step 2
+    left_half = key >> 5
+    right_half = key & 0b11111
+    # step 3
+    left_half = ((left_half << 1)|(left_half >> (5 - 1))) & 0b11111
+    right_half = ((right_half << 1)|(right_half >> (5 - 1))) & 0b11111
+    # step 4
+    K1 = (left_half << 5) | right_half
+    K1 = permute_expand(K1, p8, 10)
+    # step 5
+    left_half = ((left_half << 2)|(left_half >> (5 - 2))) & 0b11111
+    right_half = ((right_half << 2)|(right_half >> (5 - 2))) & 0b11111
+    # step 6
+    K2 = (left_half << 5) | right_half
+    K2 = permute_expand(K2, p8, 10)
+
+    return K1, K2
+    
+
+from w1d1_test import test_key_schedule
+
+
+# Run the test
+test_key_schedule(key_schedule, P10, P8)
 
 # %%
