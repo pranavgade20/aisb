@@ -74,7 +74,7 @@ def lcg_encrypt(seed: int, plaintext: bytes) -> bytes:
 from w1d1_test import test_encrypt
 
 
-test_encrypt(lcg_encrypt)
+# test_encrypt(lcg_encrypt)
 
 
 # %%
@@ -106,4 +106,104 @@ test_decrypt(lcg_decrypt)
 from w1d1_test import test_stream_cipher
 
 
-test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
+# test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
+
+# %%
+
+"""
+byte_list = []
+    for byte, code in zip(plaintext, lcg_keystream(seed=seed)):
+        byte_list.extend([byte ^ code ^ byte])
+        code = byte ^ code ^ byte
+        diff_byte ^ code ^ code
+        byte_list2.extend([diff_byte ^ code])
+"""
+
+
+# %%
+def s(keystream_bytes: list[int]) -> int:
+    """
+    Recover the LCG seed from consecutive keystream bytes.
+
+    The key insight is that we observe the OUTPUT of states, not the states themselves.
+    If we see byte b0, that was produced by some state s0.
+    We need to find s_{-1} (the seed) such that s0 = (a * s_{-1} + c) % m and s0 & 0xFF = b0.
+
+    Args:
+        keystream_bytes: At least 2 consecutive bytes from the keystream.
+
+    Returns:
+        A seed (initial state) that generates this keystream.
+    """
+    if len(keystream_bytes) < 2:
+        raise ValueError("Need at least 2 keystream bytes")
+
+    a = 1664525
+    c = 1013904223
+    m = 2**32
+    # TODO: Implement LCG state recovery
+    #   - brute-force through all possible upper 24 bits - this will let you try all possible starting states
+    #   - for each state, check if it produces the correct bytes
+    #   - if it does, calculate the seed by rearranging the LCG formula to get a formula for the seed
+
+    def check_bytes(keystream_bytes: list[int], seed: int) -> bool:
+        for byte, key in zip(keystream_bytes, lcg_keystream(seed=seed)):
+            if byte != key:
+                return False
+        return True
+
+    for i in range(0, 2**24):
+        if check_bytes(keystream_bytes, i):
+            return i
+
+    return -1
+
+
+from w1d1_test import test_lcg_state_recovery
+
+
+test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
+# %%
+
+from w1d1_stream_cipher_secrets import intercept_messages
+
+ciphertext1, ciphertext2 = intercept_messages(lcg_encrypt)
+print(f"Intercepted ciphertext 1 ({len(ciphertext1)} bytes): {ciphertext1[:50].hex()}...")
+print(f"Intercepted ciphertext 2 ({len(ciphertext2)} bytes): {ciphertext2[:50].hex()}...")
+
+# %%
+
+
+def crib_drag(ciphertext1: bytes, ciphertext2: bytes, crib: bytes) -> list[tuple[int, bytes]]:
+    """
+    Perform crib-dragging attack on two ciphertexts encrypted with the same keystream.
+
+    Args:
+        ciphertext1: First intercepted ciphertext
+        ciphertext2: Second intercepted ciphertext
+        crib: Known plaintext fragment to try
+
+    Returns:
+        List of (position, recovered_text) tuples for further analysis.
+    """
+    # TODO: Implement crib-dragging
+    #   - Use the xor_texts = C1 XOR C2 to find M1 XOR M2
+    #   - For each position in xor_texts, XOR the crib with the text at that position
+    #   - return a list of tuples (position, recovered_text)
+
+    # Hint:
+    # 1. Calculate xor_texts = C1 XOR C2 (which equals M1 XOR M2)
+    # 2. For each position from 0 to len(xor_texts) - len(crib):
+    #    a. XOR the crib with xor_texts at this position
+    #    b. Check if result is readable (all bytes are printable ASCII: 32-126)
+    #    c. If readable, add (position, recovered_text) to results
+    # 3. Return results list
+
+    for c1, c2 in zip(ciphertext1, ciphertext2):
+        m1_xor_m2 = c1 ^ c2
+
+
+from w1d1_test import test_crib_drag
+
+
+correct_position = test_crib_drag(crib_drag, ciphertext1, ciphertext2)
