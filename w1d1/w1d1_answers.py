@@ -365,3 +365,6 @@ from w1d1_test import test_feistel
 
 # Run the test
 test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
+
+
+# %%
