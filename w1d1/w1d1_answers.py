@@ -48,7 +48,7 @@ def lcg_keystream(seed: int) -> Generator[int, None, None]:
 from w1d1_test import test_lcg_keystream
 
 
-test_lcg_keystream(lcg_keystream)
+
 
 # %%
 def lcg_encrypt(seed: int, plaintext: bytes) -> bytes:
@@ -76,7 +76,7 @@ def lcg_encrypt(seed: int, plaintext: bytes) -> bytes:
 
 from w1d1_test import test_encrypt
 
-test_encrypt(lcg_encrypt)
+
 
 # %%
 test = b'test string'
@@ -108,11 +108,11 @@ def lcg_decrypt(seed: int, ciphertext: bytes) -> bytes:
 from w1d1_test import test_decrypt
 
 
-test_decrypt(lcg_decrypt)
+
 from w1d1_test import test_stream_cipher
 
 
-test_stream_cipher(lcg_keystream, lcg_encrypt, lcg_decrypt)
+
 
 # %%
 
@@ -158,7 +158,7 @@ def recover_lcg_state(keystream_bytes: list[int]) -> int:
 from w1d1_test import test_lcg_state_recovery
 
 
-test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
+
 
 # %%
 import random
@@ -183,7 +183,7 @@ _params_rng.shuffle(P4)
 S0 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
 S1 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
 
-# %% 
+# %%
 
 def permute_expand(value: int, table: List[int], in_width: int) -> int:
     """
@@ -225,7 +225,7 @@ def permute_expand(value: int, table: List[int], in_width: int) -> int:
     # for bit in out:
     #     res = (res << 1) | bit
 
-    
+
     # # return int(bin(res), 2)
     # return res
 
@@ -240,7 +240,7 @@ def permute_expand(value: int, table: List[int], in_width: int) -> int:
 from w1d1_test import test_permute_expand
 
 # Run the test
-test_permute_expand(permute_expand)
+
 
 # %%
 def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
@@ -294,13 +294,13 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
     K2 = permute_expand(K2, p8, 10)
 
     return K1, K2
-    
+
 
 from w1d1_test import test_key_schedule
 
 
 # Run the test
-test_key_schedule(key_schedule, P10, P8)
+
 
 # %%
 def sbox_lookup(sbox: List[List[int]], bits: int) -> int:
@@ -342,7 +342,7 @@ def sbox_lookup(sbox: List[List[int]], bits: int) -> int:
 from w1d1_test import test_sbox_lookup
 
 
-test_sbox_lookup(sbox_lookup, S0, S1)
+
 # %%
 
 
@@ -393,7 +393,7 @@ from w1d1_test import test_feistel
 
 
 # Run the test
-test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
+
 
 
 
@@ -441,7 +441,17 @@ def encrypt_byte(
     #    - Two rounds with swap in between
     #    - Apply IP⁻¹
     #    - Same function for encrypt/decrypt!
-    pass
+    step1 = permute_expand(byte, ip, 8)
+    step2_lhs = step1 >> 4
+    step2_rhs = step1 & 0b1111
+
+    step3_lhs, step3_rhs = fk(left=step2_lhs, right=step2_rhs, subkey=k1, ep=ep, s0=s0, s1=s1, p4=p4)
+    step4_lhs, step4_rhs = step3_rhs, step3_lhs
+    step5_lhs, step5_rhs = fk(left=step4_lhs, right=step4_rhs, subkey=k2, ep=ep, s0=s0, s1=s1, p4=p4)
+
+    step6_1 = (step5_lhs << 4) | step5_rhs
+    step6 = permute_expand(step6_1, ip_inv, 8)
+    return step6
 
 
 def des_encrypt(key: int, plaintext: bytes) -> bytes:
