@@ -31,7 +31,7 @@ This file documents guidelines for authoring exercises.
 
 
 ## Day-specific instructions
-### VulnHub VM setup
+### VulnHub VM setup (w1d4)
 w1d4 uses a lab based on the [Corrosion: 2](https://www.vulnhub.com/entry/corrosion-2,745/) VM.
 However, running the x64 VM on M* Mac is problematic and extremely slow. For this reason, we chose to create the lab so that it can run on AWS EC2. 
 This has other problems: the VM is too old and an AMI cannot be created from it, therefore we had to do a couple of changes to the original VM:
@@ -46,3 +46,13 @@ This has other problems: the VM is too old and an AMI cannot be created from it,
 - run `chmod a+w /usr/lib/python3.10/base64.py`
 
 If these changes are done on an EC2 VM, an AMI can be created from the VM in AWS console.
+
+### Networking (w1d2)
+You can quickly test the setup by running 
+
+```
+cd w1d2
+cp w1d2_solution.py w1d2_answers_agent.py
+cp w1d2_solution.py w1d2_answers_mitmproxy.py
+docker compose up --build
+```
