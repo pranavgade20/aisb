@@ -394,3 +394,69 @@ from w1d1_test import test_feistel
 
 # Run the test
 test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
+
+
+
+
+def encrypt_byte(
+    byte: int,
+    k1: int,
+    k2: int,
+    ip: List[int],
+    ip_inv: List[int],
+    ep: List[int],
+    s0: List[List[int]],
+    s1: List[List[int]],
+    p4: List[int],
+) -> int:
+    """
+    Encrypt or decrypt a single byte using DES.
+
+    For encryption: use (k1, k2)
+    For decryption: use (k2, k1) - reversed order!
+
+    Process:
+    1. Apply initial permutation (IP)
+    2. Split into 4-bit halves
+    3. Apply fk with first key
+    4. Swap halves
+    5. Apply fk with second key
+    6. Combine halves and apply IP⁻¹
+
+    Args:
+        byte: 8-bit value to process
+        k1: First subkey (8 bits)
+        k2: Second subkey (8 bits)
+        ip: Initial permutation table
+        ip_inv: Inverse initial permutation table
+        ep: Expansion permutation for fk
+        s0, s1: S-boxes for fk
+        p4: Permutation for fk
+
+    Returns:
+        8-bit processed value
+    """
+    # TODO: Implement DES encryption/decryption
+    #    - Apply IP
+    #    - Two rounds with swap in between
+    #    - Apply IP⁻¹
+    #    - Same function for encrypt/decrypt!
+    pass
+
+
+def des_encrypt(key: int, plaintext: bytes) -> bytes:
+    """Encrypt bytes using DES"""
+    k1, k2 = key_schedule(key, P10, P8)
+    return bytes(encrypt_byte(b, k1, k2, IP, IP_INV, EP, S0, S1, P4) for b in plaintext)
+
+
+def des_decrypt(key: int, ciphertext: bytes) -> bytes:
+    """Decrypt bytes using DES."""
+    k1, k2 = key_schedule(key, P10, P8)
+    # Note: reversed key order for decryption!
+    return bytes(encrypt_byte(b, k2, k1, IP, IP_INV, EP, S0, S1, P4) for b in ciphertext)
+from w1d1_test import test_des_complete
+
+
+# Run the test
+test_des_complete(encrypt_byte, des_encrypt, des_decrypt, key_schedule, P10, P8, IP, IP_INV, EP, S0, S1, P4)
