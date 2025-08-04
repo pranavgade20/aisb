@@ -696,3 +696,189 @@ from w1d1_test import test_meet_in_the_middle
 # Run the test
 test_meet_in_the_middle(meet_in_the_middle_attack, double_encrypt)
 # %%
+
+
+from typing import List
+import random
+
+
+def _generate_sbox(seed: int = 1):
+    rng = random.Random(seed)
+    sbox = list(range(16))
+    rng.shuffle(sbox)
+    inv = [0] * 16
+    for i, v in enumerate(sbox):
+        inv[v] = i
+    return sbox, inv
+
+
+SBOX, INV_SBOX = _generate_sbox()
+
+
+def substitute(x: int, sbox: List[int]) -> int:
+    """
+    Apply S-box substitution to a 16-bit value.
+
+    The 16-bit input is divided into four 4-bit nibbles.
+    Each nibble is substituted using the provided S-box.
+
+    Args:
+        x: 16-bit integer to substitute
+        sbox: List of 16 integers (0-15) defining the substitution
+
+    Returns:
+        16-bit integer after substitution
+    """
+
+    x1 = x >> 12
+    x2 = (x >> 8) - (x1 << 4)
+    x3 = (x >> 4) - (x2 << 4) - (x1 << 8)
+    x4 = x - (x3 << 4) - (x2 << 8) - (x1 << 12)
+
+    x1 = sbox[x1]
+    x2 = sbox[x2]
+    x3 = sbox[x3]
+    x4 = sbox[x4]
+
+    return (x1 << 12) + (x2 << 8) + (x3 << 4) + x4
+
+
+from w1d1_test import test_substitute
+
+
+# Run the test
+test_substitute(substitute, SBOX)
+
+# %%
+
+
+def _generate_pbox(seed: int = 2):
+    rng = random.Random(seed)
+    pbox = list(range(16))
+    rng.shuffle(pbox)
+    inv = [0] * 16
+    for i, p in enumerate(pbox):
+        inv[p] = i
+    return pbox, inv
+
+
+PBOX, INV_PBOX = _generate_pbox()
+
+
+def permute(x: int, pbox: List[int]) -> int:
+    """
+    Apply P-box permutation to a 16-bit value.
+
+    For each output bit position i, take the bit from input position pbox[i].
+
+    Args:
+        x: 16-bit integer to permute
+        pbox: List of 16 integers (0-15) defining the permutation
+              pbox[i] = j means output bit i comes from input bit j
+
+    Returns:
+        16-bit integer after permutation
+    """
+    # TODO: Implement P-box permutation
+    #    - For each output position i (0 to 15)
+    #    - Get the input bit from position pbox[i]
+    #    - Place it at output position i
+    return permute_expand(x, pbox, 16)
+
+
+from w1d1_test import test_permute
+
+
+# Run the test
+test_permute(permute, PBOX)
+
+# %%
+
+
+def round_keys(key: int) -> List[int]:
+    """Generate round keys from the main key."""
+    import random
+
+    rng = random.Random(key)
+    return [rng.randrange(0, 1 << 16) for _ in range(3)]
+
+
+def encrypt_block(block: int, keys: List[int], sbox: List[int], pbox: List[int]) -> int:
+    """
+    Encrypt a single 16-bit block using the SPN cipher.
+
+    The cipher consists of:
+    1. XOR with key[0]
+    2. S-box substitution
+    3. P-box permutation
+    4. XOR with key[1]
+    5. S-box substitution
+    6. P-box permutation
+    7. XOR with key[2]
+
+    Args:
+        block: 16-bit integer to encrypt
+        keys: List of 3 round keys
+        sbox: S-box for substitution
+        pbox: P-box for permutation
+
+    Returns:
+        16-bit encrypted block
+    """
+    # TODO: Implement the encryption algorithm
+    #    - Start with XOR of block and keys[0]
+    #    - Apply S-box substitution and P-box permutation
+    #    - XOR with keys[1]
+    #    - Apply S-box substitution and P-box permutation again
+    #    - End with XOR of keys[2]
+
+    block = block ^ keys[0]
+    block = substitute(block, sbox)
+    block = permute(block, pbox)
+    block = block ^ keys[1]
+    block = substitute(block, sbox)
+    block = permute(block, pbox)
+    block = block ^ keys[2]
+
+    return block
+
+
+def decrypt_block(block: int, keys: List[int], inv_sbox: List[int], inv_pbox: List[int]) -> int:
+    """
+    Decrypt a single 16-bit block using the SPN cipher.
+
+    Decryption reverses the encryption process:
+    1. XOR with key[2]
+    2. Inverse P-box permutation
+    3. Inverse S-box substitution
+    4. XOR with key[1]
+    5. Inverse P-box permutation
+    6. Inverse S-box substitution
+    7. XOR with key[0]
+
+    Args:
+        block: 16-bit integer to decrypt
+        keys: List of 3 round keys (same as encryption)
+        inv_sbox: Inverse S-box for substitution
+        inv_pbox: Inverse P-box for permutation
+
+    Returns:
+        16-bit decrypted block
+    """
+
+    block = block ^ keys[2]
+    block = permute(block, inv_pbox)
+    block = substitute(block, inv_sbox)
+    block = block ^ keys[1]
+    block = permute(block, inv_pbox)
+    block = substitute(block, inv_sbox)
+    block = block ^ keys[0]
+
+    return block
+
+
+from w1d1_test import test_block_cipher
+
+
+# Run the test
+test_block_cipher(encrypt_block, decrypt_block, round_keys, SBOX, PBOX, INV_SBOX, INV_PBOX)
