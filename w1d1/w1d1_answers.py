@@ -2,7 +2,7 @@
 
 import os
 import sys
-from typing import Generator, List, Tuple, Callable
+from typing import Generator, list, tuple, Callable
 
 # Allow imports from parent directory
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -182,7 +182,7 @@ def crib_drag(ciphertext1: bytes, ciphertext2: bytes, crib: bytes) -> list[tuple
         crib: Known plaintext fragment to try
 
     Returns:
-        List of (position, recovered_text) tuples for further analysis.
+        list of (position, recovered_text) tuples for further analysis.
     """
     # TODO: Implement crib-dragging
     #   - Use the xor_texts = C1 XOR C2 to find M1 XOR M2
@@ -285,7 +285,7 @@ def recover_messages(
         position: Position of known_plaintext in message1
 
     Returns:
-        Tuple of (recovered_message1, recovered_message2)
+        tuple of (recovered_message1, recovered_message2)
     """
     # TODO: Implement message recovery using recover_seed
     #   - Call recover_seed to get the original seed
@@ -335,7 +335,7 @@ def permute_expand(value: int, table: list[int], in_width: int) -> int:
 
     Args:
         value: Integer containing the bits to permute
-        table: List where table[i] is the source position for output bit i
+        table: list where table[i] is the source position for output bit i
         in_width: Number of bits in the input value
 
     Returns:
@@ -394,7 +394,7 @@ S0 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
 S1 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
 
 
-def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
+def key_schedule(key: int, p10: list[int], p8: list[int]) -> tuple[int, int]:
     """
     Generate two 8-bit subkeys from a 10-bit key.
 
@@ -412,7 +412,7 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
         p8: Selection permutation table (10 → 8 bits)
 
     Returns:
-        Tuple of (K1, K2) - the two 8-bit subkeys
+        tuple of (K1, K2) - the two 8-bit subkeys
     """
     # TODO: Implement key schedule
     #    - Apply P10 permutation
@@ -504,8 +504,8 @@ test_sbox_lookup(sbox_lookup, S0, S1)
 
 
 def fk(
-    left: int, right: int, subkey: int, ep: List[int], s0: List[List[int]], s1: List[List[int]], p4: List[int]
-) -> Tuple[int, int]:
+    left: int, right: int, subkey: int, ep: list[int], s0: list[list[int]], s1: list[list[int]], p4: list[int]
+) -> tuple[int, int]:
     """
     Apply the Feistel function to one round of DES.
 
@@ -527,7 +527,7 @@ def fk(
         p4: Final permutation (4 → 4 bits)
 
     Returns:
-        Tuple of (new_left, right) - right is unchanged
+        tuple of (new_left, right) - right is unchanged
     """
     # Step 1: Expand right half
     expanded = permute_expand(right, ep, 4)
@@ -565,12 +565,12 @@ def encrypt_byte(
     byte: int,
     k1: int,
     k2: int,
-    ip: List[int],
-    ip_inv: List[int],
-    ep: List[int],
-    s0: List[List[int]],
-    s1: List[List[int]],
-    p4: List[int],
+    ip: list[int],
+    ip_inv: list[int],
+    ep: list[int],
+    s0: list[list[int]],
+    s1: list[list[int]],
+    p4: list[int],
 ) -> int:
     """
     Encrypt or decrypt a single byte using DES.
@@ -642,4 +642,57 @@ from w1d1_test import test_des_complete
 # Run the test
 test_des_complete(encrypt_byte, des_encrypt, des_decrypt, key_schedule, P10, P8, IP, IP_INV, EP, S0, S1, P4)
 
+# %%
+
+
+def double_encrypt(key1: int, key2: int, plaintext: bytes) -> bytes:
+    """Encrypt twice with different keys."""
+    temp = des_encrypt(key1, plaintext)
+    return des_encrypt(key2, temp)
+
+
+def double_decrypt(key1: int, key2: int, ciphertext: bytes) -> bytes:
+    """Decrypt twice with different keys (reverse order)."""
+    temp = des_decrypt(key2, ciphertext)
+    return des_decrypt(key1, temp)
+
+
+def meet_in_the_middle_attack(plaintext: bytes, ciphertext: bytes) -> list[tuple[int, int]]:
+    """
+    Find all key pairs (k1, k2) such that:
+    double_encrypt(k1, k2, plaintext) == ciphertext
+
+    Strategy:
+    1. Build table: for each k1, compute encrypt(k1, plaintext)
+    2. For each k2, compute decrypt(k2, ciphertext)
+    3. If decrypt(k2, ciphertext) is in our table, we found a match!
+
+    Args:
+        plaintext: Known plaintext
+        ciphertext: Corresponding ciphertext from double encryption
+
+    Returns:
+        list of (key1, key2) pairs that work
+    """
+    # TODO: Implement meet-in-the-middle attack
+    #    - Build table of all encrypt(k1, plaintext)
+    #    - For each k2, check if decrypt(k2, ciphertext) is in table
+    #    - Return all matching (k1, k2) pairs
+    k1_encrypts = dict()
+    matches = []
+
+    for i in range(2**8):
+        k1_encrypts[(des_encrypt(i, plaintext=plaintext))] = i
+    for i in range(2**8):
+        k2_encrypt = des_decrypt(i, ciphertext=ciphertext)
+        if k2_encrypt in k1_encrypts:
+            matches.append((k1_encrypts[k2_encrypt], i))
+
+    return matches
+
+
+from w1d1_test import test_meet_in_the_middle
+
+# Run the test
+test_meet_in_the_middle(meet_in_the_middle_attack, double_encrypt)
 # %%
