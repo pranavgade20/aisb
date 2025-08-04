@@ -222,4 +222,94 @@ from w1d1_test import test_key_schedule
 
 # Run the test
 test_key_schedule(key_schedule, P10, P8)
+
+
+# %%
+def sbox_lookup(sbox: List[List[int]], bits: int) -> int:
+    """
+    Look up a value in an S-box.
+
+    DES S-boxes are 4x4 tables accessed by:
+    - Row: bit 0 (MSB) and bit 3 (LSB) form a 2-bit row index
+    - Column: bits 1 and 2 form a 2-bit column index
+
+    Args:
+        sbox: 4x4 table of 2-bit values
+        bits: 4-bit input (only lower 4 bits used)
+
+    Returns:
+        2-bit output from S-box
+
+    Example:
+        For input 0b1010:
+        - Row = b0,b3 = 1,0 = 2
+        - Col = b1,b2 = 0,1 = 1
+        - Output = sbox[2][1]
+    """
+    b3 = bits & 1
+    b2 = (bits >> 1) & 1
+    b1 = (bits >> 2) & 1
+    b0 = (bits >> 3) & 1
+
+    row = (b0 << 1) | b3
+    col = (b1 << 1) | b2
+
+    return sbox[row][col]
+
+from w1d1_test import test_sbox_lookup
+
+
+test_sbox_lookup(sbox_lookup, S0, S1)
+# %%
+
+
+def fk(
+    left: int, right: int, subkey: int, ep: List[int], s0: List[List[int]], s1: List[List[int]], p4: List[int]
+) -> Tuple[int, int]:
+    """
+    Apply the Feistel function to one round of DES.
+
+    Process:
+    1. Expand right half from 4 to 8 bits using E/P
+    2. XOR with subkey
+    3. Split into two 4-bit halves
+    4. Apply S0 to left half, S1 to right half
+    5. Combine S-box outputs and permute with P4
+    6. XOR result with left half
+
+    Args:
+        left: 4-bit left half
+        right: 4-bit right half
+        subkey: 8-bit round key
+        ep: Expansion permutation table (4 → 8 bits)
+        s0: First S-box (4x4)
+        s1: Second S-box (4x4)
+        p4: Final permutation (4 → 4 bits)
+
+    Returns:
+        Tuple of (new_left, right) - right is unchanged
+    """
+    #    - Expand right using E/P
+    right_exp = permute_expand(right, ep, 4)
+    #    - XOR with subkey
+    right_xor = right_exp ^ subkey
+    #    - Apply S-boxes to each half
+    rr = right_xor & 15
+    rl = (right_xor >> 4) & 15
+
+    rl_sbox = sbox_lookup(s0, rl)
+    rr_sbox = sbox_lookup(s1, rr)
+    #    - Combine outputs and apply P4
+    r_combined = (rl << 15) | rr
+    r_p4 = permute_expand(r_combined, p4, 4)
+    #    - XOR with left to get new left
+    new_left = left ^ r_p4
+
+    return new_left, right
+    
+from w1d1_test import test_feistel
+
+
+# Run the test
+test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
 # %%
