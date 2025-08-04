@@ -324,8 +324,21 @@ def sbox_lookup(sbox: List[List[int]], bits: int) -> int:
         - Col = b1,b2 = 0,1 = 1
         - Output = sbox[2][1]
     """
-    # TODO: Implement S-box lookup
-    pass
+    # get row/col
+    bitlist = [
+        (bits >> i) & 1
+        for i in range(4)
+    ]
+    bitlist = bitlist[::-1]
+    rowlist = [bitlist[0],bitlist[3]]
+    collist = [bitlist[1],bitlist[2]]
+
+    row = (rowlist[0] << 1) | rowlist[1]
+    col = (collist[0] << 1) | collist[1]
+
+    return sbox[row][col]
+
+
 from w1d1_test import test_sbox_lookup
 
 
