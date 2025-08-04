@@ -258,16 +258,16 @@ test_permute_expand(permute_expand)
 
 # %%
 
-def left_shift(n, d, N):  
+
+def left_shift(n, d, N):
     return ((n << d) % (1 << N)) | (n >> (N - d))
-          #  ^^^^^^ a
+
 
 shifted = left_shift(0b10101, 1, 5)
 print(f"{shifted:05b}")
 
 shifted = left_shift(0b1010100000, 1, 5)
 print(f"{shifted:05b}")
-
 
 
 def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
@@ -294,29 +294,226 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
     #    - Apply P10 permutation
     permuted = permute_expand(key, p10, 10)
     #    - Split into 5-bit halves
-    left_half = (0b1111100000 | permuted) >> 5
-    right_half = 0b0000011111 | permuted
+    left_half = (0b1111100000 & permuted) >> 5
+    right_half = 0b0000011111 & permuted
     #    - Generate K1
     #       - Left shift both halves by 1 (LS-1)
     shifted_left_half = left_shift(left_half, 1, 5)
     shifted_right_half = left_shift(right_half, 1, 5)
     #       - Combine and apply P8
     combined = (shifted_left_half << 5) | shifted_right_half
-    K1 = permute_expand(combined, p8, 8)
+    K1 = permute_expand(combined, p8, 10)
     #    - Generate K2
     #       - Left shift both halves by 2 (LS-2, for total LS-3)
     shifted_left_half = left_shift(shifted_left_half, 2, 5)
     shifted_right_half = left_shift(shifted_right_half, 2, 5)
     #       - Combine and apply P8
     combined = (shifted_left_half << 5) | shifted_right_half
-    K2 = permute_expand(combined, p8, 8)
+    K2 = permute_expand(combined, p8, 10)
     #    - you might want to implement left_shift as a helper function
     #       - for example, left_shift 0b10101 by 1 gives 0b01011
-    return(K1, K2)
-from w1d1_test import test_key_schedule
+    return (K1, K2)
 
+
+from w1d1_test import test_key_schedule
 
 # Run the test
 test_key_schedule(key_schedule, P10, P8)
 
 # %%
+
+
+def sbox_lookup(sbox: List[List[int]], bits: int) -> int:
+    """
+    Look up a value in an S-box.
+
+    DES S-boxes are 4x4 tables accessed by:
+    - Row: bit 0 (MSB) and bit 3 (LSB) form a 2-bit row index
+    - Column: bits 1 and 2 form a 2-bit column index
+
+    Args:
+        sbox: 4x4 table of 2-bit values
+        bits: 4-bit input (only lower 4 bits used)
+
+    Returns:
+        2-bit output from S-box
+
+    Example:
+        For input 0b1010:
+        - Row = b0,b3 = 1,0 = 2
+        - Col = b1,b2 = 0,1 = 1
+        - Output = sbox[2][1]
+    """
+    b0 = bits & 0b1000
+    b3 = bits & 0b0001
+    row = (b0 >> 2) | b3
+
+    b1 = bits & 0b0100
+    b2 = bits & 0b0010
+    col = (b1 >> 1) | (b2 >> 1)
+
+    return sbox[row][col]
+
+
+from w1d1_test import test_sbox_lookup
+
+test_sbox_lookup(sbox_lookup, S0, S1)
+# %%
+
+
+def fk(
+    left: int, right: int, subkey: int, ep: List[int], s0: List[List[int]], s1: List[List[int]], p4: List[int]
+) -> Tuple[int, int]:
+    """
+    Apply the Feistel function to one round of DES.
+
+    Process:
+    1. Expand right half from 4 to 8 bits using E/P
+    2. XOR with subkey
+    3. Split into two 4-bit halves
+    4. Apply S0 to left half, S1 to right half
+    5. Combine S-box outputs and permute with P4
+    6. XOR result with left half
+
+    Args:
+        left: 4-bit left half
+        right: 4-bit right half
+        subkey: 8-bit round key
+        ep: Expansion permutation table (4 → 8 bits)
+        s0: First S-box (4x4)
+        s1: Second S-box (4x4)
+        p4: Final permutation (4 → 4 bits)
+
+    Returns:
+        Tuple of (new_left, right) - right is unchanged
+    """
+    # TODO: Implement Feistel function
+    #    - Expand right using E/P
+    right_expanded = permute_expand(right, ep, 4)
+    #    - XOR with subkey
+    xor_out = right_expanded ^ subkey
+    left_half = (0b11110000 & xor_out) >> 4
+    right_half = 0b00001111 & xor_out
+    #    - Apply S-boxes to each half
+    sbox_left_out = sbox_lookup(s0, left_half)
+    sbox_right_out = sbox_lookup(s1, right_half)
+    #    - Combine outputs and apply P4
+    combined = (sbox_left_out << 2) | sbox_right_out
+    p4_out = permute_expand(combined, p4, 4)
+    #    - XOR with left to get new left
+    return left ^ p4_out, right
+
+
+from w1d1_test import test_feistel
+
+# Run the test
+test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
+
+# %%
+def encrypt_byte(
+    byte: int,
+    k1: int,
+    k2: int,
+    ip: List[int],
+    ip_inv: List[int],
+    ep: List[int],
+    s0: List[List[int]],
+    s1: List[List[int]],
+    p4: List[int],
+) -> int:
+    """
+    Encrypt or decrypt a single byte using DES.
+
+    For encryption: use (k1, k2)
+    For decryption: use (k2, k1) - reversed order!
+
+    Process:
+    1. Apply initial permutation (IP)
+    2. Split into 4-bit halves
+    3. Apply fk with first key
+    4. Swap halves
+    5. Apply fk with second key
+    6. Combine halves and apply IP⁻¹
+
+    Args:
+        byte: 8-bit value to process
+        k1: First subkey (8 bits)
+        k2: Second subkey (8 bits)
+        ip: Initial permutation table
+        ip_inv: Inverse initial permutation table
+        ep: Expansion permutation for fk
+        s0, s1: S-boxes for fk
+        p4: Permutation for fk
+
+    Returns:
+        8-bit processed value
+    """
+    # TODO: Implement DES encryption/decryption
+    #    - Apply IP
+    ip_out = permute_expand(byte, ip, 8)
+    left = (ip_out & 0b11110000) >> 4
+    right = ip_out & 0b00001111
+    #    - Two rounds with swap in between
+    left, right = fk(left, right, k1, ep, s0, s1, p4)
+    left, right = right, left
+    left, right = fk(left, right, k2, ep, s0, s1, p4)
+    combined = (left << 4) | right
+    #    - Apply IP⁻¹
+    ip_inv_out = permute_expand(combined, ip_inv, 8)
+    return ip_inv_out
+
+
+def des_encrypt(key: int, plaintext: bytes) -> bytes:
+    """Encrypt bytes using DES"""
+    k1, k2 = key_schedule(key, P10, P8)
+    return bytes(encrypt_byte(b, k1, k2, IP, IP_INV, EP, S0, S1, P4) for b in plaintext)
+
+
+def des_decrypt(key: int, ciphertext: bytes) -> bytes:
+    """Decrypt bytes using DES."""
+    k1, k2 = key_schedule(key, P10, P8)
+    # Note: reversed key order for decryption!
+    return bytes(encrypt_byte(b, k2, k1, IP, IP_INV, EP, S0, S1, P4) for b in ciphertext)
+from w1d1_test import test_des_complete
+
+
+# Run the test
+test_des_complete(encrypt_byte, des_encrypt, des_decrypt, key_schedule, P10, P8, IP, IP_INV, EP, S0, S1, P4)
+
+# %%
+
+
+def double_encrypt(key1: int, key2: int, plaintext: bytes) -> bytes:
+    """Encrypt twice with different keys."""
+    temp = des_encrypt(key1, plaintext)
+    return des_encrypt(key2, temp)
+
+
+def double_decrypt(key1: int, key2: int, ciphertext: bytes) -> bytes:
+    """Decrypt twice with different keys (reverse order)."""
+    temp = des_decrypt(key2, ciphertext)
+    return des_decrypt(key1, temp)
+
+
+def meet_in_the_middle_attack(plaintext: bytes, ciphertext: bytes) -> List[Tuple[int, int]]:
+    """
+    Find all key pairs (k1, k2) such that:
+    double_encrypt(k1, k2, plaintext) == ciphertext
+
+    Strategy:
+    1. Build table: for each k1, compute encrypt(k1, plaintext)
+    2. For each k2, compute decrypt(k2, ciphertext)
+    3. If decrypt(k2, ciphertext) is in our table, we found a match!
+
+    Args:
+        plaintext: Known plaintext
+        ciphertext: Corresponding ciphertext from double encryption
+
+    Returns:
+        List of (key1, key2) pairs that work
+    """
+    # TODO: Implement meet-in-the-middle attack
+    #    - Build table of all encrypt(k1, plaintext)
+    #    - For each k2, check if decrypt(k2, ciphertext) is in table
+    #    - Return all matching (k1, k2) pairs
+    pass
