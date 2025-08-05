@@ -28,3 +28,6 @@
 # 7
 -- the commands were given to us already. The task made sense. At first we didn't see how to read the output logs.
 
+
+# 8
+-- went quite smoothly but didn't quite understand how we are using DNS e.g. where is the DNS request going? Pranav explained that the evil.aisb.dev in theory should be the DNS server for any subdomain e.g. secret_data.evil.aisb.dev, so there just needs to be a program running on that server which can send a valid DNS response
