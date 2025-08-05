@@ -23,3 +23,4 @@
 
 # 6
 - 6.1 -- was not clear from the test error msg that i just need to catch the "FileNotFoundError". I thought it actually was not resolving the key file
+- 6.2 -- nothing hosted at the url ev1l.aisb.dev/exfiltrate. Didn't understand point of the excercise, but with help found out it's pointing out blacklists don't work.
