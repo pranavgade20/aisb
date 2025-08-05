@@ -1,0 +1,6 @@
+FROM mitmproxy/mitmproxy
+
+# Install these because the test files import it incidentally
+RUN pip install --no-cache-dir requests scapy mitmproxy dnspython
+
+COPY w1d2_test.py /home/mitmproxy/

@@ -1,0 +1,63 @@
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agent-container
+    user: "1000:1000"
+    volumes:
+      - ./w1d2_answers_agent.py:/app/w1d2_answers_agent.py
+      - ./w1d2_answers_nfqueue.py:/app/w1d2_answers_nfqueue.py
+      - ./w1d2_answers_mitmproxy.py:/app/w1d2_answers_mitmproxy.py
+    cap_add:
+      - NET_ADMIN # Required for iptables
+    networks:
+      - mitm-network
+    ports:
+      - "8081:8081" # Expose mitmweb interface port
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CONTAINER=agent
+
+      # UNCOMMENT THE TWO LINES BELOW IN EXERCISE 2.4
+      # - NO_PROXY=localhost,127.0.0.1
+      # - HTTP_PROXY=http://localhost:8080 # with a little bit more effort, you can run mitmproxy transparently by rerouting network traffic with iptables
+      # UNCOMMENT THE LINE BELOW IN EXERCISE 5.1
+      # - HTTPS_PROXY=http://localhost:8080
+
+
+  mitmproxy:
+    build:
+      context: .
+      dockerfile: Dockerfile_mitmproxy
+    container_name: mitmproxy-sidecar
+    # Share the network namespace with agent container
+    network_mode: "service:agent"
+    user: "0:0"
+    volumes:
+      - ./w1d2_answers_mitmproxy.py:/home/mitmproxy/rules.py
+      # UNCOMMENT THE LINE BELOW IN EXERCISE 5.3
+      # - ./mitmproxy-certs:/home/mitmproxy/.mitmproxy
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CONTAINER=mitmproxy
+    # CHANGE THE COMMAND BELOW IN EXERCISE 5.4
+    command: >
+      mitmdump --mode regular@8080 --showhost --set confdir=/home/mitmproxy/.mitmproxy -s /home/mitmproxy/rules.py
+    # For debugging, you can use mitmweb instead:
+    #    command: >
+    #      mitmweb
+    #      --web-host 0.0.0.0
+    #      --web-port 8081
+    #      --mode regular
+    #      --listen-port 8080
+    #      --showhost
+    #      --set web_username=admin
+    #      --set web_password=toor
+    #      -s /home/mitmproxy/rules.py
+networks:
+  mitm-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
