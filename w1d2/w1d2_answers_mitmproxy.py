@@ -69,10 +69,10 @@ def get_packet(question, request):
     )
 
 
-from mitmproxy.dns import DNSMessage, Question
+from mitmproxy.dns import DNSMessage, Question, ResourceRecord
 
 # def get_dns_block_response(question: Question, request: DNSMessage)-> DNSMessage:
-#     pass
+#     return get_packet()
 
 
 class DNSInterceptor:
@@ -104,13 +104,13 @@ class DNSInterceptor:
                 print("FOUND A SUSPICIOUS REQUEST ")
                 print("request", flow.request)
                 print("response", flow.response)
-                # flow.response = get_dns_block_response(question, flow.request)
+                flow.response = get_packet(question, flow.request)
         # TODO: Implement DNS filtering
         #   1. Check if flow.request exists
         #   2. Loop through flow.request.questions
         #   3. Check if question.type == 16 (TXT record)
         #   4. If question.name is a blocked domain:
-        #      - Set flow.response = get_dns_block_response(question, flow.request)
+        #  - Set flow.response = get_dns_block_response(question, flow.request)
         pass
 
 

