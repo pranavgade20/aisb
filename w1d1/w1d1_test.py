@@ -407,7 +407,7 @@ def test_meet_in_the_middle(meet_in_the_middle_attack, double_encrypt):
     if len(found_keys) > 5:
         print(f"  ... and {len(found_keys) - 5} more")
 
-    assert true_found, "Failed to find the true keys"
+    assert true_found, f"Failed to find the true keys {key1} and {key2}"
 
     # Verify all found keys work
     for k1, k2 in found_keys:
