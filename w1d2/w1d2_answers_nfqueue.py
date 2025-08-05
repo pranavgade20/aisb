@@ -1,3 +1,4 @@
+
 try:
     from scapy.all import IP
 
@@ -37,14 +38,22 @@ def process_packet(packet):
     Args:
         packet: NetfilterQueue packet object
     """
-    # TODO: Implement packet filtering logic
-    # 1. Parse the packet payload using scapy.IP(packet.get_payload())
-    # 2. Check if the destination IP (pkt.dst) is in BLOCKED_IPS:
-    #    - Log the blocked packet
-    #    - Call packet.drop()
-    # 3. Otherwise, call packet.accept()
-    # 4. Handle exceptions by dropping the packet for safety
-    pass
+    try:
+        # Parse packet
+        pkt = IP(packet.get_payload())
+
+        # Check if destination is blocked IP
+        if pkt.dst in BLOCKED_IPS:
+            print(f"Dropping packet to IP {pkt.dst}")
+            packet.drop()
+        else:
+            # Allow all other packets
+            packet.accept()
+
+    except Exception as e:
+        print(f"Error processing packet: {e}")
+        # On error, drop packet to be safe
+        packet.drop()
 
 
 from w1d2_test import test_packet_processor
