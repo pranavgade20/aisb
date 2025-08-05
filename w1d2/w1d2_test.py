@@ -131,7 +131,7 @@ def test_make_evil_request_pinned(make_evil_request_pinned):
         mock_get.assert_called_once()
         args, kwargs = mock_get.call_args
 
-        assert args[0] == "https://evil.aisb.dev/exfiltrate", "URL should use HTTPS"
+        assert args[0] == "https://ev1l.aisb.dev/exfiltrate", "URL should use HTTPS"
         assert kwargs.get("params") == {"data": "pinned_secret_456"}, "Query parameters should be correct"
         assert kwargs.get("verify") == "isrg-root-x1.pem", "Should use certificate pinning"
         assert result == "Pinned connection successful", "Should return response text"
