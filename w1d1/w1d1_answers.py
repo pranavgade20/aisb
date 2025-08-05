@@ -142,6 +142,59 @@ def recover_lcg_state(keystream_bytes: list[int]) -> int:
     pass
 
 
+from w1d1_stream_cipher_secrets import intercept_messages
+
+ciphertext1, ciphertext2 = intercept_messages(lcg_encrypt)
+print(f"Intercepted ciphertext 1 ({len(ciphertext1)} bytes): {ciphertext1[:50].hex()}...")
+print(f"Intercepted ciphertext 2 ({len(ciphertext2)} bytes): {ciphertext2[:50].hex()}...")
+
+# %%
+
+
+def crib_drag(ciphertext1: bytes, ciphertext2: bytes, crib: bytes) -> list[tuple[int, bytes]]:
+    """
+    Perform crib-dragging attack on two ciphertexts encrypted with the same keystream.
+
+    Args:
+        ciphertext1: First intercepted ciphertext
+        ciphertext2: Second intercepted ciphertext
+        crib: Known plaintext fragment to try
+
+    Returns:
+        List of (position, recovered_text) tuples for further analysis.
+    """
+    # TODO: Implement crib-dragging
+    #   - Use the xor_texts = C1 XOR C2 to find M1 XOR M2
+    #   - For each position in xor_texts, XOR the crib with the text at that position
+    #   - return a list of tuples (position, recovered_text)
+
+    # Hint:
+    # 1. Calculate xor_texts = C1 XOR C2 (which equals M1 XOR M2)
+    # 2. For each position from 0 to len(xor_texts) - len(crib):
+    #    a. XOR the crib with xor_texts at this position
+    #    b. Check if result is readable (all bytes are printable ASCII: 32-126)
+    #    c. If readable, add (position, recovered_text) to results
+    # 3. Return results list
+    results = []
+    xor_texts = ciphertext1 ^ ciphertext2
+    for i in range(len(xor_texts) - len(crib)):
+        crib_xor = xor_texts[i:i+len(crib)] ^ crib
+        legible = True
+        for b in crib_xor:
+            if b < 32 or b > 126:
+                legible = False
+                break
+        if legible:
+            results.append((i, crib_xor))
+
+
+
+
+from w1d1_test import test_crib_drag
+
+
+correct_position = test_crib_drag(crib_drag, ciphertext1, ciphertext2)
+
 #------------------ SECTION 2 ------------------
 
 # %%
