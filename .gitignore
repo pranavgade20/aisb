@@ -108,3 +108,4 @@ cython_debug/
 *_reference.py
 db.sqlite3
 aisb_ssh
+.DS_Store
