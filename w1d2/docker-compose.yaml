@@ -42,7 +42,7 @@ services:
       - CONTAINER=mitmproxy
     # CHANGE THE COMMAND BELOW IN EXERCISE 5.4
     command: >
-      mitmdump --mode regular@8080 --showhost --set confdir=/home/mitmproxy/.mitmproxy -s /home/mitmproxy/rules.py
+      mitmdump --mode dns@53 --showhost --set confdir=/home/mitmproxy/.mitmproxy -s /home/mitmproxy/rules.py
     # For debugging, you can use mitmweb instead:
     #    command: >
     #      mitmweb
