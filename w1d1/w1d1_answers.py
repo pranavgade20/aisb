@@ -11,7 +11,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from aisb_utils import report
 
-from typing import Generator
 
 # %%
 def lcg_keystream(seed: int) -> Generator[int, None, None]:
@@ -43,9 +42,8 @@ def lcg_keystream(seed: int) -> Generator[int, None, None]:
 
         yield X_N
 
+
 from w1d1_test import test_lcg_keystream
-
-
 
 
 # %%
@@ -65,19 +63,19 @@ def lcg_encrypt(seed: int, plaintext: bytes) -> bytes:
     # TODO: Implement stream cipher encryption
     #   - XOR each byte of plaintext with the bytes from lcg_keystream
     #   - return the resulting ciphertext as bytes
-    
+
     keystream = lcg_keystream(seed)
     cyphertext = [next(keystream) for i in range(len(plaintext))]
     cyphertext = bytes(cyphertext)
 
     return bytes(c ^ p for c, p in zip(cyphertext, plaintext))
 
+
 from w1d1_test import test_encrypt
 
 
-
 # %%
-test = b'test string'
+test = b"test string"
 print(test)
 
 
@@ -96,23 +94,22 @@ def lcg_decrypt(seed: int, ciphertext: bytes) -> bytes:
         Decrypted plaintext.
     """
     # TODO: Implement stream cipher decryption
-    
+
     keystream = lcg_keystream(seed)
     cyphertext = [next(keystream) for i in range(len(ciphertext))]
     cyphertext = bytes(cyphertext)
 
     return bytes(c ^ p for c, p in zip(cyphertext, ciphertext))
 
-from w1d1_test import test_decrypt
 
+from w1d1_test import test_decrypt
 
 
 from w1d1_test import test_stream_cipher
 
 
-
-
 # %%
+
 
 def recover_lcg_state(keystream_bytes: list[int]) -> int:
     """
@@ -177,6 +174,7 @@ def recover_lcg_state(keystream_bytes: list[int]) -> int:
             seed = ((state_0 - c) * a_inv) % m
             return seed
 
+
 from w1d1_test import test_lcg_state_recovery
 
 test_lcg_state_recovery(lcg_keystream, recover_lcg_state)
@@ -216,13 +214,14 @@ def crib_drag(ciphertext1: bytes, ciphertext2: bytes, crib: bytes) -> list[tuple
     #    c. If readable, add (position, recovered_text) to results
     # 3. Return results list
     pass
+
+
 from w1d1_test import test_crib_drag
 # correct_position = test_crib_drag(crib_drag, ciphertext1, ciphertext2)
 
 # ---------------------------------------------------------------------------
 # %%
 import random
-from typing import List, Tuple
 
 _params_rng = random.Random(0)
 P10 = list(range(10))
@@ -244,6 +243,7 @@ S0 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
 S1 = [[_params_rng.randrange(4) for _ in range(4)] for _ in range(4)]
 
 # %%
+
 
 def permute_expand(value: int, table: List[int], in_width: int) -> int:
     """
@@ -285,7 +285,6 @@ def permute_expand(value: int, table: List[int], in_width: int) -> int:
     # for bit in out:
     #     res = (res << 1) | bit
 
-
     # # return int(bin(res), 2)
     # return res
 
@@ -297,7 +296,9 @@ def permute_expand(value: int, table: List[int], in_width: int) -> int:
         out |= bit << (len(table) - 1 - i)
     return out
 
+
 from w1d1_test import test_permute_expand
+
 test_permute_expand(permute_expand)
 
 # Run the test
@@ -342,14 +343,14 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
     left_half = key >> 5
     right_half = key & 0b11111
     # step 3
-    left_half = ((left_half << 1)|(left_half >> (5 - 1))) & 0b11111
-    right_half = ((right_half << 1)|(right_half >> (5 - 1))) & 0b11111
+    left_half = ((left_half << 1) | (left_half >> (5 - 1))) & 0b11111
+    right_half = ((right_half << 1) | (right_half >> (5 - 1))) & 0b11111
     # step 4
     K1 = (left_half << 5) | right_half
     K1 = permute_expand(K1, p8, 10)
     # step 5
-    left_half = ((left_half << 2)|(left_half >> (5 - 2))) & 0b11111
-    right_half = ((right_half << 2)|(right_half >> (5 - 2))) & 0b11111
+    left_half = ((left_half << 2) | (left_half >> (5 - 2))) & 0b11111
+    right_half = ((right_half << 2) | (right_half >> (5 - 2))) & 0b11111
     # step 6
     K2 = (left_half << 5) | right_half
     K2 = permute_expand(K2, p8, 10)
@@ -358,6 +359,7 @@ def key_schedule(key: int, p10: List[int], p8: List[int]) -> Tuple[int, int]:
 
 
 from w1d1_test import test_key_schedule
+
 test_key_schedule(key_schedule, P10, P8)
 
 
@@ -387,13 +389,10 @@ def sbox_lookup(sbox: List[List[int]], bits: int) -> int:
         - Output = sbox[2][1]
     """
     # get row/col
-    bitlist = [
-        (bits >> i) & 1
-        for i in range(4)
-    ]
+    bitlist = [(bits >> i) & 1 for i in range(4)]
     bitlist = bitlist[::-1]
-    rowlist = [bitlist[0],bitlist[3]]
-    collist = [bitlist[1],bitlist[2]]
+    rowlist = [bitlist[0], bitlist[3]]
+    collist = [bitlist[1], bitlist[2]]
 
     row = (rowlist[0] << 1) | rowlist[1]
     col = (collist[0] << 1) | collist[1]
@@ -402,8 +401,8 @@ def sbox_lookup(sbox: List[List[int]], bits: int) -> int:
 
 
 from w1d1_test import test_sbox_lookup
-test_sbox_lookup(sbox_lookup, S0, S1)
 
+test_sbox_lookup(sbox_lookup, S0, S1)
 
 
 # %%
@@ -448,11 +447,14 @@ def fk(
     step6 = step5 ^ left
     return step6, right
 
+
 from w1d1_test import test_feistel
+
 test_feistel(sbox_lookup, fk, EP, S0, S1, P4)
 
 
 # Run the test
+
 
 # %%
 def encrypt_byte(
@@ -498,17 +500,17 @@ def encrypt_byte(
     #    - Two rounds with swap in between
     #    - Apply IP⁻¹
     #    - Same function for encrypt/decrypt!
-#     step1 = permute_expand(byte, ip, 8)
-#     step2_lhs = step1 >> 4
-#     step2_rhs = step1 & 0b1111
+    #     step1 = permute_expand(byte, ip, 8)
+    #     step2_lhs = step1 >> 4
+    #     step2_rhs = step1 & 0b1111
 
-#     step3_lhs, step3_rhs = fk(left=step2_lhs, right=step2_rhs, subkey=k1, ep=ep, s0=s0, s1=s1, p4=p4)
-#     step4_lhs, step4_rhs = step3_rhs, step3_lhs
-#     step5_lhs, step5_rhs = fk(left=step4_lhs, right=step4_rhs, subkey=k2, ep=ep, s0=s0, s1=s1, p4=p4)
+    #     step3_lhs, step3_rhs = fk(left=step2_lhs, right=step2_rhs, subkey=k1, ep=ep, s0=s0, s1=s1, p4=p4)
+    #     step4_lhs, step4_rhs = step3_rhs, step3_lhs
+    #     step5_lhs, step5_rhs = fk(left=step4_lhs, right=step4_rhs, subkey=k2, ep=ep, s0=s0, s1=s1, p4=p4)
 
-#     step6_1 = (step5_lhs << 4) | step5_rhs
-#     step6 = permute_expand(step6_1, ip_inv, 8)
-#     return step6
+    #     step6_1 = (step5_lhs << 4) | step5_rhs
+    #     step6 = permute_expand(step6_1, ip_inv, 8)
+    #     return step6
 
     # Step 1: Initial permutation
     bits = permute_expand(byte, ip, 8)
@@ -532,6 +534,7 @@ def encrypt_byte(
 
     return result
 
+
 def des_encrypt(key: int, plaintext: bytes) -> bytes:
     """Encrypt bytes using DES"""
     k1, k2 = key_schedule(key, P10, P8)
@@ -544,8 +547,52 @@ def des_decrypt(key: int, ciphertext: bytes) -> bytes:
     # Note: reversed key order for decryption!
     return bytes(encrypt_byte(b, k2, k1, IP, IP_INV, EP, S0, S1, P4) for b in ciphertext)
 
+
 from w1d1_test import test_des_complete
+
 # Run the test
 test_des_complete(encrypt_byte, des_encrypt, des_decrypt, key_schedule, P10, P8, IP, IP_INV, EP, S0, S1, P4)
 
+
 # %%
+def double_encrypt(key1: int, key2: int, plaintext: bytes) -> bytes:
+    """Encrypt twice with different keys."""
+    temp = des_encrypt(key1, plaintext)
+    return des_encrypt(key2, temp)
+
+
+def double_decrypt(key1: int, key2: int, ciphertext: bytes) -> bytes:
+    """Decrypt twice with different keys (reverse order)."""
+    temp = des_decrypt(key2, ciphertext)
+    return des_decrypt(key1, temp)
+
+
+def meet_in_the_middle_attack(plaintext: bytes, ciphertext: bytes) -> List[Tuple[int, int]]:
+    """
+    Find all key pairs (k1, k2) such that:
+    double_encrypt(k1, k2, plaintext) == ciphertext
+
+    Strategy:
+    1. Build table: for each k1, compute encrypt(k1, plaintext)
+    2. For each k2, compute decrypt(k2, ciphertext)
+    3. If decrypt(k2, ciphertext) is in our table, we found a match!
+
+    Args:
+        plaintext: Known plaintext
+        ciphertext: Corresponding ciphertext from double encryption
+
+    Returns:
+        List of (key1, key2) pairs that work
+    """
+    # TODO: Implement meet-in-the-middle attack
+    #    - Build table of all encrypt(k1, plaintext)
+    #    - For each k2, check if decrypt(k2, ciphertext) is in table
+    #    - Return all matching (k1, k2) pairs
+    encrypted_table = []
+
+
+from w1d1_test import test_meet_in_the_middle
+
+
+# Run the test
+test_meet_in_the_middle(meet_in_the_middle_attack, double_encrypt)
