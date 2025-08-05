@@ -541,7 +541,7 @@ def test_ecb_mode(encrypt, decrypt, SBOX, PBOX, INV_SBOX, INV_PBOX):
     odd_message = b"Hello"
     ciphertext2 = encrypt(key, odd_message, SBOX, PBOX)
     decrypted2 = decrypt(key, ciphertext2, INV_SBOX, INV_PBOX)
-    assert decrypted2 == odd_message, "Failed with odd-length message"
+    assert decrypted2 == odd_message, "Failed with odd-length message: {} / {}".format(decrypted2, odd_message)
 
     # Test 3: ECB pattern weakness
     # Repeating blocks should encrypt to the same ciphertext

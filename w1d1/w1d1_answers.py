@@ -609,7 +609,7 @@ def meet_in_the_middle_attack(plaintext: bytes, ciphertext: bytes) -> List[Tuple
 
 
     # TODO: Implement meet-in-the-middle attack
-    #    - Build table of all encrypt(k1, plaintext)
+    #    - Build table of all encrypt(k1, plaintext)edes
     #    - For each k2, check if decrypt(k2, ciphertext) is in table
     #    - Return all matching (k1, k2) pairs
     pass
@@ -619,3 +619,276 @@ from w1d1_test import test_meet_in_the_middle
 
 # Run the test
 test_meet_in_the_middle(meet_in_the_middle_attack, double_encrypt)
+
+
+from typing import List
+import random
+
+
+def _generate_sbox(seed: int = 1):
+    rng = random.Random(seed)
+    sbox = list(range(16))
+    rng.shuffle(sbox)
+    inv = [0] * 16
+    for i, v in enumerate(sbox):
+        inv[v] = i
+    return sbox, inv
+
+
+SBOX, INV_SBOX = _generate_sbox()
+
+
+def substitute(x: int, sbox: List[int]) -> int:
+    """
+    Apply S-box substitution to a 16-bit value.
+
+    The 16-bit input is divided into four 4-bit nibbles.
+    Each nibble is substituted using the provided S-box.
+
+    Args:
+        x: 16-bit integer to substitute
+        sbox: List of 16 integers (0-15) defining the substitution
+
+    Returns:
+        16-bit integer after substitution
+    """
+    # TODO: Implement S-box substitution
+    #    - Extract each 4-bit nibble from x
+    #    - Look up the substitution for each nibble in sbox
+    #    - Combine the substituted nibbles into the output
+    substitutions = []
+    for i in range(4):
+        nibble = (x >> (4 * i)) & 0b1111
+        substitutions.append(sbox[nibble])
+
+    combined = 0x0
+    for substitution in reversed(substitutions):
+        combined = ((combined << 4) + substitution)
+
+    return combined
+
+
+
+from w1d1_test import test_substitute
+
+
+# Run the test
+test_substitute(substitute, SBOX)
+
+
+def _generate_pbox(seed: int = 2):
+    rng = random.Random(seed)
+    pbox = list(range(16))
+    rng.shuffle(pbox)
+    inv = [0] * 16
+    for i, p in enumerate(pbox):
+        inv[p] = i
+    return pbox, inv
+
+
+PBOX, INV_PBOX = _generate_pbox()
+
+
+def permute(x: int, pbox: List[int]) -> int:
+    """
+    Apply P-box permutation to a 16-bit value.
+
+    For each output bit position i, take the bit from input position pbox[i].
+
+    Args:
+        x: 16-bit integer to permute
+        pbox: List of 16 integers (0-15) defining the permutation
+              pbox[i] = j means output bit i comes from input bit j
+
+    Returns:
+        16-bit integer after permutation
+    """
+    # TODO: Implement P-box permutation
+    #    - For each output position i (0 to 15)
+    #    - Get the input bit from position pbox[i]
+    #    - Place it at output position i
+    return permute_expand(x, pbox, 16)
+
+from w1d1_test import test_permute
+
+
+# Run the test
+test_permute(permute, PBOX)
+
+
+def round_keys(key: int) -> List[int]:
+    """Generate round keys from the main key."""
+    import random
+
+    rng = random.Random(key)
+    return [rng.randrange(0, 1 << 16) for _ in range(3)]
+
+
+def encrypt_block(block: int, keys: List[int], sbox: List[int], pbox: List[int]) -> int:
+    """
+    Encrypt a single 16-bit block using the SPN cipher.
+
+    The cipher consists of:
+    1. XOR with key[0]
+    2. S-box substitution
+    3. P-box permutation
+    4. XOR with key[1]
+    5. S-box substitution
+    6. P-box permutation
+    7. XOR with key[2]
+
+    Args:
+        block: 16-bit integer to encrypt
+        keys: List of 3 round keys
+        sbox: S-box for substitution
+        pbox: P-box for permutation
+
+    Returns:
+        16-bit encrypted block
+    """
+    # TODO: Implement the encryption algorithm
+    #    - Start with XOR of block and keys[0]
+    #    - Apply S-box substitution and P-box permutation
+    #    - XOR with keys[1]
+    #    - Apply S-box substitution and P-box permutation again
+    #    - End with XOR of keys[2]
+    enc = block ^ keys[0]
+    enc = substitute(enc, sbox)
+    enc = permute(enc, pbox)
+    enc = enc ^ keys[1]
+    enc = substitute(enc, sbox)
+    enc = permute(enc, pbox)
+    return enc ^ keys[2]
+
+
+def decrypt_block(block: int, keys: List[int], inv_sbox: List[int], inv_pbox: List[int]) -> int:
+    """
+    Decrypt a single 16-bit block using the SPN cipher.
+
+    Decryption reverses the encryption process:
+    1. XOR with key[2]
+    2. Inverse P-box permutation
+    3. Inverse S-box substitution
+    4. XOR with key[1]
+    5. Inverse P-box permutation
+    6. Inverse S-box substitution
+    7. XOR with key[0]
+
+    Args:
+        block: 16-bit integer to decrypt
+        keys: List of 3 round keys (same as encryption)
+        inv_sbox: Inverse S-box for substitution
+        inv_pbox: Inverse P-box for permutation
+
+    Returns:
+        16-bit decrypted block
+    """
+    dec = block ^ keys[2]
+    dec = permute(dec, inv_pbox)
+    dec = substitute(dec, inv_sbox)
+    dec = dec ^ keys[1]
+    dec = permute(dec, inv_pbox)
+    dec = substitute(dec, inv_sbox)
+    return dec ^ keys[0]
+
+from w1d1_test import test_block_cipher
+
+
+# Run the test
+test_block_cipher(encrypt_block, decrypt_block, round_keys, SBOX, PBOX, INV_SBOX, INV_PBOX)
+
+
+def aes_encrypt(key: int, plaintext: bytes, sbox: List[int], pbox: List[int]) -> bytes:
+    """
+    Encrypt a message using ECB mode with our 16-bit block cipher.
+
+    Process:
+    1. Generate round keys from the main key
+    2. Pad the message if necessary (with null bytes)
+    3. Split into 2-byte blocks
+    4. Encrypt each block
+    5. Concatenate results (truncate padding if needed)
+
+    Args:
+        key: Encryption key (used as seed for round key generation)
+        plaintext: Bytes to encrypt
+        sbox: S-box for substitution
+        pbox: P-box for permutation
+
+    Returns:
+        Encrypted bytes (same length as plaintext)
+    """
+    # TODO: Implement ECB encryption
+    #    - Generate round keys using round_keys()
+    #    - Handle padding if message length is odd
+    #    - Process each 2-byte block
+    #    - Return result truncated to original length
+    keys = round_keys(key)
+
+    plaintext_bytes = []
+    for b in plaintext:
+        plaintext_bytes.append(b)
+    print(f"{plaintext_bytes=}")
+
+    if len(plaintext) % 2 != 0:
+        plaintext = plaintext + b'\0'
+
+    result = bytearray()
+
+    for i in range(len(plaintext) // 2):
+        byte_one, byte_two = plaintext[i*2], plaintext[i*2+1]
+        two_bytes = (byte_one << 8) + int(byte_two)
+        encrypted = encrypt_block(two_bytes, keys, sbox, pbox)
+        print(f"{format(encrypted, '016b')=}")
+        enc_byte_one, enc_byte_two = (encrypted >> 8) & 0b11111111, encrypted & 0b11111111
+        result.extend([enc_byte_one, enc_byte_two])
+
+    return result
+
+
+def aes_decrypt(key: int, ciphertext: bytes, inv_sbox: List[int], inv_pbox: List[int]) -> bytes:
+    """
+    Decrypt a message using ECB mode with our 16-bit block cipher.
+
+    Process:
+    1. Generate round keys from the main key
+    2. Pad the ciphertext if necessary
+    3. Split into 2-byte blocks
+    4. Decrypt each block
+    5. Concatenate results (truncate padding if needed)
+
+    Args:
+        key: Decryption key (same as encryption key)
+        ciphertext: Bytes to decrypt
+        inv_sbox: Inverse S-box for substitution
+        inv_pbox: Inverse P-box for permutation
+
+    Returns:
+        Decrypted bytes (same length as ciphertext)
+    """
+    # TODO: Implement ECB decryption
+    #    - Similar to encryption but use decrypt_block
+    #    - Remember to use inverse S-box and P-box
+    keys = round_keys(key)
+
+    if len(ciphertext) % 2 == 1:
+        ciphertext = ciphertext + b'\0'
+
+    result = bytearray()
+    for i in range(len(ciphertext) // 2):
+        byte_one, byte_two = ciphertext[i*2], ciphertext[i*2+1]
+        two_bytes = (byte_one << 8) + byte_two
+        decrypted = decrypt_block(two_bytes, keys, inv_sbox, inv_pbox)
+        result.extend([(decrypted >> 8) & 0b11111111, decrypted & 0b11111111])
+
+    if result[-1] == 0:
+        return result[:-1]
+    else:
+        return result
+
+
+from w1d1_test import test_ecb_mode
+
+
+# Run the test
+test_ecb_mode(aes_encrypt, aes_decrypt, SBOX, PBOX, INV_SBOX, INV_PBOX)
