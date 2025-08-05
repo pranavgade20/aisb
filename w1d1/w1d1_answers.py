@@ -573,7 +573,8 @@ def substitute(x: int, sbox: List[int]) -> int:
 
     nibbles = [first_nibble, second_nibble, third_nibble, fourth_nibble]
 
-    substituted_nibbles = []
+
+    substituted_nibbles: list[int] = []
     for nibble in nibbles:
         substituted_nibbles.append(sbox[nibble])
     
