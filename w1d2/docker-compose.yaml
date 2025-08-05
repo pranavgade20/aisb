@@ -23,7 +23,7 @@ services:
       - NO_PROXY=localhost,127.0.0.1
       - HTTP_PROXY=http://localhost:8080 # with a little bit more effort, you can run mitmproxy transparently by rerouting network traffic with iptables
       # UNCOMMENT THE LINE BELOW IN EXERCISE 5.1
-      # - HTTPS_PROXY=http://localhost:8080
+      - HTTPS_PROXY=http://localhost:8080
 
 
   mitmproxy:
