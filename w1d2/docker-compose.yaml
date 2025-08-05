@@ -23,7 +23,7 @@ services:
       - NO_PROXY=localhost,127.0.0.1
       - HTTP_PROXY=http://localhost:8080 # with a little bit more effort, you can run mitmproxy transparently by rerouting network traffic with iptables
       # UNCOMMENT THE LINE BELOW IN EXERCISE 5.1
-      # - HTTPS_PROXY=http://localhost:8080
+      - HTTPS_PROXY=http://localhost:8080
 
 
   mitmproxy:
@@ -37,7 +37,7 @@ services:
     volumes:
       - ./w1d2_answers_mitmproxy.py:/home/mitmproxy/rules.py
       # UNCOMMENT THE LINE BELOW IN EXERCISE 5.3
-      # - ./mitmproxy-certs:/home/mitmproxy/.mitmproxy
+      - ./mitmproxy-certs:/home/mitmproxy/.mitmproxy
     environment:
       - PYTHONUNBUFFERED=1
       - CONTAINER=mitmproxy
