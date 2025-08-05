@@ -29,4 +29,4 @@ USER myuser
 # Command to run the application
 # CHANGE THE COMMAND BELOW IN EXERCISE 7.1
 CMD ["python", "w1d2_answers_agent.py"]
-# CMD ["bash", "start-agent.sh"]
+CMD ["bash", "start-agent.sh"]

