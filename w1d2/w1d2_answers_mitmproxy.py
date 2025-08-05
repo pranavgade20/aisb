@@ -72,7 +72,22 @@ def get_packet(question, request):
 from mitmproxy.dns import DNSMessage, Question, ResourceRecord
 
 # def get_dns_block_response(question: Question, request: DNSMessage)-> DNSMessage:
-#     return get_packet()
+#     return DNSMessage(
+#         id=request.id,
+#         query=False,
+#         op_code=request.op_code,
+#         authoritative_answer=True,
+#         truncation=False,
+#         recursion_desired=request.recursion_desired,
+#         recursion_available=True,
+#         reserved=0,
+#         response_code=TODO,
+#         questions=[request.question],
+#         answers=[ResourceRecord(??)],
+#         authorities=[request.authority],
+#         additionals=[request.additional],
+#     )
+
 
 
 class DNSInterceptor:
@@ -110,7 +125,7 @@ class DNSInterceptor:
         #   2. Loop through flow.request.questions
         #   3. Check if question.type == 16 (TXT record)
         #   4. If question.name is a blocked domain:
-        #  - Set flow.response = get_dns_block_response(question, flow.request)
+        #      - Set flow.response = get_dns_block_response(question, flow.request)
         pass
 
 
