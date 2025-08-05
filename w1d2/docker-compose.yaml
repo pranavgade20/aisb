@@ -42,19 +42,20 @@ services:
       - PYTHONUNBUFFERED=1
       - CONTAINER=mitmproxy
     # CHANGE THE COMMAND BELOW IN EXERCISE 5.4
-    command: >
-      mitmdump --mode regular@8080 --showhost --set confdir=/home/mitmproxy/.mitmproxy -s /home/mitmproxy/rules.py
-    # For debugging, you can use mitmweb instead:
     # command: >
-    #   mitmweb
-    #   --web-host 0.0.0.0
-    #   --web-port 8081
-    #   --mode regular
-    #   --listen-port 8080
-    #   --showhost
-    #   --set web_username=admin
-    #   --set web_password=toor
-    #   -s /home/mitmproxy/rules.py
+    #   mitmdump --mode regular@8080 --showhost --set confdir=/home/mitmproxy/.mitmproxy -s /home/mitmproxy/rules.py --mode dns@53
+    # For debugging, you can use mitmweb instead:
+    command: >
+      mitmweb
+      --web-host 0.0.0.0
+      --web-port 8081
+      --mode regular
+      --listen-port 8080
+      --showhost
+      --set web_username=admin
+      --set web_password=toor
+      -s /home/mitmproxy/rules.py
+      --mode dns@53
 networks:
   mitm-network:
     driver: bridge

