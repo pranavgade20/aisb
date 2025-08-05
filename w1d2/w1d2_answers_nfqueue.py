@@ -49,13 +49,15 @@ def process_packet(packet):
     try:
         # TODO: Implement packet filtering logic
         # 1. Parse the packet payload using scapy.IP(packet.get_payload())
-        payload = scapy.IP(packet.get_payload())
+        payload = IP(packet.get_payload())
+        print(payload.dst)
         # 2. Check if the destination IP (pkt.dst) is in BLOCKED_IPS:
         #    - Log the blocked packet
         #    - Call packet.drop()
 
         if payload.dst in BLOCKED_IPS:
             # log
+            print("Dropped packet from:")
             print(payload.dst)
             packet.drop()
         # 3. Otherwise, call packet.accept()
@@ -64,7 +66,7 @@ def process_packet(packet):
         # 4. Handle exceptions by dropping the packet for safety
     except Exception as e:
         print(str(e))
-        packet.drom()
+        packet.drop()
     pass
 
 
