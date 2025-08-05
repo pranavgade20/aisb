@@ -1,7 +1,6 @@
 # %%
 
 
-
 try:
     from scapy.all import IP
 
@@ -42,7 +41,7 @@ def process_packet(packet):
         packet: NetfilterQueue packet object
     """
     blocked_packets = []
-    
+
     try:
         payload = IP(packet.get_payload())
         if payload.dst in BLOCKED_IPS:
@@ -53,9 +52,6 @@ def process_packet(packet):
     except Exception as e:
         print(e)
         packet.drop()
-        
-        
-
 
     # TODO: Implement packet filtering logic
     # 1. Parse the packet payload using scapy.IP(packet.get_payload())
@@ -65,7 +61,10 @@ def process_packet(packet):
     # 3. Otherwise, call packet.accept()
     # 4. Handle exceptions by dropping the packet for safety
     pass
+
+
 from w1d2_test import test_packet_processor
+
 test_packet_processor(process_packet)
 print("Starting packet filter...")
 nfqueue = NetfilterQueue()
@@ -76,3 +75,4 @@ except KeyboardInterrupt:
     print("Stopping packet filter...")
 finally:
     nfqueue.unbind()
+# %%
