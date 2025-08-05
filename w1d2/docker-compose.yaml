@@ -23,7 +23,7 @@ services:
       - NO_PROXY=localhost,127.0.0.1
       - HTTP_PROXY=http://localhost:8080 # with a little bit more effort, you can run mitmproxy transparently by rerouting network traffic with iptables
       # UNCOMMENT THE LINE BELOW IN EXERCISE 5.1
-      # - HTTPS_PROXY=http://localhost:8080
+      - HTTPS_PROXY=http://localhost:8080
 
 
   mitmproxy:
@@ -37,24 +37,24 @@ services:
     volumes:
       - ./w1d2_answers_mitmproxy.py:/home/mitmproxy/rules.py
       # UNCOMMENT THE LINE BELOW IN EXERCISE 5.3
-      # - ./mitmproxy-certs:/home/mitmproxy/.mitmproxy
+      - ./mitmproxy-certs:/home/mitmproxy/.mitmproxy
     environment:
       - PYTHONUNBUFFERED=1
       - CONTAINER=mitmproxy
     # CHANGE THE COMMAND BELOW IN EXERCISE 5.4
+    #command: >
+    #  mitmdump --mode regular@8080 --showhost --set confdir=/home/mitmproxy/.mitmproxy -s /home/mitmproxy/rules.py
+    #For debugging, you can use mitmweb instead:
     command: >
-      mitmdump --mode regular@8080 --showhost --set confdir=/home/mitmproxy/.mitmproxy -s /home/mitmproxy/rules.py
-    # For debugging, you can use mitmweb instead:
-    #    command: >
-    #      mitmweb
-    #      --web-host 0.0.0.0
-    #      --web-port 8081
-    #      --mode regular
-    #      --listen-port 8080
-    #      --showhost
-    #      --set web_username=admin
-    #      --set web_password=toor
-    #      -s /home/mitmproxy/rules.py
+          mitmweb
+          --web-host 0.0.0.0
+          --web-port 8081
+          --mode regular
+          --listen-port 8080
+          --showhost
+          --set web_username=admin
+          --set web_password=toor
+          -s /home/mitmproxy/rules.py
 networks:
   mitm-network:
     driver: bridge

