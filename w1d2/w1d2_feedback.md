@@ -19,3 +19,4 @@
 # 5
 - 5.1 -- we were stuck on this step for ages (from about 11:30 to 14:30 incl a lunchbreak). quite frustrating
 - the rest was a bit opaque, don't really understand what we did here, just uncommented some code in dockerfiles etc
+- 5.4 -- dont see anything when filtering for tcp.port == 8080 in wireshark
