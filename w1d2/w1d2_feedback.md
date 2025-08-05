@@ -11,5 +11,6 @@
 
 - thought the agent was the blueteam but it is the redteam
 - interesting to know th enon-abstracted version of the network setup / man in the middle setup
+- would have been cool to actually see the request data in wireshark (i.e. decode the bits)
 
 # 3
