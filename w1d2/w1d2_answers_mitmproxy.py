@@ -27,9 +27,10 @@ class RequestBlocker:
             print("response blocked")
         else:
             print("response NOT blocked")
-        print(flow.response)
 
 
 # Initialize the addon for mitmproxy
 addons: list = []
 addons = [RequestBlocker()]
+
+# %%
