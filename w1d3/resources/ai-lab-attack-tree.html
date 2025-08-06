@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Research Lab - Attack Tree</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .mermaid {
+            text-align: center;
+            background-color: white;
+        }
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .legend h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .legend ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .legend li {
+            margin: 8px 0;
+            padding: 5px;
+        }
+        .insights {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+        }
+        .zoom-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 1000;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        .zoom-controls:hover {
+            opacity: 1;
+        }
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background-color: #333;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .zoom-btn:hover {
+            background-color: #555;
+            transform: scale(1.1);
+        }
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+        .diagram-container {
+            transition: transform 0.3s ease;
+            transform-origin: center center;
+            cursor: grab;
+        }
+        .diagram-container.dragging {
+            cursor: grabbing;
+            transition: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoom-in" title="Zoom In">+</button>
+        <button class="zoom-btn" id="zoom-out" title="Zoom Out">−</button>
+        <button class="zoom-btn" id="zoom-reset" title="Reset Zoom">⌂</button>
+    </div>
+
+    <div class="container">
+        <h1>AI Research Lab - Attack Tree</h1>
+        
+        <div class="diagram-container">
+            <div class="mermaid">
+graph TD
+    %% Main Goal
+    A["🎯 Steal<br/>Frontier Model<br/>Weights"] --> B{OR}
+    
+    %% Major attack vectors
+    B --> C["🌐 Attack via<br/>Public API<br/>Gateway"]
+    B --> D["🔬 Attack via<br/>Experiment<br/>Infrastructure"]
+    B --> E["☁️ Attack Job<br/>Orchestration<br/>(Kubeflow)"]
+    
+    %% Public API Attack Path
+    C --> G{AND}
+    G --> H["📡 Access<br/>Public API<br/>Endpoint"]
+    G --> I["⚡ Exploit API<br/>to Access<br/>Models"]
+    
+    H --> J{OR}
+    J --> K["👤 Obtain Valid<br/>Customer API<br/>Credentials"]
+    J --> L["🔓 Compromise<br/>Existing Customer<br/>Account"]
+    J --> M["🕳️ Exploit Auth<br/>Bypass<br/>Vulnerabilities"]
+    
+    I --> N{OR}
+    N --> O["🧠 Model Weight<br/>Extraction via<br/>Repeated Inference"]
+    N --> P["💥 Direct Backend<br/>Access via API<br/>Gateway Bypass"]
+    N --> Q["🔍 Parameter<br/>Extraction via<br/>Prompt Injection"]
+    
+    %% Experiment Infrastructure Attack
+    D --> R{AND}
+    R --> S["🔑 Gain<br/>Experiment<br/>Submission Access"]
+    R --> T["💻 Execute<br/>Malicious<br/>Experiment Code"]
+    
+    S --> U{OR}
+    U --> V["👨‍🔬 Use Internal<br/>Researcher Account<br/>Credentials"]
+    U --> W["🤝 Leverage External<br/>Collaborator<br/>Submission Rights"]
+    U --> X["🔐 Compromise<br/>Kubernetes Service<br/>Account Tokens"]
+    
+    T --> Y{AND}
+    Y --> Z["📦 Deploy<br/>Malicious<br/>Experiment Job"]
+    Y --> AA["🏃‍♂️ Execute Code<br/>on Compute<br/>Cluster"]
+    Y --> BB["🎯 Access<br/>Model<br/>Weights"]
+    
+    Z --> CC{OR}
+    CC --> DD["🐍 Submit Python<br/>Code with Model<br/>Weight Exfiltration"]
+    CC --> EE["📋 Configure Job<br/>with Excessive<br/>Volume Mounts"]
+    
+    AA --> FF{OR}
+    FF --> GG["🚪 Break Out of<br/>Container to Access<br/>Host System"]
+    FF --> HH["📂 Access Shared<br/>Storage Volumes with<br/>Model Data"]
+    FF --> II["🔗 Escalate via<br/>Kubernetes Service<br/>Account Permissions"]
+    
+    BB --> JJ{OR}
+    JJ --> KK["💾 Read Model<br/>Weight Files from<br/>Shared Filesystem"]
+    JJ --> LL["🌐 Extract Weights<br/>from Inference<br/>Service Memory"]
+    JJ --> MM["🔑 Steal Cloud<br/>Storage Access<br/>Credentials"]
+    
+    %% Kubeflow Attack Path
+    E --> NN{AND}
+    NN --> OO["🎛️ Compromise<br/>Kubeflow<br/>Control Plane"]
+    NN --> PP["🏗️ Abuse Job<br/>Orchestration<br/>Capabilities"]
+    
+    OO --> QQ{OR}
+    QQ --> RR["🌐 Exploit Kubeflow<br/>Dashboard Web App<br/>Vulnerabilities"]
+    QQ --> SS["🔧 Compromise<br/>Underlying Kubernetes<br/>API Server"]
+    QQ --> TT["🆔 Steal Service<br/>Account Tokens from<br/>Running Jobs"]
+    
+    PP --> UU{OR}
+    UU --> VV["📝 Inject Malicious<br/>Code into Existing<br/>Experiment Jobs"]
+    UU --> WW["🚀 Create Jobs<br/>with Cluster Admin<br/>Privileges"]
+    UU --> XX["📊 Access Experiment<br/>Results Containing<br/>Model Info"]
+    
+    %% Cross-cutting attacks
+    B --> JJJ["🔄 Lateral<br/>Movement<br/>Attacks"]
+    JJJ --> KKK{AND}
+    KKK --> LLL["🎯 Initial<br/>Foothold"]
+    KKK --> MMM["🕷️ Pivot to<br/>Model<br/>Storage"]
+    
+    LLL --> NNN{OR}
+    NNN --> OOO["💻 Phish Researcher<br/>Laptops for SSH<br/>Keys and Tokens"]
+    NNN --> PPP["📧 Compromise<br/>Python Packages<br/>Used in Experiments"]
+    NNN --> QQQ["☁️ Exploit<br/>Misconfigured Cloud<br/>IAM Policies"]
+    
+    MMM --> RRR{OR}
+    RRR --> SSS["🗄️ Access Training<br/>Infrastructure Where<br/>Models are Created"]
+    RRR --> TTT["☁️ Access Cloud<br/>Storage Containing<br/>Model Weights"]
+    RRR --> UUU["🔐 Escalate to<br/>High-Privilege Model<br/>Storage Access"]
+
+    %% Styling
+    classDef goalNode fill:#ff9999,stroke:#333,stroke-width:3px,color:#000
+    classDef andNode fill:#87CEEB,stroke:#333,stroke-width:2px,color:#000
+    classDef orNode fill:#98FB98,stroke:#333,stroke-width:2px,color:#000
+    classDef actionNode fill:#FFE4B5,stroke:#333,stroke-width:1px,color:#000
+    
+    class A goalNode
+    class G,R,Y,NN,YY,KKK andNode
+    class B,J,N,U,CC,FF,JJ,QQ,UU,BBB,FFF,NNN,RRR orNode
+    class O,P,Q,C,D,E,F,H,I,S,T,Z,AA,BB,OO,PP,ZZ,AAA,LLL,MMM,K,L,M,V,W,X,DD,EE,GG,HH,II,KK,LL,MM,RR,SS,TT,VV,WW,XX,CCC,DDD,EEE,GGG,HHH,III,OOO,PPP,QQQ,SSS,TTT,UUU,JJJ actionNode
+            </div>
+        </div>
+
+        <div class="legend">
+            <h2>🔍 Attack Tree Legend</h2>
+            <ul>
+                <li style="background-color: #ff9999; border-radius: 3px;">🎯 <strong>Red Nodes:</strong> Main attack goal (steal frontier model weights)</li>
+                <li style="background-color: #87CEEB; border-radius: 3px;">🔵 <strong>Blue Nodes:</strong> AND gates (all conditions must be met)</li>
+                <li style="background-color: #98FB98; border-radius: 3px;">🟢 <strong>Green Nodes:</strong> OR gates (any one condition can be met)</li>
+                <li style="background-color: #FFE4B5; border-radius: 3px;">🟡 <strong>Yellow Nodes:</strong> Sub-goals and actions</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                background: '#ffffff',
+                primaryColor: '#ffffff',
+                primaryTextColor: '#000000',
+                primaryBorderColor: '#333333',
+                lineColor: '#333333'
+            }
+        });
+
+        // Zoom and pan functionality (same as LastPass example)
+        let currentZoom = 1;
+        let panX = 0;
+        let panY = 0;
+        const zoomStep = 0.2;
+        const minZoom = 0.5;
+        const maxZoom = 3;
+
+        const diagramContainer = document.querySelector('.diagram-container');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const zoomResetBtn = document.getElementById('zoom-reset');
+
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function updateTransform() {
+            diagramContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
+            zoomInBtn.disabled = currentZoom >= maxZoom;
+            zoomOutBtn.disabled = currentZoom <= minZoom;
+            zoomInBtn.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+            zoomOutBtn.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+        }
+
+        zoomInBtn.addEventListener('click', () => {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                updateTransform();
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                updateTransform();
+            }
+        });
+
+        zoomResetBtn.addEventListener('click', () => {
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            updateTransform();
+        });
+
+        diagramContainer.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                isDragging = true;
+                lastX = e.clientX;
+                lastY = e.clientY;
+                diagramContainer.classList.add('dragging');
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - lastX;
+                const deltaY = e.clientY - lastY;
+                panX += deltaX;
+                panY += deltaY;
+                lastX = e.clientX;
+                lastY = e.clientY;
+                updateTransform();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                diagramContainer.classList.remove('dragging');
+            }
+        });
+
+        document.addEventListener('mouseleave', () => {
+            if (isDragging) {
+                isDragging = false;
+                diagramContainer.classList.remove('dragging');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '=' || e.key === '+') {
+                    e.preventDefault();
+                    zoomInBtn.click();
+                } else if (e.key === '-') {
+                    e.preventDefault();
+                    zoomOutBtn.click();
+                } else if (e.key === '0') {
+                    e.preventDefault();
+                    zoomResetBtn.click();
+                }
+            }
+        });
+
+        diagramContainer.addEventListener('wheel', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    zoomInBtn.click();
+                } else {
+                    zoomOutBtn.click();
+                }
+            }
+        });
+
+        updateTransform();
+    </script>
+</body>
+</html>

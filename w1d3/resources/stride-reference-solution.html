@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    h2 {
+        color: #333;
+        margin-top: 30px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 14px;
+    }
+    th {
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+        font-weight: bold;
+    }
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        vertical-align: top;
+    }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .priority-high {
+        background-color: #ffdddd;
+        font-weight: bold;
+    }
+    .priority-medium {
+        background-color: #fff4dd;
+    }
+    .priority-low {
+        background-color: #e6ffe6;
+    }
+    .asset-header {
+        background-color: #e0e0e0;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<h1>STRIDE Analysis - AI Lab Infrastructure</h1>
+
+<table>
+<thead>
+<tr>
+    <th style="width: 18%;">Data Flow / Asset</th>
+    <th style="width: 8%;">Category</th>
+    <th style="width: 22%;">Threat</th>
+    <th style="width: 8%;">Likelihood</th>
+    <th style="width: 7%;">Impact</th>
+    <th style="width: 7%;">Priority</th>
+    <th style="width: 20%;">Controls / Mitigations</th>
+    <th style="width: 10%;">Validation</th>
+</tr>
+</thead>
+<tbody>
+
+
+<!-- External Collaborator → Job Orchestration -->
+<tr class="asset-header">
+    <td colspan="8"><strong>Data Flow: External Collaborator → Job Orchestration</strong></td>
+</tr>
+<tr>
+    <td rowspan="6"><strong>External collaborator → Job orchestration</strong><br><em>(Kubeflow)</em></td>
+    <td>Spoofing</td>
+    <td>Unauthorized user gains access by stealing or forging collaborator credentials</td>
+    <td>Medium</td>
+    <td>High</td>
+    <td class="priority-high">High</td>
+    <td>• SSO with MFA enforcement<br>
+        • Session timeout policies<br>
+        • IP allowlisting for known collaborators<br>
+        • Regular credential rotation</td>
+    <td>• Failed login monitoring<br>
+        • Quarterly access reviews</td>
+</tr>
+<tr>
+    <td>Tampering</td>
+    <td>Malicious actor submits job configurations designed to corrupt experimental model weights or training pipeline</td>
+    <td>Low</td>
+    <td>High</td>
+    <td class="priority-medium">Medium</td>
+    <td>• Code review requirements before a job from external collaborators is executed<br>
+        • Read-only access to model weights<br>
+    <td>• Monitor for anomalous jobs (e.g., what permissions they use, network traffic)</td>
+</tr>
+<tr>
+    <td>Repudiation</td>
+    <td>User denies submitting expensive compute jobs to avoid accountability</td>
+    <td>Medium</td>
+    <td>Low</td>
+    <td class="priority-low">Low</td>
+    <td>• Tamper-proof audit logs<br>
+        • Job attribution tracking</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Information Disclosure</td>
+    <td>Job submission interface leaks information about other users' experiments or available compute resources</td>
+    <td>Medium</td>
+    <td>Medium</td>
+    <td class="priority-medium">Medium</td>
+    <td>• Access control on job metadata<br>
+        • Tenant isolation in Kubeflow<br>
+        • Encryption in transit</td>
+    <td>• Penetration testing<br>
+        • API security scanning</td>
+</tr>
+<tr>
+    <td>Denial of Service</td>
+    <td>Malicious collaborator submits resource-intensive jobs to monopolize compute cluster</td>
+    <td>High</td>
+    <td>Medium</td>
+    <td class="priority-high">High</td>
+    <td>• Rate limits and quotas<br>
+        • Resource allocation policies<br>
+        • Job priority queuing</td>
+    <td>• Resource usage monitoring<br>
+        • Anomaly detection alerts</td>
+</tr>
+<tr>
+    <td>Elevation of Privilege</td>
+    <td>External collaborator exploits job submission to gain unauthorized access to sensitive model weights or other users' experiments</td>
+    <td>Medium</td>
+    <td>Critical</td>
+    <td class="priority-high">High</td>
+    <td>• Network isolation of sensitive compute infrastructure<br>
+        • Job sandboxing and resource quotas<br>
+        • Access control with minimum privileges needed for the job to run<br>
+        • Access control on experiment results</td>
+    <td>• Penetration testing annually<br>
+        • Automated security testing of network isolation configuration </td>
+</tr>
+
+<!-- Evaluation Experiment Jobs → Experimental Model Weights -->
+<tr class="asset-header">
+    <td colspan="8"><strong>Data Flow: Evaluation Experiment Jobs → Experimental Model Weights</strong></td>
+</tr>
+<tr>
+    <td rowspan="7"><strong>Evaluation experiment jobs → Experimental model weights</strong></td>
+    <td>Spoofing</td>
+    <td>Malicious job impersonates legitimate experiment to access model weights using stolen credentials</td>
+    <td>Low</td>
+    <td>High</td>
+    <td class="priority-medium">Medium</td>
+    <td>• Use temporary IAM credentials instead of long-lived credentials<br>
+        • Encryption in transit for all network requests<br>
+        • Mutual TLS for weight access</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Tampering</td>
+    <td>Malicious experiment code modifies, corrupts, or deletes model weight files during evaluation</td>
+    <td>Low</td>
+    <td>Medium</td>
+    <td class="priority-medium">Medium</td>
+    <td>• Read-only weight access<br>
+        • Checksum validation<br>
+        • Versioned weight storage<br>
+        • Backup and recovery tools</td>
+    <td>• Integrity checks on access<br>
+        • Restore testing quarterly</td>
+</tr>
+<tr>
+    <td>Repudiation</td>
+    <td>Cannot trace which experiment job accessed or downloaded specific model weights</td>
+    <td>High</td>
+    <td>Low</td>
+    <td class="priority-medium">Medium</td>
+    <td>• Tamper-proof access logs with request correlation IDs</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Information Disclosure</td>
+    <td>Experiment code exfiltrates model weights to unauthorized external locations</td>
+    <td>Medium</td>
+    <td>High</td>
+    <td class="priority-high">High</td>
+    <td>• Allow list for network request destinations<br>
+        • Alerts on network traffic anomalies<br>
+        • Code review for all experiments</td>
+    <td>• Egress traffic analysis</td>
+</tr>
+<tr>
+    <td>Information Disclosure</td>
+    <td>Experiment code exfiltrates algorithmic secrets (e.g., code of other experiments) to unauthorized external locations</td>
+    <td>Medium</td>
+    <td>High</td>
+    <td class="priority-high">High</td>
+    <td>• Allow list for network request destinations<br>
+        • Alerts on network traffic anomalies<br>
+        • Code review for all experiments<br>
+        • No disk sharing between experiments<br>
+    </td>
+    <td>• Egress traffic analysis</td>
+</tr>
+<tr>
+    <td>Denial of Service</td>
+    <td>Experiment jobs overwhelm model weight storage with excessive concurrent reads</td>
+    <td>Medium</td>
+    <td>Low</td>
+    <td class="priority-low">Low</td>
+    <td>• Rate limits per job<br>
+        • Connection pooling</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Elevation of Privilege</td>
+    <td>Experiment job escapes container isolation to access sensitive model weights directly</td>
+    <td>Low</td>
+    <td>Critical</td>
+    <td class="priority-high">High</td>
+    <td>• Container security policies<br>
+        • Network isolation<br>
+        • Software update management<br>
+        • Security scanning of images</td>
+    <td>• Penetration testing of container isolation</td>
+</tr>
+
+<!-- Sensitive Model Weights (Data Store) -->
+<tr class="asset-header">
+    <td colspan="8"><strong>Data Store: Sensitive Model Weights</strong></td>
+</tr>
+<tr>
+    <td rowspan="7"><strong>Sensitive model weights</strong><br><em>(S3/Cloud Storage)</em></td>
+    <td>Spoofing</td>
+    <td>Attacker gains physical access to data center using forged credentials or social engineering to directly access storage hardware</td>
+    <td>Low</td>
+    <td>High</td>
+    <td class="priority-high">High</td>
+    <td>• Physical access controls<br>
+        • Encryption at rest for all model weights</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Tampering</td>
+    <td>Malicious data center employee or contractor with physical access tampers with storage hardware firmware or performs unauthorized maintenance</td>
+    <td>Low</td>
+    <td>Medium</td>
+    <td class="priority-medium">Low</td>
+    <td>• Physical access controls<br>
+        • Use hardware with tamper-proofing features</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Repudiation</td>
+    <td>A researchers uses model weights for untracked experiments or other unapproved purposes</td>
+    <td>Medium</td>
+    <td>Medium</td>
+    <td class="priority-medium">Medium</td>
+    <td>
+        • No storage of model weights outside the designated data store or backups<br>
+        • Tamper-proof audit logs
+    </td>
+    <td></td>
+</tr>
+<tr>
+    <td>Information Disclosure</td>
+    <td>Unencrypted model weights exposed through storage provider compromise or misconfiguration</td>
+    <td>Medium</td>
+    <td>Critical</td>
+    <td class="priority-high">High</td>
+    <td>• Encryption at rest for all model weights<br>
+        • Physical data center protections</td>
+    <td>• Regular access and encryption reviews</td>
+</tr>
+<tr>
+    <td>Information Disclosure</td>
+    <td>Insider threat directly accesses and exfiltrates frontier model weights through privileged access</td>
+    <td>Low</td>
+    <td>Critical</td>
+    <td class="priority-high">High</td>
+    <td>• Least privilege principle<br>
+        • No direct access to weights - only through limited APIs<br>
+        • Mandatory code reviews for weight access<br>
+        • NDAs for all personnel<br>
+        • Tamper-proof audit logs</td>
+    <td>• Bi-annual access audits<br>
+        • Real-time anomaly alerts</td>
+</tr>
+<tr>
+    <td>Denial of Service</td>
+    <td>Model weights become unavailable due to storage system failure</td>
+    <td>Low</td>
+    <td>High</td>
+    <td class="priority-medium">Medium</td>
+    <td>• Multi-region replication<br>
+        • Backup and recovery tools<br>
+        • Deletion protection policies<br>
+        • Availability monitoring</td>
+    <td>• Disaster recovery drills<br>
+        • Recovery time testing</td>
+</tr>
+<tr>
+    <td>Elevation of Privilege</td>
+    <td>Read-only service account gains write access through permission misconfiguration</td>
+    <td>Medium</td>
+    <td>High</td>
+    <td class="priority-high">High</td>
+    <td>• Least privilege principle<br>
+        • Separation of read/write roles<br>
+        • Zero trust architecture</td>
+    <td>• Automated permission scanning</td>
+</tr>
+
+</tbody>
+</table>
+
+
+</body>
+</html>

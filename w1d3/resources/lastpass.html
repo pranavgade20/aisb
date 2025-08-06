@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LastPass 2022 Data Breach - Attack Tree</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .mermaid {
+            text-align: center;
+            background-color: white;
+        }
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .legend h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .legend ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .legend li {
+            margin: 8px 0;
+            padding: 5px;
+        }
+        .insights {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+        }
+        .zoom-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 1000;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        .zoom-controls:hover {
+            opacity: 1;
+        }
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background-color: #333;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .zoom-btn:hover {
+            background-color: #555;
+            transform: scale(1.1);
+        }
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+        .diagram-container {
+            transition: transform 0.3s ease;
+            transform-origin: center center;
+            cursor: grab;
+        }
+        .diagram-container.dragging {
+            cursor: grabbing;
+            transition: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoom-in" title="Zoom In">+</button>
+        <button class="zoom-btn" id="zoom-out" title="Zoom Out">−</button>
+        <button class="zoom-btn" id="zoom-reset" title="Reset Zoom">⌂</button>
+    </div>
+
+    <div class="container">
+        <h1>LastPass 2022 Data Breach - Attack Tree</h1>
+        
+        <div class="diagram-container">
+            <div class="mermaid">
+graph TD
+    %% Main Goal
+    A["🎯 Steal LastPass<br/>Customer Vault Data"] --> B{AND}
+    
+    %% Major phases
+    B --> C["📥 Gain Initial Access<br/>to LastPass Infrastructure"]
+    B --> D["🗄️ Access Customer<br/>Data Storage"]
+    B --> E["📤 Exfiltrate<br/>Customer Data"]
+    
+    %% Initial Access breakdown
+    C --> F{OR}
+    F --> G["👨‍💻 Compromise Employee<br/>Credentials"]
+    F --> H["🌐 Exploit Public<br/>Infrastructure"]
+    F --> I["📞 Social Engineering<br/>Attack"]
+    
+    %% Employee compromise (chosen path)
+    G --> J{AND}
+    J --> K["🔍 Identify Target<br/>Employee"]
+    J --> L["💻 Compromise Employee<br/>System"]
+    J --> M["🔑 Steal<br/>Credentials"]
+    
+    %% Target identification
+    K --> N{OR}
+    N --> O["📋 Reconnaissance of<br/>DevSecOps Engineers"]
+    O -.-> O_NOTE["📝 Found 4 senior DevSecOps<br/>engineers who had access to<br/>corporate vault containing<br/>decryption keys"]
+    N --> P["🏢 Insider Information"]
+    
+    %% System compromise
+    L --> Q{AND}
+    Q --> R["🔍 Find Vulnerable<br/>Software"]
+    Q --> S["⚡ Exploit<br/>Vulnerability"]
+    Q --> T["🎯 Install<br/>Malware"]
+    
+    %% Find vulnerability (actual path)
+    R --> U{OR}
+    U --> V["📺 Plex Media Server<br/>CVE-2020-5741"]
+    V -.-> V_NOTE["📝 Engineer using outdated<br/>version with known vulnerability<br/>patched in 2020, publicly known"]
+    U --> W["🖥️ Other Third-party<br/>Software"]
+    U --> X["🔧 OS Vulnerabilities"]
+    
+    %% Exploit execution
+    S --> Y{AND}
+    Y --> Z["⚡ Remote Code<br/>Execution"]
+    Z -.-> Z_NOTE["📝 Vulnerability allowed<br/>remote code execution<br/>on engineer's computer"]
+    Y --> AA["🕵️ Bypass Detection<br/>(VPN Usage)"]
+    AA -.-> AA_NOTE["📝 Used third-party VPN service<br/>to hide origin of activity and<br/>bypass intrusion detection"]
+    
+    %% Malware installation
+    T --> BB{OR}
+    BB --> CC["⌨️ Install<br/>Keylogger"]
+    CC -.-> CC_NOTE["📝 Installed keylogger to<br/>capture master password<br/>keystrokes"]
+    BB --> DD["🔄 Persistent<br/>Backdoor"]
+    
+    %% Credential theft
+    M --> EE{AND}
+    EE --> FF["⌨️ Capture Keystrokes<br/>(Master Password)"]
+    FF -.-> FF_NOTE["📝 Captured engineer's master<br/>password as entered after<br/>logging in with MFA"]
+    EE --> GG["🔐 Bypass MFA<br/>(Post-Auth Capture)"]
+    GG -.-> GG_NOTE["📝 Keylogger captured credentials<br/>after multifactor authentication<br/>was completed"]
+    
+    %% Access customer data storage
+    D --> HH{AND}
+    HH --> II["☁️ Access Development<br/>Environment"]
+    HH --> JJ["🗂️ Locate Customer<br/>Data Repositories"]
+    HH --> KK["🔐 Access Production<br/>Data Storage"]
+    
+    %% Development environment access
+    II --> LL{AND}
+    LL --> MM["🆔 Impersonate<br/>Engineer"]
+    MM -.-> MM_NOTE["📝 Able to impersonate the<br/>software engineer using<br/>stolen credentials"]
+    LL --> NN["📂 Access Source<br/>Code Repositories"]
+    NN -.-> NN_NOTE["📝 Exfiltrated 14 code repositories<br/>from cloud-based development<br/>environment"]
+    
+    %% Locate customer data
+    JJ --> OO{OR}
+    OO --> PP["🔍 Analyze Source Code<br/>for Data Locations"]
+    OO --> QQ["📋 Extract API Keys<br/>and Credentials"]
+    QQ -.-> QQ_NOTE["📝 Source code included cleartext<br/>embedded credentials and<br/>encrypted credentials for production"]
+    OO --> RR["🗺️ Map Infrastructure<br/>from Dev Environment"]
+    
+    %% Production access
+    KK --> SS{AND}
+    SS --> TT["☁️ Access AWS S3<br/>Storage Buckets"]
+    TT -.-> TT_NOTE["📝 Accessed shared cloud storage<br/>environment powered by AWS<br/>Alerted by AWS GuardDuty"]
+    SS --> UU["🔍 Locate Backup<br/>Files"]
+    UU -.-> UU_NOTE["📝 Located and accessed archived<br/>backups of LastPass production<br/>data in cloud storage"]
+    
+    %% Data exfiltration
+    E --> VV{AND}
+    VV --> WW["💾 Extract Development<br/>Data"]
+    VV --> XX["🏪 Extract Customer<br/>Vault Data"]
+    VV --> YY["📊 Extract Customer<br/>Metadata"]
+    
+    %% Development data extraction
+    WW --> ZZ{OR}
+    ZZ --> AAA["📝 14 Source Code<br/>Repositories"]
+    AAA -.-> AAA_NOTE["📝 Specifically 14 code repositories<br/>were exfiltrated from<br/>development environment"]
+    ZZ --> BBB["🔑 Embedded<br/>Credentials"]
+    BBB -.-> BBB_NOTE["📝 Repositories included cleartext<br/>embedded credentials and<br/>stored digital certificates"]
+    ZZ --> CCC["📜 Digital<br/>Certificates"]
+    CCC -.-> CCC_NOTE["📝 Digital certificates related<br/>to development environments<br/>were stolen"]
+    
+    %% Customer data extraction  
+    XX --> DDD{AND}
+    DDD --> EEE["🔒 Encrypted Password<br/>Vaults"]
+    EEE -.-> EEE_NOTE["📝 Vault data encrypted with unique<br/>key generated based on each<br/>user's master password"]
+    DDD --> FFF["⚠️ Unencrypted Customer<br/>Information"]
+    FFF -.-> FFF_NOTE["📝 Significant amount of PII stolen<br/>including usernames, billing<br/>addresses, email addresses"]
+    
+    %% Customer metadata
+    YY --> GGG{OR}
+    GGG --> HHH["📧 Email Addresses"]
+    HHH -.-> HHH_NOTE["📝 Customer email addresses<br/>stolen in unencrypted form"]
+    GGG --> III["🏠 Billing Addresses"]
+    III -.-> III_NOTE["📝 Customer billing addresses<br/>stolen in unencrypted form"]
+    GGG --> JJJ["📁 Vault Folder<br/>Names"]
+    JJJ -.-> JJJ_NOTE["📝 Names of folders customers use<br/>in LastPass to organize passwords"]
+    GGG --> KKK["🌐 Website Names<br/>in Vaults"]
+    KKK -.-> KKK_NOTE["📝 Names of websites that customers<br/>store login credentials for"]
+
+    %% Styling
+    classDef goalNode fill:#ff9999,stroke:#333,stroke-width:3px,color:#000
+    classDef andNode fill:#87CEEB,stroke:#333,stroke-width:2px,color:#000
+    classDef orNode fill:#98FB98,stroke:#333,stroke-width:2px,color:#000
+    classDef actionNode fill:#FFE4B5,stroke:#333,stroke-width:1px,color:#000
+    classDef exploitNode fill:#FFA07A,stroke:#333,stroke-width:2px,color:#000
+    classDef noteNode fill:#f0f0f0,stroke:#666,stroke-width:1px,color:#333,font-size:10px
+    
+    class A goalNode
+    class B,J,Q,Y,EE,HH,LL,SS,VV,DDD andNode
+    class F,N,U,BB,OO,ZZ,GGG orNode
+    class C,D,E,K,L,M,II,JJ,KK,G,H,I,WW,XX,YY,O,P,R,T,Z,AA,DD,FF,GG,MM,NN,PP,QQ,RR,TT,UU,AAA,BBB,CCC,EEE,FFF,HHH,III,JJJ,KKK,W,X actionNode
+    class V,S,CC exploitNode
+    class O_NOTE,V_NOTE,Z_NOTE,AA_NOTE,CC_NOTE,FF_NOTE,GG_NOTE,MM_NOTE,NN_NOTE,QQ_NOTE,TT_NOTE,UU_NOTE,AAA_NOTE,BBB_NOTE,CCC_NOTE,EEE_NOTE,FFF_NOTE,HHH_NOTE,III_NOTE,JJJ_NOTE,KKK_NOTE noteNode
+        </div>
+        </div>
+
+        <div class="legend">
+            <h2>🔍 Attack Tree Legend</h2>
+            <ul>
+                <li style="background-color: #ff9999; border-radius: 3px;">🎯 <strong>Red Nodes:</strong> Main attack goal</li>
+                <li style="background-color: #87CEEB; border-radius: 3px;">🔵 <strong>Blue Nodes:</strong> AND gates (all conditions must be met)</li>
+                <li style="background-color: #98FB98; border-radius: 3px;">🟢 <strong>Green Nodes:</strong> OR gates (any one condition can be met)</li>
+                <li style="background-color: #FFE4B5; border-radius: 3px;">🟡 <strong>Yellow Nodes:</strong> Sub-goals and actions</li>
+                <li style="background-color: #FFA07A; border-radius: 3px;">🟠 <strong>Orange Nodes:</strong> Key exploits used in the actual attack</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                background: '#ffffff',
+                primaryColor: '#ffffff',
+                primaryTextColor: '#000000',
+                primaryBorderColor: '#333333',
+                lineColor: '#333333'
+            }
+        });
+
+        // Zoom and pan functionality
+        let currentZoom = 1;
+        let panX = 0;
+        let panY = 0;
+        const zoomStep = 0.2;
+        const minZoom = 0.5;
+        const maxZoom = 3;
+
+        const diagramContainer = document.querySelector('.diagram-container');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const zoomResetBtn = document.getElementById('zoom-reset');
+
+        // Drag state
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function updateTransform() {
+            diagramContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
+            
+            // Update button states
+            zoomInBtn.disabled = currentZoom >= maxZoom;
+            zoomOutBtn.disabled = currentZoom <= minZoom;
+            
+            // Visual feedback for disabled buttons
+            zoomInBtn.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+            zoomOutBtn.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+        }
+
+        zoomInBtn.addEventListener('click', () => {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                updateTransform();
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                updateTransform();
+            }
+        });
+
+        zoomResetBtn.addEventListener('click', () => {
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            updateTransform();
+        });
+
+        // Mouse drag functionality
+        diagramContainer.addEventListener('mousedown', (e) => {
+            if (e.button === 0) { // Left mouse button only
+                isDragging = true;
+                lastX = e.clientX;
+                lastY = e.clientY;
+                diagramContainer.classList.add('dragging');
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - lastX;
+                const deltaY = e.clientY - lastY;
+                
+                panX += deltaX;
+                panY += deltaY;
+                
+                lastX = e.clientX;
+                lastY = e.clientY;
+                
+                updateTransform();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                diagramContainer.classList.remove('dragging');
+            }
+        });
+
+        // Handle mouse leave to stop dragging
+        document.addEventListener('mouseleave', () => {
+            if (isDragging) {
+                isDragging = false;
+                diagramContainer.classList.remove('dragging');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '=' || e.key === '+') {
+                    e.preventDefault();
+                    zoomInBtn.click();
+                } else if (e.key === '-') {
+                    e.preventDefault();
+                    zoomOutBtn.click();
+                } else if (e.key === '0') {
+                    e.preventDefault();
+                    zoomResetBtn.click();
+                }
+            }
+        });
+
+        // Mouse wheel zoom
+        diagramContainer.addEventListener('wheel', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    zoomInBtn.click();
+                } else {
+                    zoomOutBtn.click();
+                }
+            }
+        });
+
+        // Initialize zoom and pan state
+        updateTransform();
+    </script>
+</body>
+</html>

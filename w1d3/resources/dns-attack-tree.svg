@@ -1,0 +1,1315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="" viewBox="0.00 0.00 1646.50 1691.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1687)">
+
+<g id="A0" class="node">
+ 
+<g id="a_A0"><a onclick="handleClickInGraphSubtree(event,'A0',false,true)" xlink:title="A0  -  Very High Risk
+Very Likely  -  Script Kiddie  -  Very Simple">
+<polygon fill="#feecf0" stroke="black" points="181.76,-955.54 181.76,-970.46 129.7,-981 56.07,-981 4,-970.46 4,-955.54 56.07,-945 129.7,-945 181.76,-955.54"></polygon>
+<polygon fill="none" stroke="black" points="185.76,-952.27 185.76,-973.73 130.1,-985 55.66,-985 0,-973.73 0,-952.27 55.66,-941 130.1,-941 185.76,-952.27"></polygon>
+<text text-anchor="middle" x="92.88" y="-958.8" font-weight="bold" font-family="Arial Bold, Arial, Helvetica, sans-serif" font-size="14.00" fill="#cc0f35">     DNS Server     </text>
+</a>
+</g>
+</g>
+
+<g id="1 × Risk:
+Very High" class="node">
+<title>1 × Risk:
+Very High</title>
+<polygon fill="#feecf0" stroke="black" points="304.25,-1332.6 228.76,-1291 304.25,-1249.4 379.73,-1291 304.25,-1332.6"></polygon>
+<text text-anchor="middle" x="304.25" y="-1295.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#cc0f35">1 × Risk:</text>
+<text text-anchor="middle" x="304.25" y="-1278.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#cc0f35">Very High</text>
+</g>
+
+<g id="edge1" class="edge">
+<title>A0-&gt;1 × Risk:
+Very High</title>
+<g id="a_edge1"><a xlink:title="Very High">
+<path fill="none" stroke="#cc0f35" stroke-width="3" d="M108.11,-985.29C144.65,-1042.53 241.85,-1194.81 283.67,-1260.32"></path>
+</a>
+</g>
+</g>
+
+<g id="3 × Risk:
+High" class="node">
+<title>3 × Risk:
+High</title>
+<polygon fill="#fffaeb" stroke="black" points="304.25,-1004.6 237.68,-963 304.25,-921.4 370.81,-963 304.25,-1004.6"></polygon>
+<text text-anchor="middle" x="304.25" y="-967.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#946c00">3 × Risk:</text>
+<text text-anchor="middle" x="304.25" y="-950.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#946c00">High</text>
+</g>
+
+<g id="edge12" class="edge">
+<title>A0-&gt;3 × Risk:
+High</title>
+<g id="a_edge12"><a xlink:title="High">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M186.02,-963C203.13,-963 220.7,-963 236.86,-963"></path>
+</a>
+</g>
+</g>
+
+<g id="3 × Risk:
+Medium" class="node">
+<title>3 × Risk:
+Medium</title>
+<polygon fill="#eff1fa" stroke="black" points="304.25,-431.6 237.68,-390 304.25,-348.4 370.81,-390 304.25,-431.6"></polygon>
+<text text-anchor="middle" x="304.25" y="-394.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">3 × Risk:</text>
+<text text-anchor="middle" x="304.25" y="-377.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">Medium</text>
+</g>
+
+<g id="edge27" class="edge">
+<title>A0-&gt;3 × Risk:
+Medium</title>
+<g id="a_edge27"><a xlink:title="Medium">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M102.09,-940.54C134.33,-852.29 252.44,-529.04 290.99,-423.55"></path>
+</a>
+</g>
+</g>
+
+<g id="A1" class="node">
+ 
+<g id="a_A1"><a onclick="handleClickInGraph(event,'A1','')" xlink:title="A1  -  Very High Risk
+Likely  -  Hacktivist  -  Simple
+Choke Point Score: 25.00">
+<polygon fill="#feecf0" stroke="black" points="683.91,-1514 458.04,-1514 454.04,-1510 454.04,-1390 679.91,-1390 683.91,-1394 683.91,-1514"></polygon>
+<polyline fill="none" stroke="black" points="679.91,-1510 454.04,-1510"></polyline>
+<polyline fill="none" stroke="black" points="679.91,-1510 679.91,-1390"></polyline>
+<polyline fill="none" stroke="black" points="679.91,-1510 683.91,-1514"></polyline>
+<text text-anchor="middle" x="568.97" y="-1481.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">          Compromise DNS Server          </text>
+<text text-anchor="middle" x="568.97" y="-1448.6" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#bb2b9c">    Overall Impact: Very High    </text>
+<text text-anchor="middle" x="568.97" y="-1431.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#bb2b9c">    Likelihood: Likely    </text>
+<text text-anchor="middle" x="568.97" y="-1415" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#bb2b9c">    Risk: Very High    </text>
+<text text-anchor="middle" x="568.97" y="-1398.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c"> </text>
+</a>
+</g>
+</g>
+
+<g id="edge2" class="edge">
+<title>1 × Risk:
+Very High-&gt;A1</title>
+<g id="a_edge2"><a xlink:title="Likely
+
+Likelihood Score: 6000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M340.95,-1312.88C373.08,-1332.57 421.89,-1362.48 466.02,-1389.52"></path>
+</a>
+</g>
+</g>
+
+<g id="A2" class="node">
+ 
+<g id="a_A2"><a onclick="handleClickInGraph(event,'A2','')" xlink:title="A2  -  Very High Risk
+Likely  -  Hacktivist  -  Simple
+Choke Point Score: 6.94">
+<path fill="#feecf0" stroke="black" d="M1078.92,-1622C1078.92,-1622 817.06,-1622 817.06,-1622 811.06,-1622 805.06,-1616 805.06,-1610 805.06,-1610 805.06,-1598 805.06,-1598 805.06,-1592 811.06,-1586 817.06,-1586 817.06,-1586 1078.92,-1586 1078.92,-1586 1084.92,-1586 1090.92,-1592 1090.92,-1598 1090.92,-1598 1090.92,-1610 1090.92,-1610 1090.92,-1616 1084.92,-1622 1078.92,-1622"></path>
+<text text-anchor="middle" x="947.99" y="-1599.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Exploit Vulnerabilities in DNS Software      </text>
+</a>
+</g>
+</g>
+
+<g id="edge3" class="edge">
+ 
+<g id="a_edge3"><a xlink:title="Likely
+
+Likelihood Score: 6000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M684.37,-1498.12C757.39,-1527.56 848.06,-1564.12 901.51,-1585.67"></path>
+</a>
+</g>
+</g>
+
+<g id="A5" class="node">
+ 
+<g id="a_A5"><a onclick="handleClickInGraph(event,'A5','')" xlink:title="A5  -  High Risk
+Possible  -  Attacker Group Outside  -  Complex
+Choke Point Score: 5.56
+
+
+High Effect  -  Unsettled: 
+Hardening of DNS Server Software">
+<path fill="#fffaeb" stroke="black" stroke-dasharray="5,2" d="M1072.1,-1500C1072.1,-1500 823.88,-1500 823.88,-1500 817.88,-1500 811.88,-1494 811.88,-1488 811.88,-1488 811.88,-1476 811.88,-1476 811.88,-1470 817.88,-1464 823.88,-1464 823.88,-1464 1072.1,-1464 1072.1,-1464 1078.1,-1464 1084.1,-1470 1084.1,-1476 1084.1,-1476 1084.1,-1488 1084.1,-1488 1084.1,-1494 1078.1,-1500 1072.1,-1500"></path>
+<text text-anchor="middle" x="947.99" y="-1477.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Execute Remote Code on DNS Server      </text>
+</a>
+</g>
+</g>
+
+<g id="edge6" class="edge">
+ 
+<g id="a_edge6"><a xlink:title="Possible
+
+Likelihood Score: 1625">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M684.37,-1461.1C724.46,-1464.29 769.86,-1467.91 811.51,-1471.22"></path>
+</a>
+</g>
+</g>
+
+<g id="A8" class="node">
+ 
+<g id="a_A8"><a onclick="handleClickInGraph(event,'A8','')" xlink:title="A8  -  Very High Risk
+Likely  -  Hacktivist  -  Simple
+Choke Point Score: 6.94">
+<path fill="#feecf0" stroke="black" d="M1082.98,-1439C1082.98,-1439 812.99,-1439 812.99,-1439 806.99,-1439 800.99,-1433 800.99,-1427 800.99,-1427 800.99,-1415 800.99,-1415 800.99,-1409 806.99,-1403 812.99,-1403 812.99,-1403 1082.98,-1403 1082.98,-1403 1088.98,-1403 1094.98,-1409 1094.98,-1415 1094.98,-1415 1094.98,-1427 1094.98,-1427 1094.98,-1433 1088.98,-1439 1082.98,-1439"></path>
+<text text-anchor="middle" x="947.99" y="-1416.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Gain Unauthorized Access to DNS Server      </text>
+</a>
+</g>
+</g>
+
+<g id="edge9" class="edge">
+ 
+<g id="a_edge9"><a xlink:title="Likely
+
+Likelihood Score: 6000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M684.37,-1442.59C720.99,-1439.58 762.05,-1436.21 800.62,-1433.03"></path>
+</a>
+</g>
+</g>
+
+<g id="A3" class="node">
+ 
+<g id="a_A3"><a onclick="handleClickInGraphSubtree(event,'A3',false,true)" xlink:title="A3  -  Very High Risk
+Likely  -  Hacktivist  -  Simple
+Choke Point Score: 2.89
+
+
+High Effect  -  Unsettled: 
+Regular patching and updates">
+<path fill="#feecf0" stroke="black" stroke-dasharray="5,2" d="M1562.92,-1683C1562.92,-1683 1256.34,-1683 1256.34,-1683 1250.34,-1683 1244.34,-1677 1244.34,-1671 1244.34,-1671 1244.34,-1659 1244.34,-1659 1244.34,-1653 1250.34,-1647 1256.34,-1647 1256.34,-1647 1562.92,-1647 1562.92,-1647 1568.92,-1647 1574.92,-1653 1574.92,-1659 1574.92,-1659 1574.92,-1671 1574.92,-1671 1574.92,-1677 1568.92,-1683 1562.92,-1683"></path>
+<text text-anchor="middle" x="1409.63" y="-1660.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Exploit Known Vulnerabilities in DNS Software      </text>
+</a>
+</g>
+</g>
+
+<g id="edge4" class="edge">
+ 
+<g id="a_edge4"><a xlink:title="Likely
+
+Likelihood Score: 6000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M1086.86,-1622.49C1117.76,-1626.62 1150.38,-1630.97 1180.76,-1635 1208.95,-1638.74 1239.09,-1642.72 1267.93,-1646.52"></path>
+</a>
+</g>
+</g>
+
+<g id="A4" class="node">
+ 
+<g id="a_A4"><a onclick="handleClickInGraphSubtree(event,'A4',false,true)" xlink:title="A4  -  High Risk
+Possible  -  Attacker Group Outside  -  Complex
+Choke Point Score: 2.31
+
+
+High Effect  -  Unsettled: 
+Hardening of DNS Server Software">
+<path fill="#fffaeb" stroke="black" stroke-dasharray="5,2" d="M1608.8,-1622C1608.8,-1622 1210.47,-1622 1210.47,-1622 1204.47,-1622 1198.47,-1616 1198.47,-1610 1198.47,-1610 1198.47,-1598 1198.47,-1598 1198.47,-1592 1204.47,-1586 1210.47,-1586 1210.47,-1586 1608.8,-1586 1608.8,-1586 1614.8,-1586 1620.8,-1592 1620.8,-1598 1620.8,-1598 1620.8,-1610 1620.8,-1610 1620.8,-1616 1614.8,-1622 1608.8,-1622"></path>
+<text text-anchor="middle" x="1409.63" y="-1599.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Discover and Exploit Unknown Vulnerabilities in DNS Software      </text>
+</a>
+</g>
+</g>
+
+<g id="edge5" class="edge">
+ 
+<g id="a_edge5"><a xlink:title="Possible
+
+Likelihood Score: 1625">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1091.27,-1604C1125.15,-1604 1162.02,-1604 1198.23,-1604"></path>
+</a>
+</g>
+</g>
+
+<g id="A6" class="node">
+ 
+<g id="a_A6"><a onclick="handleClickInGraphSubtree(event,'A6',false,true)" xlink:title="A6  -  High Risk
+Possible  -  Attacker Group Outside  -  Complex
+Choke Point Score: 2.31">
+<path fill="#fffaeb" stroke="black" d="M1610.74,-1561C1610.74,-1561 1208.53,-1561 1208.53,-1561 1202.53,-1561 1196.53,-1555 1196.53,-1549 1196.53,-1549 1196.53,-1537 1196.53,-1537 1196.53,-1531 1202.53,-1525 1208.53,-1525 1208.53,-1525 1610.74,-1525 1610.74,-1525 1616.74,-1525 1622.74,-1531 1622.74,-1537 1622.74,-1537 1622.74,-1549 1622.74,-1549 1622.74,-1555 1616.74,-1561 1610.74,-1561"></path>
+<text text-anchor="middle" x="1409.63" y="-1538.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Exploit Remote Code Execution Vulnerabilities in DNS Software      </text>
+</a>
+</g>
+</g>
+
+<g id="edge7" class="edge">
+ 
+<g id="a_edge7"><a xlink:title="Possible
+
+Likelihood Score: 1625">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1084.41,-1500.16C1116.03,-1504.39 1149.57,-1508.86 1180.76,-1513 1208.95,-1516.74 1239.09,-1520.72 1267.93,-1524.52"></path>
+</a>
+</g>
+</g>
+
+<g id="A7" class="node">
+ 
+<g id="a_A7"><a onclick="handleClickInGraphSubtree(event,'A7',false,true)" xlink:title="A7  -  High Risk
+Possible  -  Attacker Group Outside  -  Complex
+Choke Point Score: 2.31">
+<path fill="#fffaeb" stroke="black" d="M1585.46,-1500C1585.46,-1500 1233.81,-1500 1233.81,-1500 1227.81,-1500 1221.81,-1494 1221.81,-1488 1221.81,-1488 1221.81,-1476 1221.81,-1476 1221.81,-1470 1227.81,-1464 1233.81,-1464 1233.81,-1464 1585.46,-1464 1585.46,-1464 1591.46,-1464 1597.46,-1470 1597.46,-1476 1597.46,-1476 1597.46,-1488 1597.46,-1488 1597.46,-1494 1591.46,-1500 1585.46,-1500"></path>
+<text text-anchor="middle" x="1409.63" y="-1477.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Send Malicious DNS Queries to Execute Arbitrary Code      </text>
+</a>
+</g>
+</g>
+
+<g id="edge8" class="edge">
+ 
+<g id="a_edge8"><a xlink:title="Possible
+
+Likelihood Score: 1625">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1084.41,-1482C1127.31,-1482 1175.52,-1482 1221.39,-1482"></path>
+</a>
+</g>
+</g>
+
+<g id="A9" class="node">
+ 
+<g id="a_A9"><a onclick="handleClickInGraphSubtree(event,'A9',false,true)" xlink:title="A9  -  Very High Risk
+Likely  -  Hacktivist  -  Simple
+Choke Point Score: 2.89
+
+
+High Effect  -  Unsettled: 
+Password Complexity">
+<path fill="#feecf0" stroke="black" stroke-dasharray="5,2" d="M1542.11,-1439C1542.11,-1439 1277.16,-1439 1277.16,-1439 1271.16,-1439 1265.16,-1433 1265.16,-1427 1265.16,-1427 1265.16,-1415 1265.16,-1415 1265.16,-1409 1271.16,-1403 1277.16,-1403 1277.16,-1403 1542.11,-1403 1542.11,-1403 1548.11,-1403 1554.11,-1409 1554.11,-1415 1554.11,-1415 1554.11,-1427 1554.11,-1427 1554.11,-1433 1548.11,-1439 1542.11,-1439"></path>
+<text text-anchor="middle" x="1409.63" y="-1416.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Exploit Weak Passwords and Credentials      </text>
+</a>
+</g>
+</g>
+
+<g id="edge10" class="edge">
+ 
+<g id="a_edge10"><a xlink:title="Likely
+
+Likelihood Score: 6000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M1095.37,-1421C1149.51,-1421 1210.79,-1421 1264.71,-1421"></path>
+</a>
+</g>
+</g>
+
+<g id="A10" class="node">
+ 
+<g id="a_A10"><a onclick="handleClickInGraphSubtree(event,'A10',false,true)" xlink:title="A10  -  Very High Risk
+Likely  -  Hacktivist  -  Simple
+Choke Point Score: 2.89
+
+
+High Effect  -  Unsettled: 
+Password Complexity">
+<path fill="#feecf0" stroke="black" stroke-dasharray="5,2" d="M1569.12,-1378C1569.12,-1378 1250.14,-1378 1250.14,-1378 1244.14,-1378 1238.14,-1372 1238.14,-1366 1238.14,-1366 1238.14,-1354 1238.14,-1354 1238.14,-1348 1244.14,-1342 1250.14,-1342 1250.14,-1342 1569.12,-1342 1569.12,-1342 1575.12,-1342 1581.12,-1348 1581.12,-1354 1581.12,-1354 1581.12,-1366 1581.12,-1366 1581.12,-1372 1575.12,-1378 1569.12,-1378"></path>
+<text text-anchor="middle" x="1409.63" y="-1355.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Perform Brute-Force Attacks on Login Credentials      </text>
+</a>
+</g>
+</g>
+
+<g id="edge11" class="edge">
+ 
+<g id="a_edge11"><a xlink:title="Likely
+
+Likelihood Score: 6000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M1088.14,-1402.53C1145.61,-1394.91 1212.09,-1386.08 1269.55,-1378.46"></path>
+</a>
+</g>
+</g>
+
+<g id="A21" class="node">
+ 
+<g id="a_A21"><a onclick="handleClickInGraph(event,'A21','')" xlink:title="A21  -  High Risk
+Likely  -  Attacker Group Outside  -  Simple
+Choke Point Score: 13.33">
+<polygon fill="#fffaeb" stroke="black" points="691.68,-1209 450.27,-1209 446.27,-1205 446.27,-1085 687.68,-1085 691.68,-1089 691.68,-1209"></polygon>
+<polyline fill="none" stroke="black" points="687.68,-1205 446.27,-1205"></polyline>
+<polyline fill="none" stroke="black" points="687.68,-1205 687.68,-1085"></polyline>
+<polyline fill="none" stroke="black" points="687.68,-1205 691.68,-1209"></polyline>
+<text text-anchor="middle" x="568.97" y="-1176.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">          Deny Access to DNS Server          </text>
+<text text-anchor="middle" x="568.97" y="-1143.6" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Overall Impact: High    </text>
+<text text-anchor="middle" x="568.97" y="-1126.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Likelihood: Likely    </text>
+<text text-anchor="middle" x="568.97" y="-1110" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Risk: High    </text>
+<text text-anchor="middle" x="568.97" y="-1093.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7"> </text>
+</a>
+</g>
+</g>
+
+<g id="edge13" class="edge">
+<title>3 × Risk:
+High-&gt;A21</title>
+<g id="a_edge13"><a xlink:title="Likely
+
+Likelihood Score: 4875">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M336.42,-984.83C371.35,-1009.29 429.56,-1050.06 478.87,-1084.6"></path>
+</a>
+</g>
+</g>
+
+<g id="A11" class="node">
+ 
+<g id="a_A11"><a onclick="handleClickInGraph(event,'A11','')" xlink:title="A11  -  High Risk
+Likely  -  Hacktivist  -  Ordinary
+Choke Point Score: 13.33">
+<polygon fill="#fffaeb" stroke="black" points="673.78,-1025 468.17,-1025 464.17,-1021 464.17,-901 669.78,-901 673.78,-905 673.78,-1025"></polygon>
+<polyline fill="none" stroke="black" points="669.78,-1021 464.17,-1021"></polyline>
+<polyline fill="none" stroke="black" points="669.78,-1021 669.78,-901"></polyline>
+<polyline fill="none" stroke="black" points="669.78,-1021 673.78,-1025"></polyline>
+<text text-anchor="middle" x="568.97" y="-992.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">          Intercept DNS Traffic          </text>
+<text text-anchor="middle" x="568.97" y="-959.6" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#bb2b9c">    Overall Impact: High    </text>
+<text text-anchor="middle" x="568.97" y="-942.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#bb2b9c">    Likelihood: Likely    </text>
+<text text-anchor="middle" x="568.97" y="-926" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#bb2b9c">    Risk: High    </text>
+<text text-anchor="middle" x="568.97" y="-909.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c"> </text>
+</a>
+</g>
+</g>
+
+<g id="edge20" class="edge">
+<title>3 × Risk:
+High-&gt;A11</title>
+<g id="a_edge20"><a xlink:title="Likely
+
+Likelihood Score: 4000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M371.54,-963C399.51,-963 432.75,-963 463.85,-963"></path>
+</a>
+</g>
+</g>
+
+<g id="A28" class="node">
+ 
+<g id="a_A28"><a onclick="handleClickInGraph(event,'A28','')" xlink:title="A28  -  High Risk
+Very Likely  -  Script Kiddie  -  Very Simple
+Choke Point Score: 20.00">
+<polygon fill="#fffaeb" stroke="black" points="676.91,-781 465.04,-781 461.04,-777 461.04,-657 672.91,-657 676.91,-661 676.91,-781"></polygon>
+<polyline fill="none" stroke="black" points="672.91,-777 461.04,-777"></polyline>
+<polyline fill="none" stroke="black" points="672.91,-777 672.91,-657"></polyline>
+<polyline fill="none" stroke="black" points="672.91,-777 676.91,-781"></polyline>
+<text text-anchor="middle" x="568.97" y="-748.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#cc0f35">          Steal DNS Information          </text>
+<text text-anchor="middle" x="568.97" y="-715.6" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#cc0f35">    Overall Impact: Medium    </text>
+<text text-anchor="middle" x="568.97" y="-698.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#cc0f35">    Likelihood: Very Likely    </text>
+<text text-anchor="middle" x="568.97" y="-682" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#cc0f35">    Risk: High    </text>
+<text text-anchor="middle" x="568.97" y="-665.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#cc0f35"> </text>
+</a>
+</g>
+</g>
+
+<g id="edge33" class="edge">
+<title>3 × Risk:
+High-&gt;A28</title>
+<g id="a_edge33"><a xlink:title="Very Likely
+
+Likelihood Score: 10000">
+<path fill="none" stroke="#cc0f35" stroke-width="3" d="M331.89,-938.26C371.15,-901.79 445.85,-832.42 500.74,-781.44"></path>
+</a>
+</g>
+</g>
+
+<g id="A22" class="node">
+ 
+<g id="a_A22"><a onclick="handleClickInGraph(event,'A22','')" xlink:title="A22  -  High Risk
+Likely  -  Attacker Group Outside  -  Simple
+Choke Point Score: 5.56
+
+
+High Effect  -  Unsettled: 
+DDoS Protection">
+<path fill="#fffaeb" stroke="black" stroke-dasharray="5,2" d="M1074.83,-1256C1074.83,-1256 821.14,-1256 821.14,-1256 815.14,-1256 809.14,-1250 809.14,-1244 809.14,-1244 809.14,-1232 809.14,-1232 809.14,-1226 815.14,-1220 821.14,-1220 821.14,-1220 1074.83,-1220 1074.83,-1220 1080.83,-1220 1086.83,-1226 1086.83,-1232 1086.83,-1232 1086.83,-1244 1086.83,-1244 1086.83,-1250 1080.83,-1256 1074.83,-1256"></path>
+<text text-anchor="middle" x="947.99" y="-1233.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Perform DDoS Attacks on DNS Server      </text>
+</a>
+</g>
+</g>
+
+<g id="edge14" class="edge">
+ 
+<g id="a_edge14"><a xlink:title="Likely
+
+Likelihood Score: 4875">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M692.12,-1176.48C750.83,-1190.65 819.4,-1207.2 870.61,-1219.56"></path>
+</a>
+</g>
+</g>
+
+<g id="A25" class="node">
+ 
+<g id="a_A25"><a onclick="handleClickInGraph(event,'A25','')" xlink:title="A25  -  Medium Risk
+Possible  -  Hacktivist  -  Complex
+Choke Point Score: 4.17
+
+
+High Effect  -  Unsettled: 
+Implementing DNS Response Rate Limiting (DNS RRL)
+
+Medium Effect  -  Unsettled: 
+Implementing DNS Server Load Balancing">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1125.76,-1165C1125.76,-1165 770.21,-1165 770.21,-1165 764.21,-1165 758.21,-1159 758.21,-1153 758.21,-1153 758.21,-1141 758.21,-1141 758.21,-1135 764.21,-1129 770.21,-1129 770.21,-1129 1125.76,-1129 1125.76,-1129 1131.76,-1129 1137.76,-1135 1137.76,-1141 1137.76,-1141 1137.76,-1153 1137.76,-1153 1137.76,-1159 1131.76,-1165 1125.76,-1165"></path>
+<text text-anchor="middle" x="947.99" y="-1142.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Exploit DNS Server Resource Exhaustion Vulnerabilities      </text>
+</a>
+</g>
+</g>
+
+<g id="edge17" class="edge">
+ 
+<g id="a_edge17"><a xlink:title="Possible
+
+Likelihood Score: 2000">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M692.12,-1147C713.2,-1147 735.54,-1147 757.9,-1147"></path>
+</a>
+</g>
+</g>
+
+<g id="A23" class="node">
+ 
+<g id="a_A23"><a onclick="handleClickInGraphSubtree(event,'A23',false,true)" xlink:title="A23  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74">
+<path fill="#eff1fa" stroke="black" d="M1567.19,-1317C1567.19,-1317 1252.08,-1317 1252.08,-1317 1246.08,-1317 1240.08,-1311 1240.08,-1305 1240.08,-1305 1240.08,-1293 1240.08,-1293 1240.08,-1287 1246.08,-1281 1252.08,-1281 1252.08,-1281 1567.19,-1281 1567.19,-1281 1573.19,-1281 1579.19,-1287 1579.19,-1293 1579.19,-1293 1579.19,-1305 1579.19,-1305 1579.19,-1311 1573.19,-1317 1567.19,-1317"></path>
+<text text-anchor="middle" x="1409.63" y="-1294.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Flood DNS Server with Large Amounts of Traffic      </text>
+</a>
+</g>
+</g>
+
+<g id="edge15" class="edge">
+ 
+<g id="a_edge15"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1086.86,-1256.49C1117.76,-1260.62 1150.38,-1264.97 1180.76,-1269 1208.95,-1272.74 1239.09,-1276.72 1267.93,-1280.52"></path>
+</a>
+</g>
+</g>
+
+<g id="A24" class="node">
+ 
+<g id="a_A24"><a onclick="handleClickInGraphSubtree(event,'A24',false,true)" xlink:title="A24  -  High Risk
+Likely  -  Attacker Group Outside  -  Simple
+Choke Point Score: 2.31">
+<path fill="#fffaeb" stroke="black" d="M1577.5,-1256C1577.5,-1256 1241.76,-1256 1241.76,-1256 1235.76,-1256 1229.76,-1250 1229.76,-1244 1229.76,-1244 1229.76,-1232 1229.76,-1232 1229.76,-1226 1235.76,-1220 1241.76,-1220 1241.76,-1220 1577.5,-1220 1577.5,-1220 1583.5,-1220 1589.5,-1226 1589.5,-1232 1589.5,-1232 1589.5,-1244 1589.5,-1244 1589.5,-1250 1583.5,-1256 1577.5,-1256"></path>
+<text text-anchor="middle" x="1409.63" y="-1233.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use Botnets to Launch DDoS Attacks on DNS Server      </text>
+</a>
+</g>
+</g>
+
+<g id="edge16" class="edge">
+ 
+<g id="a_edge16"><a xlink:title="Likely
+
+Likelihood Score: 4875">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M1087.21,-1238C1131.89,-1238 1182.09,-1238 1229.31,-1238"></path>
+</a>
+</g>
+</g>
+
+<g id="A26" class="node">
+ 
+<g id="a_A26"><a onclick="handleClickInGraphSubtree(event,'A26',false,true)" xlink:title="A26  -  Medium Risk
+Possible  -  Hacktivist  -  Complex
+Choke Point Score: 1.74">
+<path fill="#eff1fa" stroke="black" d="M1606.26,-1195C1606.26,-1195 1213,-1195 1213,-1195 1207,-1195 1201,-1189 1201,-1183 1201,-1183 1201,-1171 1201,-1171 1201,-1165 1207,-1159 1213,-1159 1213,-1159 1606.26,-1159 1606.26,-1159 1612.26,-1159 1618.26,-1165 1618.26,-1171 1618.26,-1171 1618.26,-1183 1618.26,-1183 1618.26,-1189 1612.26,-1195 1606.26,-1195"></path>
+<text text-anchor="middle" x="1409.63" y="-1172.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Exhaust DNS Server Resources by Sending Large DNS Queries      </text>
+</a>
+</g>
+</g>
+
+<g id="edge18" class="edge">
+ 
+<g id="a_edge18"><a xlink:title="Possible
+
+Likelihood Score: 2000">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1137.93,-1159.33C1158.61,-1160.68 1179.74,-1162.06 1200.63,-1163.42"></path>
+</a>
+</g>
+</g>
+
+<g id="A27" class="node">
+ 
+<g id="a_A27"><a onclick="handleClickInGraphSubtree(event,'A27',false,true)" xlink:title="A27  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Complex
+Choke Point Score: 1.74">
+<path fill="#eff1fa" stroke="black" d="M1619.29,-1134C1619.29,-1134 1199.97,-1134 1199.97,-1134 1193.97,-1134 1187.97,-1128 1187.97,-1122 1187.97,-1122 1187.97,-1110 1187.97,-1110 1187.97,-1104 1193.97,-1098 1199.97,-1098 1199.97,-1098 1619.29,-1098 1619.29,-1098 1625.29,-1098 1631.29,-1104 1631.29,-1110 1631.29,-1110 1631.29,-1122 1631.29,-1122 1631.29,-1128 1625.29,-1134 1619.29,-1134"></path>
+<text text-anchor="middle" x="1409.63" y="-1111.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Exploit Other Resource Exhaustion Vulnerabilities in DNS Software      </text>
+</a>
+</g>
+</g>
+
+<g id="edge19" class="edge">
+ 
+<g id="a_edge19"><a xlink:title="Possible
+
+Likelihood Score: 1625">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1137.93,-1134.26C1154.4,-1133.15 1171.15,-1132.02 1187.85,-1130.89"></path>
+</a>
+</g>
+</g>
+
+<g id="A12" class="node">
+ 
+<g id="a_A12"><a onclick="handleClickInGraph(event,'A12','')" xlink:title="A12  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 4.17">
+<path fill="#eff1fa" stroke="black" d="M1028.77,-1012C1028.77,-1012 867.21,-1012 867.21,-1012 861.21,-1012 855.21,-1006 855.21,-1000 855.21,-1000 855.21,-988 855.21,-988 855.21,-982 861.21,-976 867.21,-976 867.21,-976 1028.77,-976 1028.77,-976 1034.77,-976 1040.77,-982 1040.77,-988 1040.77,-988 1040.77,-1000 1040.77,-1000 1040.77,-1006 1034.77,-1012 1028.77,-1012"></path>
+<text text-anchor="middle" x="947.99" y="-989.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Spoof DNS Responses      </text>
+</a>
+</g>
+</g>
+
+<g id="edge21" class="edge">
+ 
+<g id="a_edge21"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M674.24,-971.57C730.91,-976.23 800.36,-981.94 854.99,-986.44"></path>
+</a>
+</g>
+</g>
+
+<g id="A15" class="node">
+ 
+<g id="a_A15"><a onclick="handleClickInGraph(event,'A15','')" xlink:title="A15  -  High Risk
+Likely  -  Hacktivist  -  Ordinary
+Choke Point Score: 5.56">
+<path fill="#fffaeb" stroke="black" d="M1063.74,-951C1063.74,-951 832.24,-951 832.24,-951 826.24,-951 820.24,-945 820.24,-939 820.24,-939 820.24,-927 820.24,-927 820.24,-921 826.24,-915 832.24,-915 832.24,-915 1063.74,-915 1063.74,-915 1069.74,-915 1075.74,-921 1075.74,-927 1075.74,-927 1075.74,-939 1075.74,-939 1075.74,-945 1069.74,-951 1063.74,-951"></path>
+<text text-anchor="middle" x="947.99" y="-928.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Intercept and Modify DNS Queries      </text>
+</a>
+</g>
+</g>
+
+<g id="edge24" class="edge">
+ 
+<g id="a_edge24"><a xlink:title="Likely
+
+Likelihood Score: 4000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M674.24,-954.7C719.36,-951.11 772.57,-946.88 819.97,-943.11"></path>
+</a>
+</g>
+</g>
+
+<g id="A13" class="node">
+ 
+<g id="a_A13"><a onclick="handleClickInGraphSubtree(event,'A13',false,true)" xlink:title="A13  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Implement DNSSEC">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1521.7,-1073C1521.7,-1073 1297.56,-1073 1297.56,-1073 1291.56,-1073 1285.56,-1067 1285.56,-1061 1285.56,-1061 1285.56,-1049 1285.56,-1049 1285.56,-1043 1291.56,-1037 1297.56,-1037 1297.56,-1037 1521.7,-1037 1521.7,-1037 1527.7,-1037 1533.7,-1043 1533.7,-1049 1533.7,-1049 1533.7,-1061 1533.7,-1061 1533.7,-1067 1527.7,-1073 1521.7,-1073"></path>
+<text text-anchor="middle" x="1409.63" y="-1050.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Perform Cache Poisoning Attacks      </text>
+</a>
+</g>
+</g>
+
+<g id="edge22" class="edge">
+ 
+<g id="a_edge22"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1041.19,-1006.38C1083.68,-1012.07 1134.78,-1018.9 1180.76,-1025 1214.68,-1029.5 1251.44,-1034.35 1285.34,-1038.82"></path>
+</a>
+</g>
+</g>
+
+<g id="A14" class="node">
+ 
+<g id="a_A14"><a onclick="handleClickInGraphSubtree(event,'A14',false,true)" xlink:title="A14  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Implement DNS-over-TLS (DoT) or DNS-over-HTTPS (DoH)
+
+High Effect  -  Unsettled: 
+Implement DNSSEC
+
+Medium Effect  -  Unsettled: 
+Implement DNS Query Response Policy Zones (RPZ)">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1521.13,-1012C1521.13,-1012 1298.13,-1012 1298.13,-1012 1292.13,-1012 1286.13,-1006 1286.13,-1000 1286.13,-1000 1286.13,-988 1286.13,-988 1286.13,-982 1292.13,-976 1298.13,-976 1298.13,-976 1521.13,-976 1521.13,-976 1527.13,-976 1533.13,-982 1533.13,-988 1533.13,-988 1533.13,-1000 1533.13,-1000 1533.13,-1006 1527.13,-1012 1521.13,-1012"></path>
+<text text-anchor="middle" x="1409.63" y="-989.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Spoof Responses to DNS Queries      </text>
+</a>
+</g>
+</g>
+
+<g id="edge23" class="edge">
+ 
+<g id="a_edge23"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1041.17,-994C1111.41,-994 1208.8,-994 1285.67,-994"></path>
+</a>
+</g>
+</g>
+
+<g id="A16" class="node">
+ 
+<g id="a_A16"><a onclick="handleClickInGraphSubtree(event,'A16',false,true)" xlink:title="A16  -  High Risk
+Likely  -  Hacktivist  -  Ordinary
+Choke Point Score: 2.31
+
+
+High Effect  -  Unsettled: 
+Implement DNSSEC">
+<path fill="#fffaeb" stroke="black" stroke-dasharray="5,2" d="M1583.9,-951C1583.9,-951 1235.37,-951 1235.37,-951 1229.37,-951 1223.37,-945 1223.37,-939 1223.37,-939 1223.37,-927 1223.37,-927 1223.37,-921 1229.37,-915 1235.37,-915 1235.37,-915 1583.9,-915 1583.9,-915 1589.9,-915 1595.9,-921 1595.9,-927 1595.9,-927 1595.9,-939 1595.9,-939 1595.9,-945 1589.9,-951 1583.9,-951"></path>
+<text text-anchor="middle" x="1409.63" y="-928.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Intercept DNS Queries with Man-in-the-Middle Attacks      </text>
+</a>
+</g>
+</g>
+
+<g id="edge25" class="edge">
+ 
+<g id="a_edge25"><a xlink:title="Likely
+
+Likelihood Score: 4000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M1076.11,-933C1121.54,-933 1173.72,-933 1223.07,-933"></path>
+</a>
+</g>
+</g>
+
+<g id="A17" class="node">
+ 
+<g id="a_A17"><a onclick="handleClickInGraphSubtree(event,'A17',false,true)" xlink:title="A17  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Implement DNSSEC">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1589.56,-890C1589.56,-890 1229.71,-890 1229.71,-890 1223.71,-890 1217.71,-884 1217.71,-878 1217.71,-878 1217.71,-866 1217.71,-866 1217.71,-860 1223.71,-854 1229.71,-854 1229.71,-854 1589.56,-854 1589.56,-854 1595.56,-854 1601.56,-860 1601.56,-866 1601.56,-866 1601.56,-878 1601.56,-878 1601.56,-884 1595.56,-890 1589.56,-890"></path>
+<text text-anchor="middle" x="1409.63" y="-867.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Modify DNS Queries to Redirect Users to Malicious Sites      </text>
+</a>
+</g>
+</g>
+
+<g id="edge26" class="edge">
+ 
+<g id="a_edge26"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1076.11,-916.13C1136.16,-908.16 1207.98,-898.63 1269.49,-890.47"></path>
+</a>
+</g>
+</g>
+
+<g id="A46" class="node">
+ 
+<g id="a_A46"><a onclick="handleClickInGraph(event,'A46','')" xlink:title="A46  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 7.50">
+<polygon fill="#eff1fa" stroke="black" points="701.22,-526 440.73,-526 436.73,-522 436.73,-402 697.22,-402 701.22,-406 701.22,-526"></polygon>
+<polyline fill="none" stroke="black" points="697.22,-522 436.73,-522"></polyline>
+<polyline fill="none" stroke="black" points="697.22,-522 697.22,-402"></polyline>
+<polyline fill="none" stroke="black" points="697.22,-522 701.22,-526"></polyline>
+<text text-anchor="middle" x="568.97" y="-493.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">          Perform DNS Spoofing Attacks          </text>
+<text text-anchor="middle" x="568.97" y="-460.6" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Overall Impact: High    </text>
+<text text-anchor="middle" x="568.97" y="-443.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Likelihood: Possible    </text>
+<text text-anchor="middle" x="568.97" y="-427" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Risk: Medium    </text>
+<text text-anchor="middle" x="568.97" y="-410.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7"> </text>
+</a>
+</g>
+</g>
+
+<g id="edge28" class="edge">
+<title>3 × Risk:
+Medium-&gt;A46</title>
+<g id="a_edge28"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M351.01,-402.89C374.97,-409.64 405.67,-418.29 436.38,-426.94"></path>
+</a>
+</g>
+</g>
+
+<g id="A38" class="node">
+ 
+<g id="a_A38"><a onclick="handleClickInGraph(event,'A38','')" xlink:title="A38  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 5.00">
+<polygon fill="#eff1fa" stroke="black" points="715.21,-377 426.73,-377 422.73,-373 422.73,-253 711.21,-253 715.21,-257 715.21,-377"></polygon>
+<polyline fill="none" stroke="black" points="711.21,-373 422.73,-373"></polyline>
+<polyline fill="none" stroke="black" points="711.21,-373 711.21,-253"></polyline>
+<polyline fill="none" stroke="black" points="711.21,-373 715.21,-377"></polyline>
+<text text-anchor="middle" x="568.97" y="-344.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">          Abuse DNS Server in DDoS Attacks          </text>
+<text text-anchor="middle" x="568.97" y="-311.6" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Overall Impact: Medium    </text>
+<text text-anchor="middle" x="568.97" y="-294.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Likelihood: Possible    </text>
+<text text-anchor="middle" x="568.97" y="-278" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Risk: Medium    </text>
+<text text-anchor="middle" x="568.97" y="-261.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7"> </text>
+</a>
+</g>
+</g>
+
+<g id="edge43" class="edge">
+<title>3 × Risk:
+Medium-&gt;A38</title>
+<g id="a_edge43"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M350.71,-377.02C371.05,-371.21 396.29,-364.01 422.28,-356.59"></path>
+</a>
+</g>
+</g>
+
+<g id="A53" class="node">
+ 
+<g id="a_A53"><a onclick="handleClickInGraph(event,'A53','')" xlink:title="A53  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 10.00">
+<polygon fill="#eff1fa" stroke="black" points="704.32,-211 437.63,-211 433.63,-207 433.63,-87 700.32,-87 704.32,-91 704.32,-211"></polygon>
+<polyline fill="none" stroke="black" points="700.32,-207 433.63,-207"></polyline>
+<polyline fill="none" stroke="black" points="700.32,-207 700.32,-87"></polyline>
+<polyline fill="none" stroke="black" points="700.32,-207 704.32,-211"></polyline>
+<text text-anchor="middle" x="568.97" y="-178.4" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">          Perform DNS Tunneling Attacks          </text>
+<text text-anchor="middle" x="568.97" y="-145.6" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Overall Impact: Medium    </text>
+<text text-anchor="middle" x="568.97" y="-128.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Likelihood: Possible    </text>
+<text text-anchor="middle" x="568.97" y="-112" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#3850b7">    Risk: Medium    </text>
+<text text-anchor="middle" x="568.97" y="-95.2" font-weight="bold" font-family="Arial Bold, Helvetica, sans-serif" font-size="14.00" fill="#3850b7"> </text>
+</a>
+</g>
+</g>
+
+<g id="edge47" class="edge">
+<title>3 × Risk:
+Medium-&gt;A53</title>
+<g id="a_edge47"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M324.12,-360.41C345.46,-328.47 382.49,-277.29 422.73,-241 434.26,-230.6 447.1,-220.64 460.23,-211.35"></path>
+</a>
+</g>
+</g>
+
+<g id="A47" class="node">
+ 
+<g id="a_A47"><a onclick="handleClickInGraphSubtree(event,'A47',false,true)" xlink:title="A47  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 2.08
+
+
+High Effect  -  Unsettled: 
+Implement DNSSEC
+
+High Effect  -  Unsettled: 
+Use a Secure DNS Resolver">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1084.95,-507C1084.95,-507 811.03,-507 811.03,-507 805.03,-507 799.03,-501 799.03,-495 799.03,-495 799.03,-483 799.03,-483 799.03,-477 805.03,-471 811.03,-471 811.03,-471 1084.95,-471 1084.95,-471 1090.95,-471 1096.95,-477 1096.95,-483 1096.95,-483 1096.95,-495 1096.95,-495 1096.95,-501 1090.95,-507 1084.95,-507"></path>
+<text text-anchor="middle" x="947.99" y="-484.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Poison DNS Cache with False Information      </text>
+</a>
+</g>
+</g>
+
+<g id="edge29" class="edge">
+ 
+<g id="a_edge29"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M701.57,-472.73C732.9,-474.8 766.55,-477.04 798.58,-479.16"></path>
+</a>
+</g>
+</g>
+
+<g id="A50" class="node">
+ 
+<g id="a_A50"><a onclick="handleClickInGraph(event,'A50','')" xlink:title="A50  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 4.17">
+<path fill="#eff1fa" stroke="black" d="M1080.28,-446C1080.28,-446 815.7,-446 815.7,-446 809.7,-446 803.7,-440 803.7,-434 803.7,-434 803.7,-422 803.7,-422 803.7,-416 809.7,-410 815.7,-410 815.7,-410 1080.28,-410 1080.28,-410 1086.28,-410 1092.28,-416 1092.28,-422 1092.28,-422 1092.28,-434 1092.28,-434 1092.28,-440 1086.28,-446 1080.28,-446"></path>
+<text text-anchor="middle" x="947.99" y="-423.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Redirect DNS Queries to Malicious Sites      </text>
+</a>
+</g>
+</g>
+
+<g id="edge30" class="edge">
+ 
+<g id="a_edge30"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M701.57,-451.43C734.5,-448.29 769.98,-444.9 803.45,-441.71"></path>
+</a>
+</g>
+</g>
+
+<g id="A51" class="node">
+ 
+<g id="a_A51"><a onclick="handleClickInGraphSubtree(event,'A51',false,true)" xlink:title="A51  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Implement DNSSEC
+
+High Effect  -  Unsettled: 
+Use a Secure DNS Resolver">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1580.4,-463C1580.4,-463 1238.86,-463 1238.86,-463 1232.86,-463 1226.86,-457 1226.86,-451 1226.86,-451 1226.86,-439 1226.86,-439 1226.86,-433 1232.86,-427 1238.86,-427 1238.86,-427 1580.4,-427 1580.4,-427 1586.4,-427 1592.4,-433 1592.4,-439 1592.4,-439 1592.4,-451 1592.4,-451 1592.4,-457 1586.4,-463 1580.4,-463"></path>
+<text text-anchor="middle" x="1409.63" y="-440.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Intercept DNS Queries and Redirect to Malicious Sites      </text>
+</a>
+</g>
+</g>
+
+<g id="edge31" class="edge">
+ 
+<g id="a_edge31"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1092.53,-433.31C1134.94,-434.88 1181.93,-436.62 1226.44,-438.26"></path>
+</a>
+</g>
+</g>
+
+<g id="A52" class="node">
+ 
+<g id="a_A52"><a onclick="handleClickInGraphSubtree(event,'A52',false,true)" xlink:title="A52  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Implement DNSSEC
+
+High Effect  -  Unsettled: 
+Use a Secure DNS Resolver">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1626.5,-402C1626.5,-402 1192.76,-402 1192.76,-402 1186.76,-402 1180.76,-396 1180.76,-390 1180.76,-390 1180.76,-378 1180.76,-378 1180.76,-372 1186.76,-366 1192.76,-366 1192.76,-366 1626.5,-366 1626.5,-366 1632.5,-366 1638.5,-372 1638.5,-378 1638.5,-378 1638.5,-390 1638.5,-390 1638.5,-396 1632.5,-402 1626.5,-402"></path>
+<text text-anchor="middle" x="1409.63" y="-379.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use DNS Cache Poisoning to Redirect DNS Queries to Malicious Sites      </text>
+</a>
+</g>
+</g>
+
+<g id="edge32" class="edge">
+ 
+<g id="a_edge32"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1092.53,-414.26C1131.52,-410.53 1174.37,-406.42 1215.61,-402.48"></path>
+</a>
+</g>
+</g>
+
+<g id="A29" class="node">
+ 
+<g id="a_A29"><a onclick="handleClickInGraph(event,'A29','')" xlink:title="A29  -  Medium Risk
+Likely  -  Attacker Group Outside  -  Simple
+Choke Point Score: 4.17
+
+
+Very High Effect  -  Unsettled: 
+Disable DNS caching
+
+Very High Effect  -  Unsettled: 
+Implement DNSSEC
+
+Very High Effect  -  Unsettled: 
+Use encrypted DNS">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1074.64,-768C1074.64,-768 821.34,-768 821.34,-768 815.34,-768 809.34,-762 809.34,-756 809.34,-756 809.34,-744 809.34,-744 809.34,-738 815.34,-732 821.34,-732 821.34,-732 1074.64,-732 1074.64,-732 1080.64,-732 1086.64,-738 1086.64,-744 1086.64,-744 1086.64,-756 1086.64,-756 1086.64,-762 1080.64,-768 1074.64,-768"></path>
+<text text-anchor="middle" x="947.99" y="-745.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Perform DNS Cache Snooping Attacks      </text>
+</a>
+</g>
+</g>
+
+<g id="edge34" class="edge">
+ 
+<g id="a_edge34"><a xlink:title="Likely
+
+Likelihood Score: 4875">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M677.25,-727.82C718.29,-731.19 765.67,-735.09 809.16,-738.67"></path>
+</a>
+</g>
+</g>
+
+<g id="A32" class="node">
+ 
+<g id="a_A32"><a onclick="handleClickInGraph(event,'A32','')" xlink:title="A32  -  High Risk
+Very Likely  -  Script Kiddie  -  Very Simple
+Choke Point Score: 5.56
+
+
+Very High Effect  -  Unsettled: 
+Disable Zone Transfers">
+<path fill="#fffaeb" stroke="black" stroke-dasharray="5,2" d="M1068.4,-707C1068.4,-707 827.57,-707 827.57,-707 821.57,-707 815.57,-701 815.57,-695 815.57,-695 815.57,-683 815.57,-683 815.57,-677 821.57,-671 827.57,-671 827.57,-671 1068.4,-671 1068.4,-671 1074.4,-671 1080.4,-677 1080.4,-683 1080.4,-683 1080.4,-695 1080.4,-695 1080.4,-701 1074.4,-707 1068.4,-707"></path>
+<text text-anchor="middle" x="947.99" y="-684.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#cc0f35">      Perform DNS Zone Transfer Attacks      </text>
+</a>
+</g>
+</g>
+
+<g id="edge37" class="edge">
+ 
+<g id="a_edge37"><a xlink:title="Very Likely
+
+Likelihood Score: 10000">
+<path fill="none" stroke="#cc0f35" stroke-width="3" d="M677.25,-710.46C720.24,-707.04 770.2,-703.07 815.36,-699.47"></path>
+</a>
+</g>
+</g>
+
+<g id="A35" class="node">
+ 
+<g id="a_A35"><a onclick="handleClickInGraph(event,'A35','')" xlink:title="A35  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 4.17">
+<path fill="#eff1fa" stroke="black" d="M1102.24,-585C1102.24,-585 793.74,-585 793.74,-585 787.74,-585 781.74,-579 781.74,-573 781.74,-573 781.74,-561 781.74,-561 781.74,-555 787.74,-549 793.74,-549 793.74,-549 1102.24,-549 1102.24,-549 1108.24,-549 1114.24,-555 1114.24,-561 1114.24,-561 1114.24,-573 1114.24,-573 1114.24,-579 1108.24,-585 1102.24,-585"></path>
+<text text-anchor="middle" x="947.99" y="-562.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use DNS Information to Launch Further Attacks      </text>
+</a>
+</g>
+</g>
+
+<g id="edge40" class="edge">
+ 
+<g id="a_edge40"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M677.25,-675.75C751.26,-645.91 845.93,-607.74 901.18,-585.47"></path>
+</a>
+</g>
+</g>
+
+<g id="A30" class="node">
+ 
+<g id="a_A30"><a onclick="handleClickInGraphSubtree(event,'A30',false,true)" xlink:title="A30  -  Medium Risk
+Likely  -  Attacker Group Outside  -  Simple
+Choke Point Score: 1.74">
+<path fill="#eff1fa" stroke="black" d="M1586.44,-829C1586.44,-829 1232.83,-829 1232.83,-829 1226.83,-829 1220.83,-823 1220.83,-817 1220.83,-817 1220.83,-805 1220.83,-805 1220.83,-799 1226.83,-793 1232.83,-793 1232.83,-793 1586.44,-793 1586.44,-793 1592.44,-793 1598.44,-799 1598.44,-805 1598.44,-805 1598.44,-817 1598.44,-817 1598.44,-823 1592.44,-829 1586.44,-829"></path>
+<text text-anchor="middle" x="1409.63" y="-806.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Retrieve DNS Information from Cached DNS Responses      </text>
+</a>
+</g>
+</g>
+
+<g id="edge35" class="edge">
+ 
+<g id="a_edge35"><a xlink:title="Likely
+
+Likelihood Score: 4875">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M1086.86,-768.49C1117.76,-772.62 1150.38,-776.97 1180.76,-781 1208.95,-784.74 1239.09,-788.72 1267.93,-792.52"></path>
+</a>
+</g>
+</g>
+
+<g id="A31" class="node">
+ 
+<g id="a_A31"><a onclick="handleClickInGraphSubtree(event,'A31',false,true)" xlink:title="A31  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74">
+<path fill="#eff1fa" stroke="black" d="M1590.34,-768C1590.34,-768 1228.92,-768 1228.92,-768 1222.92,-768 1216.92,-762 1216.92,-756 1216.92,-756 1216.92,-744 1216.92,-744 1216.92,-738 1222.92,-732 1228.92,-732 1228.92,-732 1590.34,-732 1590.34,-732 1596.34,-732 1602.34,-738 1602.34,-744 1602.34,-744 1602.34,-756 1602.34,-756 1602.34,-762 1596.34,-768 1590.34,-768"></path>
+<text text-anchor="middle" x="1409.63" y="-745.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use DNS Cache Snooping to Map Out Network Topology      </text>
+</a>
+</g>
+</g>
+
+<g id="edge36" class="edge">
+ 
+<g id="a_edge36"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1086.9,-750C1127.62,-750 1172.95,-750 1216.44,-750"></path>
+</a>
+</g>
+</g>
+
+<g id="A33" class="node">
+ 
+<g id="a_A33"><a onclick="handleClickInGraphSubtree(event,'A33',false,true)" xlink:title="A33  -  High Risk
+Very Likely  -  Script Kiddie  -  Very Simple
+Choke Point Score: 2.31">
+<path fill="#fffaeb" stroke="black" d="M1567.38,-707C1567.38,-707 1251.88,-707 1251.88,-707 1245.88,-707 1239.88,-701 1239.88,-695 1239.88,-695 1239.88,-683 1239.88,-683 1239.88,-677 1245.88,-671 1251.88,-671 1251.88,-671 1567.38,-671 1567.38,-671 1573.38,-671 1579.38,-677 1579.38,-683 1579.38,-683 1579.38,-695 1579.38,-695 1579.38,-701 1573.38,-707 1567.38,-707"></path>
+<text text-anchor="middle" x="1409.63" y="-684.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#cc0f35">      Request DNS Zone Information from DNS Server      </text>
+</a>
+</g>
+</g>
+
+<g id="edge38" class="edge">
+ 
+<g id="a_edge38"><a xlink:title="Very Likely
+
+Likelihood Score: 10000">
+<path fill="none" stroke="#cc0f35" stroke-width="3" d="M1080.7,-689C1130.18,-689 1187.12,-689 1239.53,-689"></path>
+</a>
+</g>
+</g>
+
+<g id="A34" class="node">
+ 
+<g id="a_A34"><a onclick="handleClickInGraphSubtree(event,'A34',false,true)" xlink:title="A34  -  Medium Risk
+Likely  -  Hacktivist  -  Simple
+Choke Point Score: 1.74">
+<path fill="#eff1fa" stroke="black" d="M1604.9,-646C1604.9,-646 1214.36,-646 1214.36,-646 1208.36,-646 1202.36,-640 1202.36,-634 1202.36,-634 1202.36,-622 1202.36,-622 1202.36,-616 1208.36,-610 1214.36,-610 1214.36,-610 1604.9,-610 1604.9,-610 1610.9,-610 1616.9,-616 1616.9,-622 1616.9,-622 1616.9,-634 1616.9,-634 1616.9,-640 1610.9,-646 1604.9,-646"></path>
+<text text-anchor="middle" x="1409.63" y="-623.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#bb2b9c">      Exploit Misconfigured DNS Servers to Perform Zone Transfers      </text>
+</a>
+</g>
+</g>
+
+<g id="edge39" class="edge">
+ 
+<g id="a_edge39"><a xlink:title="Likely
+
+Likelihood Score: 6000">
+<path fill="none" stroke="#946c00" stroke-width="2.5" d="M1080.7,-671.52C1139.73,-663.69 1209.38,-654.44 1269.28,-646.49"></path>
+</a>
+</g>
+</g>
+
+<g id="A36" class="node">
+ 
+<g id="a_A36"><a onclick="handleClickInGraphSubtree(event,'A36',false,true)" xlink:title="A36  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74">
+<path fill="#eff1fa" stroke="black" d="M1612.49,-585C1612.49,-585 1206.78,-585 1206.78,-585 1200.78,-585 1194.78,-579 1194.78,-573 1194.78,-573 1194.78,-561 1194.78,-561 1194.78,-555 1200.78,-549 1206.78,-549 1206.78,-549 1612.49,-549 1612.49,-549 1618.49,-549 1624.49,-555 1624.49,-561 1624.49,-561 1624.49,-573 1624.49,-573 1624.49,-579 1618.49,-585 1612.49,-585"></path>
+<text text-anchor="middle" x="1409.63" y="-562.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use DNS Information to Identify Vulnerable Systems on Network      </text>
+</a>
+</g>
+</g>
+
+<g id="edge41" class="edge">
+ 
+<g id="a_edge41"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1114.6,-567C1140.59,-567 1167.76,-567 1194.65,-567"></path>
+</a>
+</g>
+</g>
+
+<g id="A37" class="node">
+ 
+<g id="a_A37"><a onclick="handleClickInGraphSubtree(event,'A37',false,true)" xlink:title="A37  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74">
+<path fill="#eff1fa" stroke="black" d="M1585.47,-524C1585.47,-524 1233.79,-524 1233.79,-524 1227.79,-524 1221.79,-518 1221.79,-512 1221.79,-512 1221.79,-500 1221.79,-500 1221.79,-494 1227.79,-488 1233.79,-488 1233.79,-488 1585.47,-488 1585.47,-488 1591.47,-488 1597.47,-494 1597.47,-500 1597.47,-500 1597.47,-512 1597.47,-512 1597.47,-518 1591.47,-524 1585.47,-524"></path>
+<text text-anchor="middle" x="1409.63" y="-501.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use DNS Information to Launch Spear Phishing Attacks      </text>
+</a>
+</g>
+</g>
+
+<g id="edge42" class="edge">
+ 
+<g id="a_edge42"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1088.14,-548.53C1145.61,-540.91 1212.09,-532.08 1269.55,-524.46"></path>
+</a>
+</g>
+</g>
+
+<g id="A18" class="node">
+ 
+<g id="a_A18"><a onclick="handleClickInGraph(event,'A18','')" xlink:title="A18  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 4.17">
+<path fill="#eff1fa" stroke="black" d="M1067.83,-333C1067.83,-333 828.14,-333 828.14,-333 822.14,-333 816.14,-327 816.14,-321 816.14,-321 816.14,-309 816.14,-309 816.14,-303 822.14,-297 828.14,-297 828.14,-297 1067.83,-297 1067.83,-297 1073.83,-297 1079.83,-303 1079.83,-309 1079.83,-309 1079.83,-321 1079.83,-321 1079.83,-327 1073.83,-333 1067.83,-333"></path>
+<text text-anchor="middle" x="947.99" y="-310.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Perform DNS Amplification Attacks      </text>
+</a>
+</g>
+</g>
+
+<g id="edge44" class="edge">
+ 
+<g id="a_edge44"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M715.47,-315C748.54,-315 783.47,-315 815.9,-315"></path>
+</a>
+</g>
+</g>
+
+<g id="A19" class="node">
+ 
+<g id="a_A19"><a onclick="handleClickInGraphSubtree(event,'A19',false,true)" xlink:title="A19  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Disable open DNS resolvers
+
+Medium Effect  -  Unsettled: 
+Implement DNS Monitoring">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1624.72,-341C1624.72,-341 1194.54,-341 1194.54,-341 1188.54,-341 1182.54,-335 1182.54,-329 1182.54,-329 1182.54,-317 1182.54,-317 1182.54,-311 1188.54,-305 1194.54,-305 1194.54,-305 1624.72,-305 1624.72,-305 1630.72,-305 1636.72,-311 1636.72,-317 1636.72,-317 1636.72,-329 1636.72,-329 1636.72,-335 1630.72,-341 1624.72,-341"></path>
+<text text-anchor="middle" x="1409.63" y="-318.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Send Large DNS Queries to DNS Servers to Amplify Traffic to Target      </text>
+</a>
+</g>
+</g>
+
+<g id="edge45" class="edge">
+ 
+<g id="a_edge45"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1080.09,-317.28C1112.06,-317.84 1147.18,-318.45 1182.2,-319.06"></path>
+</a>
+</g>
+</g>
+
+<g id="A20" class="node">
+ 
+<g id="a_A20"><a onclick="handleClickInGraphSubtree(event,'A20',false,true)" xlink:title="A20  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Disable Recursive Queries
+
+Medium Effect  -  Unsettled: 
+Implement DNS Monitoring
+
+Medium Effect  -  Unsettled: 
+Implement DNS Rate Limiting">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1592.26,-280C1592.26,-280 1227,-280 1227,-280 1221,-280 1215,-274 1215,-268 1215,-268 1215,-256 1215,-256 1215,-250 1221,-244 1227,-244 1227,-244 1592.26,-244 1592.26,-244 1598.26,-244 1604.26,-250 1604.26,-256 1604.26,-256 1604.26,-268 1604.26,-268 1604.26,-274 1598.26,-280 1592.26,-280"></path>
+<text text-anchor="middle" x="1409.63" y="-257.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use Open Recursive DNS Servers to Amplify DNS Traffic      </text>
+</a>
+</g>
+</g>
+
+<g id="edge46" class="edge">
+ 
+<g id="a_edge46"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1080.09,-299.88C1132.49,-293.84 1193.36,-286.82 1248.35,-280.48"></path>
+</a>
+</g>
+</g>
+
+<g id="A54" class="node">
+ 
+<g id="a_A54"><a onclick="handleClickInGraph(event,'A54','')" xlink:title="A54  -  Medium Risk
+Possible  -  Attacker Group Inside  -  Very Simple
+Choke Point Score: 4.17">
+<path fill="#eff1fa" stroke="black" d="M1106.54,-167C1106.54,-167 789.44,-167 789.44,-167 783.44,-167 777.44,-161 777.44,-155 777.44,-155 777.44,-143 777.44,-143 777.44,-137 783.44,-131 789.44,-131 789.44,-131 1106.54,-131 1106.54,-131 1112.54,-131 1118.54,-137 1118.54,-143 1118.54,-143 1118.54,-155 1118.54,-155 1118.54,-161 1112.54,-167 1106.54,-167"></path>
+<text text-anchor="middle" x="947.99" y="-144.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#296fa8">      Use DNS Protocol to Bypass Firewall Restrictions      </text>
+</a>
+</g>
+</g>
+
+<g id="edge48" class="edge">
+ 
+<g id="a_edge48"><a xlink:title="Possible
+
+Likelihood Score: 3200">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M704.75,-149C728.22,-149 752.89,-149 777.15,-149"></path>
+</a>
+</g>
+</g>
+
+<g id="A57" class="node">
+ 
+<g id="a_A57"><a onclick="handleClickInGraph(event,'A57','')" xlink:title="A57  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 4.17">
+<path fill="#eff1fa" stroke="black" d="M1072.49,-97C1072.49,-97 823.49,-97 823.49,-97 817.49,-97 811.49,-91 811.49,-85 811.49,-85 811.49,-73 811.49,-73 811.49,-67 817.49,-61 823.49,-61 823.49,-61 1072.49,-61 1072.49,-61 1078.49,-61 1084.49,-67 1084.49,-73 1084.49,-73 1084.49,-85 1084.49,-85 1084.49,-91 1078.49,-97 1072.49,-97"></path>
+<text text-anchor="middle" x="947.99" y="-74.8" font-family="Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use DNS Tunneling to Exfiltrate Data      </text>
+</a>
+</g>
+</g>
+
+<g id="edge51" class="edge">
+ 
+<g id="a_edge51"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M704.75,-123.98C751.89,-115.22 803.92,-105.56 847.64,-97.45"></path>
+</a>
+</g>
+</g>
+
+<g id="A55" class="node">
+ 
+<g id="a_A55"><a onclick="handleClickInGraphSubtree(event,'A55',false,true)" xlink:title="A55  -  Medium Risk
+Possible  -  Attacker Group Inside  -  Very Simple
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Implement DNS Filtering
+
+Medium Effect  -  Unsettled: 
+Implement DNS Monitoring
+
+Medium Effect  -  Unsettled: 
+Use DNS Sinkhole">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1525.97,-219C1525.97,-219 1293.29,-219 1293.29,-219 1287.29,-219 1281.29,-213 1281.29,-207 1281.29,-207 1281.29,-195 1281.29,-195 1281.29,-189 1287.29,-183 1293.29,-183 1293.29,-183 1525.97,-183 1525.97,-183 1531.97,-183 1537.97,-189 1537.97,-195 1537.97,-195 1537.97,-207 1537.97,-207 1537.97,-213 1531.97,-219 1525.97,-219"></path>
+<text text-anchor="middle" x="1409.63" y="-196.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#296fa8">      Use DNS Queries to Transmit Data      </text>
+</a>
+</g>
+</g>
+
+<g id="edge49" class="edge">
+ 
+<g id="a_edge49"><a xlink:title="Possible
+
+Likelihood Score: 3200">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1112.34,-167.48C1167.68,-173.74 1228.66,-180.64 1280.84,-186.54"></path>
+</a>
+</g>
+</g>
+
+<g id="A56" class="node">
+ 
+<g id="a_A56"><a onclick="handleClickInGraphSubtree(event,'A56',false,true)" xlink:title="A56  -  Medium Risk
+Possible  -  Attacker Group Inside  -  Very Simple
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Implement DNS Filtering
+
+Medium Effect  -  Unsettled: 
+Implement DNS Monitoring
+
+Medium Effect  -  Unsettled: 
+Use DNS Sinkhole">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1531.03,-158C1531.03,-158 1288.24,-158 1288.24,-158 1282.24,-158 1276.24,-152 1276.24,-146 1276.24,-146 1276.24,-134 1276.24,-134 1276.24,-128 1282.24,-122 1288.24,-122 1288.24,-122 1531.03,-122 1531.03,-122 1537.03,-122 1543.03,-128 1543.03,-134 1543.03,-134 1543.03,-146 1543.03,-146 1543.03,-152 1537.03,-158 1531.03,-158"></path>
+<text text-anchor="middle" x="1409.63" y="-135.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#296fa8">      Use DNS Responses to Receive Data      </text>
+</a>
+</g>
+</g>
+
+<g id="edge50" class="edge">
+ 
+<g id="a_edge50"><a xlink:title="Possible
+
+Likelihood Score: 3200">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1118.84,-145.67C1170.62,-144.66 1226.78,-143.56 1275.74,-142.6"></path>
+</a>
+</g>
+</g>
+
+<g id="A58" class="node">
+ 
+<g id="a_A58"><a onclick="handleClickInGraphSubtree(event,'A58',false,true)" xlink:title="A58  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Use DNS Firewalls
+
+Medium Effect  -  Unsettled: 
+Implement DNS Rate Limiting">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1565.04,-97C1565.04,-97 1254.22,-97 1254.22,-97 1248.22,-97 1242.22,-91 1242.22,-85 1242.22,-85 1242.22,-73 1242.22,-73 1242.22,-67 1248.22,-61 1254.22,-61 1254.22,-61 1565.04,-61 1565.04,-61 1571.04,-61 1577.04,-67 1577.04,-73 1577.04,-73 1577.04,-85 1577.04,-85 1577.04,-91 1571.04,-97 1565.04,-97"></path>
+<text text-anchor="middle" x="1409.63" y="-74.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Encapsulate Data in DNS Queries and Responses      </text>
+</a>
+</g>
+</g>
+
+<g id="edge52" class="edge">
+ 
+<g id="a_edge52"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1084.72,-79C1133.97,-79 1190.18,-79 1241.8,-79"></path>
+</a>
+</g>
+</g>
+
+<g id="A59" class="node">
+ 
+<g id="a_A59"><a onclick="handleClickInGraphSubtree(event,'A59',false,true)" xlink:title="A59  -  Medium Risk
+Possible  -  Attacker Group Outside  -  Ordinary
+Choke Point Score: 1.74
+
+
+High Effect  -  Unsettled: 
+Use DNS Firewalls
+
+Medium Effect  -  Unsettled: 
+Implement DNS Rate Limiting">
+<path fill="#eff1fa" stroke="black" stroke-dasharray="5,2" d="M1558.43,-36C1558.43,-36 1260.83,-36 1260.83,-36 1254.83,-36 1248.83,-30 1248.83,-24 1248.83,-24 1248.83,-12 1248.83,-12 1248.83,-6 1254.83,0 1260.83,0 1260.83,0 1558.43,0 1558.43,0 1564.43,0 1570.43,-6 1570.43,-12 1570.43,-12 1570.43,-24 1570.43,-24 1570.43,-30 1564.43,-36 1558.43,-36"></path>
+<text text-anchor="middle" x="1409.63" y="-13.8" font-style="italic" font-family="Arial Italic, Arial, Helvetica, sans-serif" font-size="14.00" fill="#3850b7">      Use Encrypted DNS Tunnels to Exfiltrate Data      </text>
+</a>
+</g>
+</g>
+
+<g id="edge53" class="edge">
+ 
+<g id="a_edge53"><a xlink:title="Possible
+
+Likelihood Score: 3250">
+<path fill="none" stroke="#3850b7" stroke-width="2" d="M1084.72,-60.99C1142.97,-53.26 1210.96,-44.23 1269.58,-36.45"></path>
+</a>
+</g>
+</g>
+</g>
+</svg>
