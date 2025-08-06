@@ -52,3 +52,29 @@ inference service -> API gateway -> user
 |  | Elevation of Privilege | Injection attack on the underlying OS through the submitted job. | Likelihood: Medium Impact: Critical | Escape all submitted code and data. |
 
 
+
+## 
+
+
+|  | 1 | 2 | 3 | 4 | 5 |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| Category | Individual | Organised group / small corporation | Corporations / Large groups | States / Large corporations | Superpowers |
+| Budget | $1000 3 | $10k 4 | $100K 6 | $1M 7 | $1B+ 9 |
+| Technical expertise | No expertise | Professional |  | Top people with many years’ training | Top people with many years’ training |
+| Individuals or groups |  |  | Apollo Research, Anonymous | Azerbaijan, Google | USA, China |
+| Typical operation |  |  |  |  | Military espionage, Energy, Nuclear |
+
+|  Attack Vector |  | OC1 | OC2 | OC3 | OC4 | OC5 |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| 1 | Exploiting vulnerabilities for which a patch exists | 3 | 4 | 4 | 5 | 5 |
+| 2 | Exploiting reported but not (fully) patched vulnerabilities | 4 | 5 | 5 | 5 | 5 |
+| 3 | Finding and exploiting individual zero-days | 1 | 2 | 4 | 5 | 5 |
+| 4 | Social engineering for credentials | 3 | 5 | 5 | 5 | 5 |
+| 5 | Password brute-forcing and cracking | 2 | 2 | 3 | 4 | 4 |
+| 6 | Intentional ML supply chain compromise | 1 | 1 | 2 | 3 | 4 |
+| 7 | Model extraction (through API) | 1 | 1 | 1 | 2 | 4 |
+| 8 | Model distillation | 1 | 1 | 2 | 3 | 4 |
+| 9 | Direct physical access to sensitive systems | 1 | 1 | 2 | 3 | 4 |
+| 10 | Bribes and cooperation (with insiders) | 1 | 1 | 2 | 4 | 5 |
+
+1
