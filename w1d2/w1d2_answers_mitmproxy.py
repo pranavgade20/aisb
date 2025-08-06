@@ -1,3 +1,4 @@
+# %%
 from mitmproxy import http
 from typing import List
 
@@ -22,3 +23,77 @@ class RequestBlocker:
 # Initialize the addon for mitmproxy
 addons: list = []
 addons = [RequestBlocker()]
+
+# %%
+from mitmproxy import dns as mitmproxydns  # alias to avoid conflict with dnspython
+import base64
+
+
+def get_packet(question, request):
+    msg_cls = (
+        mitmproxydns.DNSMessage if hasattr(mitmproxydns, "DNSMessage") else mitmproxydns.Message
+    )  # mac has Message, linux has DNSMessage ??
+    return msg_cls(
+        id=request.id,  # Match the request's transaction ID
+        op_code=0,  # Standard query opcode
+        authoritative_answer=False,  # Not authoritative
+        truncation=False,  # Not truncated
+        recursion_desired=True,  # RD flag set
+        recursion_available=True,  # RA flag set
+        response_code=0,  # NOERROR
+        questions=request.questions,
+        answers=[
+            mitmproxydns.ResourceRecord(
+                name=question.name,
+                type=question.type,
+                class_=question.class_,
+                ttl=60,
+                # this is intentionally base64 encoded - look at exercise 8.1a for more details
+                data=base64.decodebytes(b"GGJsb2NrZWQgYnkgRE5TIGZpbHRlciA6KQ=="),
+            )
+        ],
+        authorities=[],  # No authority records
+        additionals=[],  # No additional records
+        timestamp=request.timestamp,
+        query=False,  # This is a response, not a query
+        reserved=0,  # Reserved bits must be 0
+    )
+
+
+class DNSInterceptor:
+    """
+    Intercept and modify TXT requests to any subdomain of evil.aisb.dev.
+
+    This addon demonstrates how to read and rewrite DNS requests
+    """
+
+    def dns_request(self, flow: mitmproxydns.DNSFlow) -> None:
+        """
+        Intercept DNS requests before they are sent to the upstream server.
+
+        You need to:
+        1. Check if the flow contains a request
+        2. Iterate through questions in the request
+        3. Identify TXT record queries (type == 16)
+        4. Block queries to suspicious domains
+
+        Args:
+            flow: The DNS flow object containing the DNS query
+        """
+        # TODO: Implement DNS filtering
+        #   1. Check if flow.request exists
+        #   2. Loop through flow.request.questions
+        #   3. Check if question.type == 16 (TXT record)
+        #   4. If question.name is a blocked domain:
+        #      - Set flow.response = get_dns_block_response(question, flow.request)
+        req = flow.request
+        if req:
+            for question in flow.request.questions:
+                if question.type == 16:
+                    if "evil.aisb.dev" in question.name:
+                        flow.response = get_packet(question, flow.request)
+
+
+addons = [RequestBlocker(), DNSInterceptor()]
+
+# %%

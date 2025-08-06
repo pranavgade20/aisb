@@ -12,14 +12,14 @@ sudo iptables -A OUTPUT -p tcp -d localhost --dport 8080 -j ACCEPT
 sudo iptables -A OUTPUT -p tcp -j NFQUEUE --queue-num 0
 
 # UNCOMMENT THE LINES BELOW FOR EXERCISE 9.2
-# # Allow all traffic from root user (UID 0)
-# sudo iptables -A OUTPUT -p udp -m owner --uid-owner 0 -j ACCEPT
-# # Allow UDP to localhost:53 (for DNS to your mitmproxy)
-# sudo iptables -A OUTPUT -p udp -d 127.0.0.1 --dport 53 -j ACCEPT
-# # Allow established connections (for responses)
-# sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-# # Drop all other UDP traffic
-# sudo iptables -A OUTPUT -p udp -j DROP
+# Allow all traffic from root user (UID 0)
+sudo iptables -A OUTPUT -p udp -m owner --uid-owner 0 -j ACCEPT
+# Allow UDP to localhost:53 (for DNS to your mitmproxy)
+sudo iptables -A OUTPUT -p udp -d 127.0.0.1 --dport 53 -j ACCEPT
+# Allow established connections (for responses)
+sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+# Drop all other UDP traffic
+sudo iptables -A OUTPUT -p udp -j DROP
 
 # Run the agent
 echo "Running agent..."
