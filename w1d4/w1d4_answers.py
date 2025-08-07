@@ -627,3 +627,59 @@ from w1d4_test import test_generate_keys
 
 
 test_generate_keys(generate_keys)
+
+# %%
+
+
+def encrypt_rsa(public_key: Tuple[int, int], message: str) -> List[int]:
+    """Encrypt a UTF-8 string one byte at a time.
+
+    Process each byte of the message:
+    1. Convert message to UTF-8 bytes
+    2. For each byte b, compute c = b^e mod n
+    3. Return list of encrypted values
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The plaintext string
+
+    Returns:
+        List of encrypted integers (one per byte)
+    """
+    # Implement encryption
+    #    - Extract n and e from public_key
+    n, e = public_key
+    #    - Convert message to bytes with .encode("utf-8")
+    message = message.encode("utf-8")
+    #    - Encrypt each byte with pow(byte, e, n)
+    encryption = [pow(byte, e, n) for byte in message]
+    return encryption
+
+
+def decrypt_rsa(private_key: Tuple[int, int], ciphertext: List[int]) -> str:
+    """Decrypt a list of integers with the private key.
+
+    Process each encrypted value:
+    1. For each ciphertext c, compute m = c^d mod n
+    2. Collect decrypted values as bytes
+    3. Decode UTF-8 string
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        ciphertext: List of encrypted integers
+
+    Returns:
+        Decrypted string
+    """
+    # TODO: Implement decryption
+    #    - Extract n and d from private_key
+    n, d = private_key
+    #    - Decrypt each value with pow(c, d, n)
+    decryption = bytes([pow(c, d, n) for c in ciphertext])
+    return decryption.decode("utf-8")
+
+
+from w1d4_test import test_encryption
+
+test_encryption(encrypt_rsa, decrypt_rsa, generate_keys)
+# %%
