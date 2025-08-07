@@ -202,7 +202,10 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
 
     # 1. Convert 64-byte block into 16 32-bit words in little-endian order
     #    - use the bytes_to_int32_le function
-    X = bytes_to_int32_le(block, 0)
+    X = []
+
+    for i in range(16):
+        X.append(bytes_to_int32_le(block[i * 4 : (i + 1) * 4], 0))
 
     # 2. Initialize A, B, C, D from state
     A, B, C, D = state
@@ -271,7 +274,19 @@ def md5_hash(message: bytes) -> bytes:
     #    - convert the state values to little-endian bytes
     #    - concatenate the bytes to get the final hash bytes
 
-    pass
+    state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+    message = md5_padding(message)
+
+    for j in range(len(message) // 64):
+        block = message[j * 64 : (j + 1) * 64]
+        state = md5_process_block(block, state)
+
+    hash = bytes([])
+
+    for s in state:
+        hash += int32_to_bytes_le(s)
+
+    return hash
 
 
 def md5_hex(message: bytes) -> str:
