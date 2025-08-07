@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password-Cracking Cost & Time Demonstrator</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0; padding: 1.5rem; line-height: 1.6;
+      background: #f7f8fa; color: #222;
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.2rem; margin-top: 2rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    label { display: block; font-weight: 600; margin-bottom: 0.2rem; }
+    input[type="range"], input[type="number"], select { width: 100%; }
+    input, select { padding: 0.4rem 0.5rem; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+    .results { margin-top: 1.5rem; background: white; border-radius: 8px; padding: 1rem 1.2rem; box-shadow: 0 2px 3px rgba(0,0,0,0.06); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.45rem 0.6rem; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #fafbfc; }
+    .explanation { font-size: 0.95rem; margin-top: 1rem; }
+    .assumptions { background: #f0f8ff; border-radius: 6px; padding: 1rem; margin-top: 1rem; font-size: 0.9rem; }
+    .assumptions h3 { margin-top: 0; font-size: 1.1rem; }
+    footer { margin-top: 3rem; font-size: 0.85rem; color: #555; }
+    output { font-weight: 700; }
+    .cost-display { color: #0066cc; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Interactive Password-Cracking Estimator</h1>
+  <p>This demo shows how <strong>salting strategies</strong> affect the effort an attacker needs to recover passwords by brute-force.
+    Modify the parameters and see how time & money estimates change.</p>
+
+  <div class="grid" id="controls">
+    <div>
+      <label for="numPw">Number of passwords: <output id="numPwOut">1000</output></label>
+      <input type="range" id="numPw" min="1" max="100000" value="1000" step="1" />
+    </div>
+    <div>
+      <label for="pwLen">Password length (characters): <output id="pwLenOut">8</output></label>
+      <input type="range" id="pwLen" min="1" max="20" value="8" step="1" />
+    </div>
+    <div>
+      <label for="charset">Character set</label>
+      <select id="charset">
+        <option value="10">Digits (0-9) – 10</option>
+        <option value="26">Lower-case a-z – 26</option>
+        <option value="52">Letters a-z,A-Z – 52</option>
+        <option value="62" selected>Alphanumeric – 62</option>
+        <option value="95">ASCII printable – 95</option>
+      </select>
+    </div>
+    <div>
+      <label for="algo">Hash algorithm</label>
+      <select id="algo">
+        <option value="md5" selected>MD5</option>
+        <option value="sha256">SHA-256</option>
+        <option value="bcrypt">bcrypt (cost=12)</option>
+        <option value="argon2">Argon2id (t=3, m=64MB)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <h2>Estimates</h2>
+    <table id="resultTable">
+      <thead>
+        <tr><th>Storage method</th><th>Hashes required</th><th>Time to crack</th><th>Cost (USD)</th></tr>
+      </thead>
+      <tbody>
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+    <div class="explanation" id="explanation"></div>
+    <div class="assumptions">
+      <h3>Assumptions</h3>
+      <ul>
+        <li><strong>Hardware:</strong> High-end GPU setup (e.g., 8× RTX 4090) at <span class="cost-display">$4.00/hour</span></li>
+        <li><strong>Hash rates:</strong>
+          <ul>
+            <li>MD5: 1,040 GH/s (1.04 × 10¹² hashes/sec)</li>
+            <li>SHA-256: 200 GH/s (2 × 10¹¹ hashes/sec)</li>
+            <li>bcrypt (cost=12): 128,000 H/s</li>
+            <li>Argon2id (t=3, m=64MB, p=1): 6,400 H/s</li>
+          </ul>
+        </li>
+        <li>Attack method: Pure brute-force (no dictionaries or patterns)</li>
+        <li>Expected work: 50% of search space on average</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>⚠️ <em>These numbers are <strong>illustrative only</strong>. Real-world attacks often use dictionaries, patterns, and leaked password lists which can be orders of magnitude faster than pure brute-force.</em></p>
+  </footer>
+
+<script>
+  // Hash rates based on 8× RTX 4090 GPUs (realistic high-end setup)
+  // Sources: Hashcat benchmarks, various security research papers
+  const hashRates = {
+    md5: 1.04e12,      // ~1,040 GH/s (8 GPUs × 130 GH/s each)
+    sha256: 2e11,      // ~200 GH/s (8 GPUs × 25 GH/s each)
+    bcrypt: 128000,    // ~128 KH/s at cost=12 (8 GPUs × 16 KH/s each)
+    argon2: 6400       // ~6.4 KH/s at t=3, m=64MB (8 GPUs × 800 H/s each)
+  };
+
+  // Cost per hour for 8× RTX 4090 setup (cloud GPU pricing)
+  const COST_PER_HOUR = 4.00; // USD
+
+  // Helper: human-readable large integers
+  function formatNumber(x) {
+    if (x < 1000) return x.toFixed(0);
+    if (x < 1e6) return (x/1e3).toFixed(1) + 'K';
+    if (x < 1e9) return (x/1e6).toFixed(1) + 'M';
+    if (x < 1e12) return (x/1e9).toFixed(1) + 'B';
+    if (x < 1e15) return (x/1e12).toFixed(1) + 'T';
+    return x.toExponential(2);
+  }
+
+  // Helper: convert seconds to human-readable duration
+  function formatDuration(sec) {
+    if (sec < 0.001) return (sec * 1e6).toFixed(1) + ' μs';
+    if (sec < 1) return (sec * 1000).toFixed(1) + ' ms';
+    if (sec < 60) return sec.toFixed(1) + ' sec';
+    if (sec < 3600) return (sec / 60).toFixed(1) + ' min';
+    if (sec < 86400) return (sec / 3600).toFixed(1) + ' hours';
+    if (sec < 31536000) return (sec / 86400).toFixed(1) + ' days';
+    const years = sec / 31536000;
+    if (years < 1000) return years.toFixed(1) + ' years';
+    if (years < 1e6) return (years / 1000).toFixed(1) + ' thousand years';
+    if (years < 1e9) return (years / 1e6).toFixed(1) + ' million years';
+    return (years / 1e9).toFixed(1) + ' billion years';
+  }
+
+  // Recalculate and update UI
+  function recalc() {
+    const numPw = +document.getElementById('numPw').value;
+    const pwLen = +document.getElementById('pwLen').value;
+    const charset = +document.getElementById('charset').value;
+    const algo = document.getElementById('algo').value;
+
+    // Update output displays
+    document.getElementById('numPwOut').textContent = numPw.toLocaleString();
+    document.getElementById('pwLenOut').textContent = pwLen;
+
+    // Get hash rate for selected algorithm
+    const hashRate = hashRates[algo];
+
+    // Calculate search space size and expected hashes
+    const searchSpace = Math.pow(charset, pwLen);
+    const avgHashesSingle = searchSpace / 2; // Average case: 50% of search space
+
+    // Different salting strategies
+    const hashesUnsalted = avgHashesSingle; // Can attack all at once
+    const hashesPerUser = avgHashesSingle * numPw; // Must attack each separately
+
+    // Time calculations
+    const timeUnsalted = hashesUnsalted / hashRate;
+    const timePerUser = hashesPerUser / hashRate;
+
+    // Cost calculations
+    const costUnsalted = (timeUnsalted / 3600) * COST_PER_HOUR;
+    const costPerUser = (timePerUser / 3600) * COST_PER_HOUR;
+
+    // Update table
+    const tbody = document.querySelector('#resultTable tbody');
+    tbody.innerHTML = '';
+
+    const rows = [
+      ['Unsalted', hashesUnsalted, timeUnsalted, costUnsalted],
+      ['Static salt', hashesUnsalted, timeUnsalted, costUnsalted],
+      ['Per-user salt', hashesPerUser, timePerUser, costPerUser]
+    ];
+
+    for (const [label, h, t, c] of rows) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${label}</td>
+        <td>${formatNumber(h)}</td>
+        <td>${formatDuration(t)}</td>
+        <td>$${c < 0.01 ? c.toExponential(2) : formatNumber(c)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // Update explanation
+    const explanation = document.getElementById('explanation');
+    explanation.innerHTML = `
+      <strong>Search space:</strong> ${charset}<sup>${pwLen}</sup> = ${formatNumber(searchSpace)} possible passwords<br>
+      <strong>Average work:</strong> ${formatNumber(avgHashesSingle)} hashes per password (50% of search space)<br><br>
+      With <em>unsalted</em> or <em>static-salt</em> hashes, each guess can be tested against all ${numPw.toLocaleString()} 
+      password hashes simultaneously. With <em>per-user salts</em>, each password must be attacked independently, 
+      multiplying the work by ${numPw.toLocaleString()}.
+    `;
+  }
+
+  // Attach events
+  document.getElementById('controls').addEventListener('input', recalc);
+
+  // Initial calculation
+  recalc();
+</script>
+</body>
+</html>
