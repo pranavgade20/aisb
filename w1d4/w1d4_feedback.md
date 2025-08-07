@@ -13,4 +13,6 @@ Pretty smooth and straightforward.
 Exercise 3.2
 Nice one. Explaining the theory through diagram instead of giving pseudocode is much enjoyable!
 
-
+Exercise 3.3
+Checking the cookie length seems artificial / unexpected condition to have to include
+Otherwise quite straightforward
