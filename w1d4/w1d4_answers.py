@@ -700,11 +700,9 @@ def cbc_encrypt(plaintext: bytes, key: bytes, iv: bytes) -> bytes:
     ]
 
     prev_ciphertext = iv
-    encrypted_blocks: list[bytes] = [] 
+    encrypted_blocks: list[bytes] = []
     for current_plaintext in blocks:
-        xor_out = bytes([
-            c ^ p for c, p in zip(prev_ciphertext, current_plaintext, strict=True)
-        ])
+        xor_out = bytes([c ^ p for c, p in zip(prev_ciphertext, current_plaintext, strict=True)])
         encrypt_out = single_block_aes_encrypt(xor_out, key)
         encrypted_blocks.append(encrypt_out)
         prev_ciphertext = encrypt_out
@@ -715,3 +713,48 @@ def cbc_encrypt(plaintext: bytes, key: bytes, iv: bytes) -> bytes:
 from w1d4_test import test_cbc_encrypt
 
 test_cbc_encrypt(cbc_encrypt)
+
+
+# %%
+def single_block_aes_decrypt(ciphertext: bytes, key: bytes) -> bytes:
+    assert len(ciphertext) == 16, "Ciphertext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.decrypt(ciphertext)
+
+
+def cbc_decrypt(ciphertext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Decrypt ciphertext using AES in CBC mode.
+
+    Args:
+        ciphertext: The encrypted message
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Decrypted plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    block_size = len(iv)
+    blocks = [ciphertext[block_idx : block_idx + block_size] for block_idx in range(0, len(ciphertext), block_size)]
+    blocks: list[bytes] = [iv] + blocks
+
+    plaintext_blocks = bytes()
+    for i in range(len(blocks) - 1, 0, -1):
+        block = blocks[i]
+        decrypted = single_block_aes_decrypt(block, key)
+        plaintext = xor_bytes(decrypted, blocks[i - 1])
+        plaintext_blocks = plaintext + plaintext_blocks
+
+    text_without_padding = remove_pkcs7_padding(plaintext_blocks)
+    return text_without_padding
+
+
+from w1d4_test import test_cbc_decrypt
+
+
+test_cbc_decrypt(cbc_decrypt, cbc_encrypt, InvalidPaddingError)
+
+# %%

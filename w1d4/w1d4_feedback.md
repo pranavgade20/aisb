@@ -10,4 +10,7 @@ Some background on the maths of RSA would have been useful
 Exercise 3.1
 Pretty smooth and straightforward.
 
+Exercise 3.2
+Nice one. Explaining the theory through diagram instead of giving pseudocode is much enjoyable!
+
 
