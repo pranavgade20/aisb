@@ -964,6 +964,43 @@ def padding_oracle_attack_block(oracle: Callable[[bytes], bool], iv: bytes, bloc
     # High-level algorithm:
     # 1. For each byte position from 15 down to 0:
     #    a. Calculate the target padding value for the step
+
+    assert len(iv) == 16
+    assert len(block) == 16
+
+    # We'll discover the intermediate decryption state
+    intermediate = bytearray(16)
+
+    # Work backwards from the last byte
+    for position in range(15, -1, -1):
+        # Padding value we're targeting
+        padding_value = 16 - position
+
+        # Start with a zeroed IV
+        modified_iv = bytearray(16)
+
+        # Set all bytes after current position to produce correct padding
+        for j in range(position + 1, 16):
+            modified_iv[j] = intermediate[j] ^ padding_value
+
+        # Brute force the current position
+        found = False
+        for candidate_byte in range(256):
+            modified_iv[position] = candidate_byte
+
+            # Test with oracle
+            success = oracle(bytes(modified_iv) + block)
+            if success:
+                intermediate[position] = candidate_byte ^ padding_value
+                found = True
+                break
+
+        if not found:
+            raise ValueError(f"Failed to find valid padding for position {position}")
+
+    # Recover plaintext by XORing intermediate with original IV
+    return bytes(x ^ y for x, y in zip(intermediate, iv))
+
     for position in range(15, -1, -1):  # why
         target_padding_value = 16 - position
 
