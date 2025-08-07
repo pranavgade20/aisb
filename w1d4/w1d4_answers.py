@@ -191,7 +191,7 @@ def md5_padding(message: bytes) -> bytes:
 from w1d4_test import test_left_rotate
 from w1d4_test import test_md5_padding_length
 from w1d4_test import test_md5_padding_content
-# test_left_rotate(left_rotate)
+test_left_rotate(left_rotate)
 test_md5_padding_length(md5_padding)
 test_md5_padding_content(md5_padding)
 
@@ -211,10 +211,42 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
         Updated MD5 state
     """
     assert len(state) == 4, "State must be a list of 4 32-bit integers"
+
     # TODO: Implement MD5 block processing
     # 1. Convert 64-byte block into 16 32-bit words in little-endian order
     #    - use the bytes_to_int32_le function
-    # 2. Initialize A, B, C, D from state
+    
+    words = []
+    for i in range(16):
+        offset = i * 32 // 8 
+        word = bytes_to_int32_le(block, offset)
+        words.append(word)
+    
+    A, B, C, D = state
+
+    for i in range(64):
+        if i < 16:
+            fun = md5_f
+            k = i
+        elif i < 32:
+            fun = md5_g
+            k = (5*i + 1) % 16
+        elif i < 48:
+            fun = md5_h
+            k = (3*i + 5) % 16
+        elif i >= 48:
+            fun = md5_i
+            k = (7*i) % 16
+
+        temp = A + fun(B,C,D) + words[k] + MD5_T[i]
+        masked = temp & 0xFFFFFFFF
+
+        rotated = left_rotate(masked, MD5_S[i])
+        rotated_plus_B = rotated + B
+
+        rotated_masked = rotated_plus_B & 0xFFFFFFFF
+        
+
     # 3. For each of 64 rounds (i from 0 to 63):
     #    - Choose function and message index k based on round:
     #      * Round 1 (i < 16): use md5_f, k = i
@@ -232,7 +264,9 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
     #    - e.g., state[0] = (state[0] + A)
     #    - mask the new state values to the low 32 bits
     pass
-
+from w1d4_test import test_md5_process_block
+test_md5_process_block(md5_process_block)
+#%%
 
 def md5_hash(message: bytes) -> bytes:
     """
