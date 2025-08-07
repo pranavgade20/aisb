@@ -719,3 +719,30 @@ from w1d4_test import test_signatures
 
 
 test_signatures(sign, verify, generate_keys)
+
+
+# %%
+def add_pkcs7_padding(plaintext: bytes, block_size: int = 16) -> bytes:
+    """
+    Add PKCS#7 padding to plaintext.
+
+    Args:
+        plaintext: The data to pad
+        block_size: The cipher block size
+
+    Returns:
+        Padded plaintext that is a multiple of block_size
+    """
+    # TODO: Implement PKCS#7 padding according to the spec above
+    length = len(plaintext)
+    padlength = block_size - length % block_size
+    padding = int.to_bytes(padlength) * padlength
+    return plaintext + padding
+
+    pass
+
+
+from w1d4_test import test_add_pkcs7_padding
+
+
+test_add_pkcs7_padding(add_pkcs7_padding)
