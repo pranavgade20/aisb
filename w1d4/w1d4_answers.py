@@ -770,6 +770,8 @@ def remove_pkcs7_padding(padded_text: bytes, block_size: int = 16) -> bytes:
         InvalidPaddingError: If padding is invalid
     """
     # TODO: Implement PKCS#7 unpadding with validation
+    if len(padded_text) == 0:
+        raise InvalidPaddingError
     lastbyte = int(padded_text[-1])
     if lastbyte > block_size:
         raise InvalidPaddingError
