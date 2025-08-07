@@ -199,28 +199,56 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
         Updated MD5 state
     """
     assert len(state) == 4, "State must be a list of 4 32-bit integers"
-    # TODO: Implement MD5 block processing
+
     # 1. Convert 64-byte block into 16 32-bit words in little-endian order
     #    - use the bytes_to_int32_le function
-    # 2. Initialize A, B, C, D from state
-    # 3. For each of 64 rounds (i from 0 to 63):
-    #    - Choose function and message index k based on round:
-    #      * Round 1 (i < 16): use md5_f, k = i
-    #      * Round 2 (i < 32): use md5_g, k = (5*i + 1) % 16
-    #      * Round 3 (i < 48): use md5_h, k = (3*i + 5) % 16
-    #      * Round 4 (i >= 48): use md5_i, k = (7*i) % 16
-    #    - Compute value: temp = A + function(B,C,D) + X[k] + MD5_T[i]
-    #    - Mask the value to the low 32 bits
-    #    - Left rotate the value by MD5_S[i] bits (use the left_rotate function)
-    #    - Add B to the rotated value
-    #    - Mask the result temp value to the low 32 bits
-    #    - Rotate the state variables: A,B,C,D = D,temp,B,C
-    # 4. Return the new state:
-    #    - add the resulting values of A, B, C, D to the respective values in the state given in the argument
-    #    - e.g., state[0] = (state[0] + A)
-    #    - mask the new state values to the low 32 bits
     X = bytes_to_int32_le(block, 0)
+
+    # 2. Initialize A, B, C, D from state
     A, B, C, D = state
+
+    # 3. For each of 64 rounds (i from 0 to 63)
+    for i in range(64):
+        # Choose function and k
+        if i < 16:
+            # * Round 1 (i < 16): use md5_f, k = i
+            fun = md5_f
+            k = i
+        elif i < 32:
+            # * Round 2 (i < 32): use md5_g, k = (5*i + 1) % 16
+            fun = md5_g
+            k = (5 * i + 1) % 16
+        elif i < 48:
+            # * Round 3 (i < 48): use md5_h, k = (3*i + 5) % 16
+            fun = md5_h
+            k = (3 * i + 5) % 16
+        else:
+            #  * Round 4 (i >= 48): use md5_i, k = (7*i) % 16
+            fun = md5_i
+            k = (7 * i) % 16
+        # Compute temp = A + function(B,C,D) + X[k] + MD5_T[i]
+        temp = A + fun(B, C, D) + X[k] + MD5_T[i]
+        # Mask the value to the low 32 bits
+        temp = temp & (2**32 - 1)
+        # Left rotate the value by MD5_S[i] bits (use the left_rotate function)
+        temp = left_rotate(temp, MD5_S[i])
+        # Add B to the rotated value
+        temp += B
+        # Mask the result temp value to the low 32 bits
+        temp = temp & (2**32 - 1)
+        # Rotate the state variables: A,B,C,D = D,temp,B,C
+        A, B, C, D = D, temp, B, C
+
+    # 4. Return the new state:
+    # add the resulting values of A, B, C, D to the respective values in the state given in the argument
+    # mask the new state values to the low 32 bits
+    state[0] = (state[0] + A) & (2**32 - 1)
+    state[1] = (state[1] + B) & (2**32 - 1)
+    state[2] = (state[2] + C) & (2**32 - 1)
+    state[3] = (state[3] + D) & (2**32 - 1)
+
+    # return new state
+    return state
 
 
 def md5_hash(message: bytes) -> bytes:
