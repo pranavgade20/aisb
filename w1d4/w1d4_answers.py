@@ -730,7 +730,7 @@ def verify(public_key: Tuple[int, int], message: str, signature: List[int]) -> b
     #    - Extract n and e from public_key
     n, e = public_key
     #    - Recover each byte with pow(s, e, n)
-    recovered_bytes = bytes(b for s in signature if (b := pow(s, e, n)) < 255)
+    recovered_bytes = bytes(b for s in signature if (b := pow(s, e, n)) <= 255)
     #    - Check if recovered bytes match original message
     recovered_message = recovered_bytes.decode("utf-8")
     #    - Return False for any errors
