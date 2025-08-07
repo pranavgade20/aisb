@@ -16,3 +16,7 @@ Nice one. Explaining the theory through diagram instead of giving pseudocode is 
 Exercise 3.3
 Checking the cookie length seems artificial / unexpected condition to have to include
 Otherwise quite straightforward
+
+Exercise 4
+We found out about bytearray() in the end of the comment - which we read by the end of implementation. If it was in the top of the function or in README that would save a lot of our time.
+Otherwise quite enjoyable exercise with lots of discussions.

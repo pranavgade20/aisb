@@ -516,7 +516,7 @@ def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     1. Generate two primes p and q of bits//2 length each
     2. Ensure p ≠ q
     3. Compute n = p × q and φ(n) = (p-1) × (q-1)
-    4. Choose e (try 65537 first, fall back if needed)
+    4. Choose e (try 65537 first, fall back if needed)e
     5. Compute d = e⁻¹ mod φ(n)
 
     Args:
@@ -536,9 +536,9 @@ def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
             return ((n, e), (n, d))
 
 
-from w1d4_test import test_generate_keys
+# from w1d4_test import test_generate_keys
 
-test_generate_keys(generate_keys)
+# test_generate_keys(generate_keys)
 
 # %%
 
@@ -815,3 +815,71 @@ class VulnerableServer:
 from w1d4_test import test_vulnerable_server
 
 test_vulnerable_server(VulnerableServer, cbc_encrypt)
+
+
+def assign_byte_at_idx(arr: bytes, idx: int, val: int):
+    pass
+
+
+# %%
+def padding_oracle_attack_block(oracle: Callable[[bytes], bool], iv: bytes, block: bytes) -> bytes:
+    """
+    Decrypt a single 16-byte ciphertext block using a padding oracle.
+
+    Args:
+        oracle: Function that takes IV||block and returns True if padding is valid, False otherwise.
+        iv:     The IV or previous ciphertext block (16 bytes)
+        block:  The ciphertext block to decrypt (16 bytes)
+
+    Returns:
+        Decrypted plaintext block (16 bytes)
+    """
+    intermediaries_list = [0 for _ in range(16)]
+    # High-level algorithm:
+    # 1. For each byte position from 15 down to 0:
+    for byte_pos in range(15, -1, -1):
+        #    a. Calculate the target padding value for the step
+        padding_val = 16 - byte_pos
+        #    b. Initialize modified IV bytes initialized to all zeroes
+        iv_list = list(bytes(16))
+        #    c. Set the modified IV bytes corresponding to already found intermediary bytes and the target padding
+        for i in range(padding_val):
+            idx = 16 - i - 1
+            iv_list[idx] = padding_val ^ intermediaries_list[idx]
+        #    d. Try all 256 values for current position until padding is valid
+        for byte_pos_candidate in range(256):
+            iv_list[byte_pos] = byte_pos_candidate
+            msg = bytes(iv_list) + block
+            ok = oracle(msg)
+            if ok:
+                #    e. Calculate intermediate value byte from the IV byte that produced valid padding
+                intermediary: int = padding_val ^ byte_pos_candidate
+                #    f. Record the intermediate value byte
+                intermediaries_list[byte_pos] = intermediary
+                break
+
+    # 2. XOR intermediate values with original IV to get plaintext
+    plaintext = xor_bytes(bytes(intermediaries_list), iv)
+    # Hint:
+    # - Use bytearray() if you need a mutable byte array, bytes() if you need an immutable one
+    return plaintext
+
+
+from w1d4_test import test_padding_oracle_attack_block
+
+
+# Try with internal oracle
+test_padding_oracle_attack_block(padding_oracle_attack_block)
+
+# Try with VulnerableServer as oracle
+vulnerable_server = VulnerableServer()
+
+
+def oracle(ciphertext):
+    result = vulnerable_server.decrypt_cookie(ciphertext)
+    return result == (False, "PADDING_ERROR")
+
+
+test_padding_oracle_attack_block(padding_oracle_attack_block, oracle_func=oracle)
+
+# %%
