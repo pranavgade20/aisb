@@ -590,6 +590,7 @@ def decrypt_rsa(private_key: Tuple[int, int], ciphertext: List[int]) -> str:
     #    - Convert to bytes and decode UTF-8
     return bytes(decrypted).decode("utf-8")
 
+
 # from w1d4_test import test_encryption
 
 
@@ -599,3 +600,71 @@ pub, priv = generate_keys()
 message = "Hello, world!"
 encrypted = encrypt_rsa(pub, message)
 decrypted = decrypt_rsa(priv, encrypted)
+
+
+# %%
+def add_pkcs7_padding(plaintext: bytes, block_size: int = 16) -> bytes:
+    """
+    Add PKCS#7 padding to plaintext.
+
+    Args:
+        plaintext: The data to pad
+        block_size: The cipher block size
+
+    Returns:
+        Padded plaintext that is a multiple of block_size
+    """
+    text_len = len(plaintext)
+    bytes_to_add = block_size - (text_len % block_size)
+    text_with_padding = plaintext + (bytes([bytes_to_add]) * bytes_to_add)
+    return text_with_padding
+
+
+from w1d4_test import test_add_pkcs7_padding
+
+
+test_add_pkcs7_padding(add_pkcs7_padding)
+
+
+# %%
+class InvalidPaddingError(Exception):
+    """Raised when PKCS#7 padding is invalid."""
+
+    pass
+
+
+def remove_pkcs7_padding(padded_text: bytes, block_size: int = 16) -> bytes:
+    """
+    Remove and validate PKCS#7 padding.
+
+    Args:
+        padded_text: The padded data
+        block_size: The cipher block size
+
+    Returns:
+        Original plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    text_len = len(padded_text)
+    if text_len == 0:
+        raise InvalidPaddingError
+
+    padding_size = int(padded_text[text_len - 1])
+    if padding_size > block_size or padding_size > text_len or padding_size == 0:
+        raise InvalidPaddingError
+
+    for i in range(padding_size):
+        if int(padded_text[text_len - i - 1]) != padding_size:
+            raise InvalidPaddingError
+
+    return padded_text[:-padding_size]
+
+
+from w1d4_test import test_remove_pkcs7_padding
+
+
+test_remove_pkcs7_padding(remove_pkcs7_padding, InvalidPaddingError)
+
+# %%

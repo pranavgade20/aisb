@@ -7,4 +7,6 @@ Exercise 2.1, 2.2
 It was quite easy to implement but was confused about the type conversions
 Some background on the maths of RSA would have been useful
 
+Exercise 3.1
+Pretty smooth and straightforward.
 
