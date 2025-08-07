@@ -622,7 +622,6 @@ def add_pkcs7_padding(plaintext: bytes, block_size: int = 16) -> bytes:
 
 from w1d4_test import test_add_pkcs7_padding
 
-
 test_add_pkcs7_padding(add_pkcs7_padding)
 
 
@@ -664,7 +663,55 @@ def remove_pkcs7_padding(padded_text: bytes, block_size: int = 16) -> bytes:
 
 from w1d4_test import test_remove_pkcs7_padding
 
-
 test_remove_pkcs7_padding(remove_pkcs7_padding, InvalidPaddingError)
 
 # %%
+
+
+# %%
+def xor_bytes(a: bytes, b: bytes) -> bytes:
+    """XOR two byte strings of equal length."""
+    assert len(a) == len(b), "Byte strings must have equal length"
+    return bytes(x ^ y for x, y in zip(a, b))
+
+
+def single_block_aes_encrypt(plaintext: bytes, key: bytes) -> bytes:
+    assert len(plaintext) == 16, "Plaintext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.encrypt(plaintext)
+
+
+def cbc_encrypt(plaintext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Encrypt plaintext using AES in CBC mode.
+
+    Args:
+        plaintext: The message to encrypt (will be padded)
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Ciphertext (same length as padded plaintext)
+    """
+    block_size = len(iv)
+    padded_message = add_pkcs7_padding(plaintext, block_size=block_size)
+    blocks = [
+        padded_message[block_idx : block_idx + block_size] for block_idx in range(0, len(padded_message), block_size)
+    ]
+
+    prev_ciphertext = iv
+    encrypted_blocks: list[bytes] = [] 
+    for current_plaintext in blocks:
+        xor_out = bytes([
+            c ^ p for c, p in zip(prev_ciphertext, current_plaintext, strict=True)
+        ])
+        encrypt_out = single_block_aes_encrypt(xor_out, key)
+        encrypted_blocks.append(encrypt_out)
+        prev_ciphertext = encrypt_out
+
+    return bytes(byte for block in encrypted_blocks for byte in block)
+
+
+from w1d4_test import test_cbc_encrypt
+
+test_cbc_encrypt(cbc_encrypt)
