@@ -281,14 +281,32 @@ def md5_hash(message: bytes) -> bytes:
     """
     # TODO: Implement MD5 hash function
     # 1. Initialize state with MD5 magic constants: [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+    state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
     # 2. Pad the message using md5_padding() to make the length in bytes divisible by 64
+    message = md5_padding(message)
+
     # 3. Process each 64-byte block:
     #    - For each block, apply the md5_process_block function to the block and the current state
+    length = len(message)
+    blocknumber = length // 64  # len is divisible by 64
+    # slicing
+    blocklist = []
+    for i in range(blocknumber):
+        block = message[i * 64 : (i + 1) * 64]
+        blocklist.append(block)
+        state = md5_process_block(block, state)
+    print(message, blocklist)
+
     #    - Update the current state to be the result of md5_process_block
     # 4. Convert final state to bytes:
+
     #    - convert the state values to little-endian bytes
-    #    - concatenate the bytes to get the final hash bytes
-    pass
+    hashbytes = b""
+    for statevalue in state:
+        statevalue = int32_to_bytes_le(statevalue)
+        #    - concatenate the bytes to get the final hash bytes
+        hashbytes = hashbytes + statevalue
+    return hashbytes
 
 
 def md5_hex(message: bytes) -> str:
