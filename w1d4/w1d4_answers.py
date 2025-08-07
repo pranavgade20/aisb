@@ -187,6 +187,122 @@ test_md5_padding_content(md5_padding)
 # %%
 
 
+# def md5_process_block(block: bytes, state: List[int]) -> List[int]:
+#     """
+#     Process a single 512-bit block with MD5 algorithm.
+
+#     Args:
+#         block: 64-byte block to process
+#         state: Current MD5 state: variables [A, B, C, D]
+
+#     Returns:
+#         Updated MD5 state
+#     """
+#     assert len(state) == 4, "State must be a list of 4 32-bit integers"
+#     # TODO: Implement MD5 block processing
+#     # 1. Convert 64-byte block into 16 32-bit words in little-endian order
+#     #    - use the bytes_to_int32_le function
+#     X = [bytes_to_int32_le(block, offset) for offset in range(0, 64, 4)]
+#     # 2. Initialize A, B, C, D from state
+#     assert len(state) == 4
+#     A, B, C, D = state
+
+#     # 3. For each of 64 rounds (i from 0 to 63):
+
+#     #    - Choose function and message index k based on round:
+#     #      * Round 1 (i < 16): use md5_f, k = i
+#     #      * Round 2 (i < 32): use md5_g, k = (5*i + 1) % 16
+#     #      * Round 3 (i < 48): use md5_h, k = (3*i + 5) % 16
+#     #      * Round 4 (i >= 48): use md5_i, k = (7*i) % 16
+#     def get_round(i: int) -> Tuple[Callable[...], int]:
+#         if i < 16:
+#             return md5_f, i
+#         elif 16 <= i < 32:
+#             return md5_g, (5 * i + 1) % 16
+#         elif 32 <= i < 48:
+#             return md5_h, (3 * i + 5) % 16
+#         elif i >= 48:
+#             return md5_i, (7 * i) % 16
+
+#     #    - Compute value: temp = A + function(B,C,D) + X[k] + MD5_T[i]
+#     for i in range(64):
+#         function, k = get_round(i)
+#         temp = A + function(B, C, D) + X[k] + MD5_T[i]
+#         #    - Mask the value to the low 32 bits
+#         temp_masked = temp & 0xFFFFFFFF
+#         #    - Left rotate the value by MD5_S[i] bits (use the left_rotate function)
+#         rotated = left_rotate(temp_masked, MD5_S[i])
+#         #    - Add B to the rotated value
+#         b_added = B + rotated
+#         #    - Mask the result temp value to the low 32 bits
+#         b_added_masked = b_added & 0xFFFFFFFF
+#         #    - Rotate the state variables: A,B,C,D = D,temp,B,C
+#         A, B, C, D = D, b_added_masked, B, C
+#         # 4. Return the new state:
+#         #    - add the resulting values of A, B, C, D to the respective values in the state given in the argument
+#         #    - e.g., state[0] = (state[0] + A)
+#         assert len(state) == 4
+
+#     state[0] = (state[0] + A) & 0xFFFFFFFF
+#     state[1] = (state[1] + B) & 0xFFFFFFFF
+#     state[2] = (state[2] + C) & 0xFFFFFFFF
+#     state[3] = (state[3] + D) & 0xFFFFFFFF
+#     #    - mask the new state values to the low 32 bits
+
+#     return state
+
+
+# def md5_hash(message: bytes) -> bytes:
+#     """
+#     Compute MD5 hash of message.
+
+#     Args:
+#         message: Input message as bytes
+
+#     Returns:
+#         16-byte MD5 hash
+#     """
+#     # TODO: Implement MD5 hash function
+#     # 1. Initialize state with MD5 magic constants: [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+#     state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+#     # 2. Pad the message using md5_padding() to make the length in bytes divisible by 64
+#     padded_message = md5_padding(message)
+#     # 3. Process each 64-byte block:
+#     blocks: list[bytes] = []
+#     i = 0
+#     while i + 64 < len(padded_message):
+#         block = padded_message[i : i + 64]
+#         blocks.append(block)
+#         i += 64
+#     assert len(blocks) == len(padded_message) / 64
+
+#     #    - For each block, apply the md5_process_block function to the block and the current state
+#     for block in blocks:
+#         #    - Update the current state to be the result of md5_process_block
+#         state = md5_process_block(block, state)
+#     # 4. Convert final state to bytes:
+#     #    - convert the state values to little-endian bytes
+
+#     #    - concatenate the bytes to get the final hash bytes
+#     result = b""
+#     for word in state:
+#         result += int32_to_bytes_le(word)
+#     return result
+#     pass
+
+
+# def md5_hex(message: bytes) -> str:
+#     """Compute MD5 hash and return as hex string."""
+#     return md5_hash(message).hex()
+
+
+# from w1d4_test import test_md5, test_md5_process_block
+
+# test_md5_process_block(md5_process_block)
+# test_md5(md5_hex)
+
+
+# %%
 def md5_process_block(block: bytes, state: List[int]) -> List[int]:
     """
     Process a single 512-bit block with MD5 algorithm.
@@ -199,54 +315,47 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
         Updated MD5 state
     """
     assert len(state) == 4, "State must be a list of 4 32-bit integers"
-    # TODO: Implement MD5 block processing
-    # 1. Convert 64-byte block into 16 32-bit words in little-endian order
-    #    - use the bytes_to_int32_le function
-    X = [bytes_to_int32_le(block, offset) for offset in range(0, 64, 4)]
-    # 2. Initialize A, B, C, D from state
-    assert len(state) == 4
+    # Convert 64-byte block to 16 32-bit little-endian words
+    X = []
+    for i in range(16):
+        word = bytes_to_int32_le(block, i * 4)
+        X.append(word)
+
+    # Initialize working variables
     A, B, C, D = state
 
-    # 3. For each of 64 rounds (i from 0 to 63):
-
-    #    - Choose function and message index k based on round:
-    #      * Round 1 (i < 16): use md5_f, k = i
-    #      * Round 2 (i < 32): use md5_g, k = (5*i + 1) % 16
-    #      * Round 3 (i < 48): use md5_h, k = (3*i + 5) % 16
-    #      * Round 4 (i >= 48): use md5_i, k = (7*i) % 16
-    def get_round(i: int) -> Tuple[Callable[...], int]:
-        if i < 16:
-            return md5_f, i
-        elif 16 <= i < 32:
-            return md5_g, (5 * i + 1) % 16
-        elif 32 <= i < 48:
-            return md5_h, (3 * i + 5) % 16
-        elif i >= 48:
-            return md5_i, (7 * i) % 16
-
-    #    - Compute value: temp = A + function(B,C,D) + X[k] + MD5_T[i]
+    # Process 64 rounds
     for i in range(64):
-        function, k = get_round(i)
-        temp = A + function(B, C, D) + X[k] + MD5_T[i]
-        #    - Mask the value to the low 32 bits
-        temp_masked = temp & 0xFFFFFFFF
-        #    - Left rotate the value by MD5_S[i] bits (use the left_rotate function)
-        rotated = left_rotate(temp_masked, MD5_S[i])
-        #    - Add B to the rotated value
-        b_added = B + rotated
-        #    - Mask the result temp value to the low 32 bits
-        b_added_masked = b_added & 0xFFFFFFFF
-        #    - Rotate the state variables: A,B,C,D = D,temp,B,C
-        A, B, C, D = D, b_added_masked, B, C
-        # 4. Return the new state:
-        #    - add the resulting values of A, B, C, D to the respective values in the state given in the argument
-        #    - e.g., state[0] = (state[0] + A)
-        assert len(state) == 4
-        state[0] = (state[0] + A) & 0xFFFFFFFF
-        state[1] = (state[1] + B) & 0xFFFFFFFF
-        state[2] = (state[2] + C) & 0xFFFFFFFF
-        state[3] = (state[3] + D) & 0xFFFFFFFF
-    #    - mask the new state values to the low 32 bits
+        if i < 16:
+            # Round 1: F function
+            f_result = md5_f(B, C, D)
+            k = i
+        elif i < 32:
+            # Round 2: G function
+            f_result = md5_g(B, C, D)
+            k = (5 * i + 1) % 16
+        elif i < 48:
+            # Round 3: H function
+            f_result = md5_h(B, C, D)
+            k = (3 * i + 5) % 16
+        else:
+            # Round 4: I function
+            f_result = md5_i(B, C, D)
+            k = (7 * i) % 16
+
+        # MD5 round operation
+        temp = (A + f_result + X[k] + MD5_T[i]) & 0xFFFFFFFF
+        temp = left_rotate(temp, MD5_S[i])
+        temp = (B + temp) & 0xFFFFFFFF
+
+        # Rotate variables: A, B, C, D = D, temp, B, C
+        A, B, C, D = D, temp, B, C
+
+    # Add this block's hash to the state
+    state[0] = (state[0] + A) & 0xFFFFFFFF
+    state[1] = (state[1] + B) & 0xFFFFFFFF
+    state[2] = (state[2] + C) & 0xFFFFFFFF
+    state[3] = (state[3] + D) & 0xFFFFFFFF
 
     return state
 
@@ -261,33 +370,22 @@ def md5_hash(message: bytes) -> bytes:
     Returns:
         16-byte MD5 hash
     """
-    # TODO: Implement MD5 hash function
-    # 1. Initialize state with MD5 magic constants: [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+    # MD5 initial state (magic constants)
     state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
-    # 2. Pad the message using md5_padding() to make the length in bytes divisible by 64
-    padded_message = md5_padding(message)
-    # 3. Process each 64-byte block:
-    blocks: list[bytes] = []
-    i = 0 
-    while i+64 < len(message):
-        block = message[i:i+64]
-        blocks.append(block)
-        i += 64
-    assert len(blocks) == len(message) / 64
 
-    #    - For each block, apply the md5_process_block function to the block and the current state
-    for block in blocks:
-    #    - Update the current state to be the result of md5_process_block
+    # Apply padding
+    padded_msg = md5_padding(message)
+
+    # Process each 512-bit block
+    for i in range(0, len(padded_msg), 64):
+        block = padded_msg[i : i + 64]
         state = md5_process_block(block, state)
-    # 4. Convert final state to bytes:
-    #    - convert the state values to little-endian bytes
-    
-    #    - concatenate the bytes to get the final hash bytes
+
+    # Convert state to bytes (little-endian)
     result = b""
     for word in state:
         result += int32_to_bytes_le(word)
     return result
-    pass
 
 
 def md5_hex(message: bytes) -> str:
@@ -299,3 +397,69 @@ from w1d4_test import test_md5, test_md5_process_block
 
 test_md5_process_block(md5_process_block)
 test_md5(md5_hex)
+
+
+# %%
+def hmac_md5(key: bytes, message: bytes) -> bytes:
+    """
+    Implement HMAC using MD5 as the underlying hash function.
+
+    Args:
+        key: Secret key for authentication
+        message: Message to authenticate
+
+    Returns:
+        HMAC tag (16 bytes for MD5)
+    """
+    block_size = 64  # MD5 block size in bytes - normalize the key length to this size
+    ipad = 0x36  # Inner padding byte
+    opad = 0x5C  # Outer padding byte
+    # TODO: Implement HMAC-MD5
+
+    # Step 1: Normalize the key length
+    # - If key longer than block_size, hash it with md5_hash
+    if len(key) > block_size:
+        key = md5_hash(key)
+    # - Otherwise, pad key to exactly block_size bytes with null bytes
+    else:
+        while len(key) < 64:
+            key += b"\x00"
+
+    # Step 2: Compute inner hash
+    # - compute Hash(ipad ⊕ key || message)
+    # Hint: Use bytes(k ^ ipad for k in key) for XOR operation
+    ipad_key = bytes(k ^ ipad for k in key)
+    ihash = md5_hash(ipad_key + message)
+
+    # Step 3: Compute HMAC
+    # - compute Hash(opad ⊕ key || inner_hash)
+    opad_key = bytes(k ^ opad for k in key)
+    ohash = md5_hash(opad_key + ihash)
+
+    return ohash
+
+
+def hmac_verify(key: bytes, message: bytes, tag: bytes) -> bool:
+    """
+    Verify an HMAC tag.
+
+    Args:
+        key: Secret key
+        message: Message to verify
+        tag: HMAC tag to check
+
+    Returns:
+        True if tag is valid
+    """
+    expected_tag = hmac_md5(key, message)
+    return expected_tag == tag
+
+
+from w1d4_test import test_hmac_md5
+from w1d4_test import test_hmac_verify
+
+
+test_hmac_md5(hmac_md5)
+test_hmac_verify(hmac_verify)
+
+# %%
