@@ -904,3 +904,64 @@ from w1d4_test import test_cbc_decrypt
 
 
 test_cbc_decrypt(cbc_decrypt, cbc_encrypt, InvalidPaddingError)
+
+# %%
+
+
+# %%
+class VulnerableServer:
+    """
+    A server vulnerable to padding oracle attacks.
+    """
+
+    def __init__(self, key: bytes = None):
+        """Initialize with a random AES key."""
+        self.key = key or secrets.token_bytes(16)
+
+    def encrypt_cookie(self, cookie_content: dict[str, str]) -> bytes:
+        """Encrypt a cookie value."""
+        # TODO: Implement cookie encryption
+        # - Serialize cookie_content as a JSON string and encode it as bytes
+        encoded = json.dumps(cookie_content).encode("utf-8")
+        # - Use the cbc_encrypt() function you implemented earlier
+        iv = secrets.token_bytes(16)
+        encrypted = cbc_encrypt(encoded, self.key, iv)
+        # - Don't forget to include the IV in the returned value so that you can decrypt it later!
+        return iv + encrypted
+
+    def decrypt_cookie(self, cookie: bytes) -> Tuple[Literal[False], str] | Tuple[Literal[True], dict[str, str]]:
+        """
+        Decrypt and validate a cookie.
+
+        Returns:
+            (success, error_message)
+            - (True, None) if decryption succeeds
+            - (False, "PADDING_ERROR") if padding is invalid
+            - (False, "INVALID_COOKIE") for other errors
+
+        This is the padding oracle - it leaks whether padding is valid!
+        """
+        # TODO: Implement the vulnerable decryption
+        # - Use the cbc_decrypt() function you implemented earlier
+        iv = cookie[:16]
+        try:
+            if len(cookie) < 32:
+                return (False, "INVALID_COOKIE")
+            decrypted = cbc_decrypt(cookie[16:], self.key, iv)
+            decoded_decrypted = json.loads(decrypted.decode("utf-8"))
+        except InvalidPaddingError:
+            # - Return (False, "PADDING_ERROR") if cbc_decrypt() raises an InvalidPaddingError
+            return (False, "PADDING_ERROR")
+        except Exception:
+            # - Return (False, "INVALID_COOKIE") if any other error is detected, including when the cookie is not valid JSON
+            return (False, "INVALID_COOKIE")
+        else:
+            return (True, decoded_decrypted)
+
+
+from w1d4_test import test_vulnerable_server
+
+
+test_vulnerable_server(VulnerableServer, cbc_encrypt)
+
+# %%
