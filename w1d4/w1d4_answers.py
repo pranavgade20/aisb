@@ -683,3 +683,61 @@ from w1d4_test import test_encryption
 
 test_encryption(encrypt_rsa, decrypt_rsa, generate_keys)
 # %%
+
+
+def sign(private_key: Tuple[int, int], message: str) -> List[int]:
+    """Sign a UTF-8 message by raising bytes to the private exponent.
+
+    Similar to decryption but applied to plaintext:
+    1. Convert message to bytes
+    2. For each byte m, compute s = m^d mod n
+    3. Return list of signature values
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        message: The message to sign
+
+    Returns:
+        List of signature integers (one per byte)
+    """
+    # TODO: Implement signing
+    #    - Extract n and d from private_key
+    n, d = private_key
+    #    - Convert message to bytes
+    message_bytes = message.encode("utf-8")
+    #    - Sign each byte with pow(byte, d, n)
+    signed_message = [pow(b, d, n) for b in message_bytes]
+    return signed_message
+
+
+def verify(public_key: Tuple[int, int], message: str, signature: List[int]) -> bool:
+    """Verify an RSA signature.
+
+    Steps:
+    1. For each signature value s, compute m = s^e mod n
+    2. Check if recovered values match original message bytes
+    3. Handle invalid signatures gracefully
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The original message
+        signature: List of signature values to verify
+
+    Returns:
+        True if signature is valid, False otherwise
+    """
+    # TODO: Implement verification
+    #    - Extract n and e from public_key
+    n, e = public_key
+    #    - Recover each byte with pow(s, e, n)
+    recovered_bytes = bytes(b for s in signature if (b := pow(s, e, n)) < 255)
+    #    - Check if recovered bytes match original message
+    recovered_message = recovered_bytes.decode("utf-8")
+    #    - Return False for any errors
+    return recovered_message == message
+
+
+from w1d4_test import test_signatures
+
+
+test_signatures(sign, verify, generate_keys)
