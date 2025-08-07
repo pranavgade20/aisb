@@ -746,3 +746,43 @@ from w1d4_test import test_add_pkcs7_padding
 
 
 test_add_pkcs7_padding(add_pkcs7_padding)
+
+
+# %%
+class InvalidPaddingError(Exception):
+    """Raised when PKCS#7 padding is invalid."""
+
+    pass
+
+
+def remove_pkcs7_padding(padded_text: bytes, block_size: int = 16) -> bytes:
+    """
+    Remove and validate PKCS#7 padding.
+
+    Args:
+        padded_text: The padded data
+        block_size: The cipher block size
+
+    Returns:
+        Original plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    # TODO: Implement PKCS#7 unpadding with validation
+    lastbyte = int(padded_text[-1])
+    if lastbyte > block_size:
+        raise InvalidPaddingError
+    elif lastbyte > len(padded_text):
+        raise InvalidPaddingError
+    else:
+        for byte in padded_text[-lastbyte:]:
+            if int(byte) != lastbyte:
+                raise InvalidPaddingError
+        return padded_text[:-lastbyte]
+
+
+from w1d4_test import test_remove_pkcs7_padding
+
+
+test_remove_pkcs7_padding(remove_pkcs7_padding, InvalidPaddingError)
