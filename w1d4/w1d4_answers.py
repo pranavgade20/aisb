@@ -488,7 +488,7 @@ def hmac_md5(key: bytes, message: bytes) -> bytes:
     block_size = 64  # MD5 block size in bytes - normalize the key length to this size
     ipad = 0x36  # Inner padding byte
     opad = 0x5C  # Outer padding byte
-    # TODO: Implement HMAC-MD5
+    # Implement HMAC-MD5
 
     # Step 1: Normalize the key length
     # - If key longer than block_size, hash it with md5_hash
