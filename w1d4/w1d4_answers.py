@@ -809,4 +809,98 @@ from w1d4_test import test_remove_pkcs7_padding
 
 test_remove_pkcs7_padding(remove_pkcs7_padding, InvalidPaddingError)
 
+
 # %%
+def xor_bytes(a: bytes, b: bytes) -> bytes:
+    """XOR two byte strings of equal length."""
+    assert len(a) == len(b), "Byte strings must have equal length"
+    return bytes(x ^ y for x, y in zip(a, b))
+
+
+def single_block_aes_encrypt(plaintext: bytes, key: bytes) -> bytes:
+    assert len(plaintext) == 16, "Plaintext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.encrypt(plaintext)
+
+
+def cbc_encrypt(plaintext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Encrypt plaintext using AES in CBC mode.
+
+    Args:
+        plaintext: The message to encrypt (will be padded)
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Ciphertext (same length as padded plaintext)
+    """
+
+    plaintext = add_pkcs7_padding(plaintext)
+
+    block_size = len(iv)
+
+    C = iv
+
+    for i in range(len(plaintext) // block_size):
+        Pi = plaintext[i * block_size : (i + 1) * block_size]
+        Pi = xor_bytes(Pi, C[i * block_size :])
+        Ci = single_block_aes_encrypt(Pi, key)
+        C += Ci
+
+    return C[block_size:]
+
+
+from w1d4_test import test_cbc_encrypt
+
+
+test_cbc_encrypt(cbc_encrypt)
+
+
+# %%
+def single_block_aes_decrypt(ciphertext: bytes, key: bytes) -> bytes:
+    assert len(ciphertext) == 16, "Ciphertext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.decrypt(ciphertext)
+
+
+def cbc_decrypt(ciphertext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Decrypt ciphertext using AES in CBC mode.
+
+    Args:
+        ciphertext: The encrypted message
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Decrypted plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    # TODO: Implement CBC decryption
+
+    block_size = len(iv)
+
+    # C = iv
+    P = bytes()
+
+    C = iv + ciphertext
+
+    for i in range(len(C) // block_size - 1, 0, -1):
+        Ci = C[i * block_size : (i + 1) * block_size]
+        Ci_ = C[(i - 1) * block_size : i * block_size]
+        Pi = single_block_aes_decrypt(Ci, key)
+        Pi = xor_bytes(Pi, Ci_)
+        P = Pi + P
+
+    plaintext = remove_pkcs7_padding(P)
+
+    return plaintext
+
+
+from w1d4_test import test_cbc_decrypt
+
+
+test_cbc_decrypt(cbc_decrypt, cbc_encrypt, InvalidPaddingError)
