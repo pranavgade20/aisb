@@ -539,9 +539,10 @@ def get_prime(bits: int, rng: random.Random | None = None) -> int:
             return candidate
 
 
-#%%
+# %%
 def euler(p, q):
-    return (p-1)*(q-1)
+    return (p - 1) * (q - 1)
+
 
 def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     """Generate RSA public and private keys.
@@ -559,9 +560,9 @@ def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     Returns:
         ((n, e), (n, d)) - public and private key tuples
     """
-    p = get_prime(bits//2)
+    p = get_prime(bits // 2)
     while True:
-        q = get_prime(bits//2)
+        q = get_prime(bits // 2)
         if p != q:
             break
 
@@ -581,12 +582,13 @@ def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     #    - Choose e (check if coprime with φ)
     #    - Compute d using pow(e, -1, phi)
     pass
+
+
 from w1d4_test import test_generate_keys
 
 
 test_generate_keys(generate_keys)
-#%%
-
+# %%
 
 
 def encrypt_rsa(public_key: Tuple[int, int], message: str) -> List[int]:
@@ -611,12 +613,12 @@ def encrypt_rsa(public_key: Tuple[int, int], message: str) -> List[int]:
     #    - Return list of encrypted values
     n, e = public_key
 
-    message_bytes = message.encode('utf-8')
+    message_bytes = message.encode("utf-8")
     message_bytes_encrypted = []
     for i in range(len(message_bytes)):
         byte = message_bytes[i]
         message_bytes_encrypted.append(pow(byte, e, n))
-    
+
     return message_bytes_encrypted
 
 
@@ -637,17 +639,83 @@ def decrypt_rsa(private_key: Tuple[int, int], ciphertext: List[int]) -> str:
     """
     #    - Extract n and d from private_key
     n, d = private_key
-    message_bytes_encrypted = b''
+    message_bytes_encrypted = b""
     for c in ciphertext:
         #    - Decrypt each value with pow(c, d, n)
-        newbyte = int.to_bytes(pow(c, d,n))
+        newbyte = int.to_bytes(pow(c, d, n))
         message_bytes_encrypted += newbyte
 
     #    - Convert to bytes and decode UTF-8
-    msg =  message_bytes_encrypted.decode('UTF-8')
+    msg = message_bytes_encrypted.decode("UTF-8")
     return msg
+
 
 from w1d4_test import test_encryption
 
 
 test_encryption(encrypt_rsa, decrypt_rsa, generate_keys)
+
+
+def sign(private_key: Tuple[int, int], message: str) -> List[int]:
+    """Sign a UTF-8 message by raising bytes to the private exponent.
+
+    Similar to decryption but applied to plaintext:
+    1. Convert message to bytes
+    2. For each byte m, compute s = m^d mod n
+    3. Return list of signature values
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        message: The message to sign
+
+    Returns:
+        List of signature integers (one per byte)
+    """
+    # TODO: Implement signing
+    #    - Extract n and d from private_key
+
+    #    - Sign each byte with pow(byte, d, n)
+    return encrypt_rsa(private_key, message)
+    pass
+
+
+def verify(public_key: Tuple[int, int], message: str, signature: List[int]) -> bool:
+    """Verify an RSA signature.
+
+    Steps:
+    1. For each signature value s, compute m = s^e mod n
+    2. Check if recovered values match original message bytes
+    3. Handle invalid signatures gracefully
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The original message
+        signature: List of signature values to verify
+
+    Returns:
+        True if signature is valid, False otherwise
+    """
+    # TODO: Implement verification
+
+    #    - Extract n and e from public_key
+    #    - Recover each byte with pow(s, e, n)
+    #    - Check if recovered bytes match original message
+    #    - Return False for any errors
+
+    n, e = public_key
+    signature_bytes = b""
+    for s in signature:
+        try:
+            newbyte = int.to_bytes(pow(s, e, n))
+            signature_bytes += newbyte
+        except:
+            return False
+
+    # comparison = decrypt_rsa(public_key, signature)
+    return signature_bytes.decode("UTF-8") == message
+
+
+from w1d4_test import test_signatures
+
+
+test_signatures(sign, verify, generate_keys)
