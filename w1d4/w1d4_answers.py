@@ -285,9 +285,9 @@ def md5_hash(message: bytes) -> bytes:
     state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
 
     padded_msg = md5_padding(message)
-    print(len(padded_msg))
 
     blocks_64_byte = [padded_msg[i : i + 64] for i in range(0, len(padded_msg) // 64)]
+    # blocks_64_byte = [padded_msg]
 
     for block in blocks_64_byte:
         state = md5_process_block(block, state)
@@ -309,5 +309,48 @@ from w1d4_test import test_md5
 
 test_md5_process_block(md5_process_block)
 test_md5(md5_hex)
+
+# %%
+# Famous MD5 collision pair discovered by researchers
+
+# Famous MD5 collision pair discovered by researchers
+COLLISION_A = bytes.fromhex(
+    "d131dd02c5e6eec4693d9a0698aff95c2fcab58712467eab4004583eb8fb7f89"
+    "55ad340609f4b30283e488832571415a085125e8f7cdc99fd91dbdf280373c5b"
+    "d8823e3156348f5bae6dacd436c919c6dd53e2b487da03fd02396306d248cda0"
+    "e99f33420f577ee8ce54b67080a80d1ec69821bcb6a8839396f9652b6ff72a70"
+)
+
+COLLISION_B = bytes.fromhex(
+    "d131dd02c5e6eec4693d9a0698aff95c2fcab50712467eab4004583eb8fb7f89"
+    "55ad340609f4b30283e4888325f1415a085125e8f7cdc99fd91dbd7280373c5b"
+    "d8823e3156348f5bae6dacd436c919c6dd53e23487da03fd02396306d248cda0"
+    "e99f33420f577ee8ce54b67080280d1ec69821bcb6a8839396f965ab6ff72a70"
+)
+
+
+def demonstrate_md5_collision():
+    """Show that two different messages can have the same MD5 hash."""
+    print("\nMessage differences at positions:")
+    for i, (a, b) in enumerate(zip(COLLISION_A, COLLISION_B)):
+        if a != b:
+            print(f"  Position {i}: {a:02x} vs {b:02x}")
+
+    hash_a = md5_hex(COLLISION_A)
+    hash_b = md5_hex(COLLISION_B)
+
+    print("MD5 Collision Demonstration")
+    print("=" * 40)
+    print(f"Message A: {COLLISION_A.hex()[:60]}...")
+    print(f"MD5(A):    {hash_a}")
+    print()
+    print(f"Message B: {COLLISION_B.hex()[:60]}...")
+    print(f"MD5(B):    {hash_b}")
+    print()
+    print(f"Messages identical? {COLLISION_A == COLLISION_B}")
+    print(f"Hashes identical? {hash_a == hash_b}")
+
+
+demonstrate_md5_collision()
 
 # %%
