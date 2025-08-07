@@ -40,9 +40,7 @@ def md5_i(x: int, y: int, z: int) -> int:
 
 
 # Pre-computed sine-based constants using the formula T[i] = floor(2^32 * abs(sin(i+1)))
-MD5_T = [
-    int(math.floor((2**32) * abs(math.sin(i + 1)))) & 0xFFFFFFFF for i in range(64)
-]
+MD5_T = [int(math.floor((2**32) * abs(math.sin(i + 1)))) & 0xFFFFFFFF for i in range(64)]
 
 # Rotation amounts for each round
 MD5_S = [
@@ -118,19 +116,12 @@ MD5_S = [
 # But you can re-implement them yourself if you want to practice bit manipulation!
 def bytes_to_int32_le(data: bytes, offset: int) -> int:
     """Convert 4 bytes starting at offset to 32-bit little-endian integer."""
-    return (
-        data[offset]
-        | (data[offset + 1] << 8)
-        | (data[offset + 2] << 16)
-        | (data[offset + 3] << 24)
-    )
+    return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24)
 
 
 def int32_to_bytes_le(value: int) -> bytes:
     """Convert 32-bit integer to 4 bytes in little-endian format."""
-    return bytes(
-        [value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF]
-    )
+    return bytes([value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF])
 
 
 def int64_to_bytes_le(value: int) -> bytes:
@@ -171,20 +162,23 @@ def md5_padding(message: bytes) -> bytes:
     # 4. Convert message length to bits
     # 5. Append bit-length as 64-bit little-endian
     mlength = len(message)
-    message = message+b'\x80'
+    message = message + b"\x80"
     while len(message) % 64 != 56:
-        message = message+b'\x00'
+        message = message + b"\x00"
     mlength_bits = 8 * mlength
-    message = message + mlength_bits.to_bytes(8, byteorder='little')
+    message = message + mlength_bits.to_bytes(8, byteorder="little")
     return message
+
+
 from w1d4_test import test_left_rotate
 from w1d4_test import test_md5_padding_length
 from w1d4_test import test_md5_padding_content
 
 
-test_left_rotate(left_rotate)
-test_md5_padding_length(md5_padding)
-test_md5_padding_content(md5_padding)
+# test_left_rotate(left_rotate)
+# test_md5_padding_length(md5_padding)
+# test_md5_padding_content(md5_padding)
+
 
 # %%
 def md5_process_block(block: bytes, state: List[int]) -> List[int]:
@@ -222,32 +216,34 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
     offset = 0
     wordlist = []
     for i in range(16):
-        wordlist.append(bytes_to_int32_le(block,offset))
+        wordlist.append(bytes_to_int32_le(block, offset))
         offset += 4
-    A,B,C,D=state
+    A, B, C, D = state
     for i in range(64):
-        if i<16:
+        if i < 16:
             k = i
-            temp = A + md5_f(B,C,D) + wordlist[k] + MD5_T[i]
-        elif i<32:
-            k = (5*i + 1) % 16
-            temp = A + md5_g(B,C,D) + wordlist[k] + MD5_T[i]
-        elif i<48:
-            k = (3*i + 5) % 16
-            temp = A + md5_h(B,C,D) + wordlist[k] + MD5_T[i]
+            temp = A + md5_f(B, C, D) + wordlist[k] + MD5_T[i]
+        elif i < 32:
+            k = (5 * i + 1) % 16
+            temp = A + md5_g(B, C, D) + wordlist[k] + MD5_T[i]
+        elif i < 48:
+            k = (3 * i + 5) % 16
+            temp = A + md5_h(B, C, D) + wordlist[k] + MD5_T[i]
         else:
-            k = (7*i) % 16
-            temp = A + md5_i(B,C,D) + wordlist[k] + MD5_T[i]
+            k = (7 * i) % 16
+            temp = A + md5_i(B, C, D) + wordlist[k] + MD5_T[i]
         temp = temp & 0xFFFFFFFF
-        rotatedb = left_rotate(temp,MD5_S[i]) + B
+        rotatedb = left_rotate(temp, MD5_S[i]) + B
         masked_rotated = rotatedb & 0xFFFFFFFF
-        A,B,C,D = D,masked_rotated,B,C
-    final_list = [A,B,C,D]
-    result = [x + y for x,y in zip(final_list,state)]
+        A, B, C, D = D, masked_rotated, B, C
+    final_list = [A, B, C, D]
+    result = [x + y for x, y in zip(final_list, state)]
     masked_result = [x & 0xFFFFFFFF for x in result]
     return masked_result
-        
-    # %%
+
+
+# %%
+
 
 def md5_hash(message: bytes) -> bytes:
     """
@@ -270,19 +266,206 @@ def md5_hash(message: bytes) -> bytes:
     #    - concatenate the bytes to get the final hash bytes
     state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
     message = md5_padding(message)
-    for i in range(len(message)//64):
-        block = message[64*i:64*(i+1)]
-        state = md5_process_block(block,state)
-    result = [x.to_bytes(4, byteorder = 'little') for x in state]
-    return result[0]+result[1]+result[2]+result[3]
+    for i in range(len(message) // 64):
+        block = message[64 * i : 64 * (i + 1)]
+        state = md5_process_block(block, state)
+    result = [x.to_bytes(4, byteorder="little") for x in state]
+    return result[0] + result[1] + result[2] + result[3]
+
 
 def md5_hex(message: bytes) -> str:
     """Compute MD5 hash and return as hex string."""
     return md5_hash(message).hex()
+
+
 from w1d4_test import test_md5_process_block
 from w1d4_test import test_md5
 
-test_md5_process_block(md5_process_block)
-test_md5(md5_hex)
+# test_md5_process_block(md5_process_block)
+# test_md5(md5_hex)
+
+# %%
+
+
+def naive_mac(message: bytes, secret: bytes) -> bytes:
+    """
+    Naive message authentication: Hash(secret || message)
+
+    Args:
+        message: The message to authenticate
+        secret: Secret key known only to legitimate parties
+    Returns:
+        Authentication tag
+    """
+    # TODO: Implement naive MAC
+    # Concatenate secret and message, then hash the result
+    # Use the md5_hash function you implemented earlier
+
+    return md5_hash(secret + message)
+
+
+def naive_verify(message: bytes, secret: bytes, tag: bytes) -> bool:
+    """
+    Verify a message using the naive MAC.
+
+    Args:
+        message: The message to verify
+        secret: Secret key
+        tag: Authentication tag to check
+
+    Returns:
+        True if the tag is valid for the message
+    """
+    # TODO: Implement naive verification
+    # Compute the expected tag for the message and compare it with the provided tag
+    return naive_mac(message, secret) == tag
+
+
+from w1d4_test import test_naive_mac
+
+
+# test_naive_mac(naive_mac, naive_verify)
+
+# %%
+
+
+def length_extension_attack(
+    original_message: bytes,
+    original_tag: bytes,
+    secret_length: int,
+    additional_data: bytes,
+) -> tuple[bytes, bytes]:
+    """
+    Perform a length extension attack against the naive MAC.
+
+    This demonstrates how an attacker can forge valid MACs for new messages
+    without knowing the secret key.
+
+    Args:
+        original_message: Message with known valid MAC
+        original_tag: Valid MAC for original_message
+        secret_length: Length of the secret (often can be guessed/brute-forced)
+        additional_data: Data to append and authenticate
+
+    Returns:
+        (forged_message, forged_tag) - New message and its valid MAC
+    """
+    # TODO: Implement length extension attack
+    # Step 1: Determine the "glue padding" that MD5 applied to (secret || original_message)
+    # - The padding only depends on input length, not contents,
+    #   therefore you can use a dummy value of secret_length + len(original_message) to construct input to md5_padding(),
+    # - Extract just the padding part that was added as glue_padding
+
+    dummy_secret = b"x" * secret_length
+    padded_message = md5_padding(dummy_secret + original_message)
+    padding = padded_message[len(original_message) + secret_length :]
+
+    # Step 2: Build the forged message that the attacker will present as
+    #   concatenation of original_message + glue_padding + additional_data
+    forged_message = original_message + padding + additional_data
+
+    # Step 3: Convert the original tag back to MD5 internal state
+    # - The tag represents the MD5 state after processing (secret || original_message || glue_padding)
+    # - Use bytes_to_int32_le to extract 4 32-bit words from the tag
+
+    state = []
+    for i in range(4):
+        state.append(bytes_to_int32_le(original_tag, i * 4))
+
+    # Step 4: Determine what final padding is needed
+    # - Calculate total length: secret_length + len(original_message) + len(glue_padding) + len(additional_data)
+    # - Create dummy data of that length and apply md5_padding()
+    # - Extract the final padding that would be added
+
+    total_len = secret_length + len(original_message) + len(padding) + len(additional_data)
+    padded_dummy = md5_padding(b"X" * total_len)
+    final_padding = padded_dummy[total_len:]
+
+    # Step 5: Continue MD5 processing from the known state
+    # - Process (additional_data + final_padding) starting from the extracted state
+    # - Use md5_process_block for each 64-byte block
+
+    data = additional_data + final_padding
+    for i in range(0, len(data), 64):
+        block = data[i : i + 64]
+        if len(block) == 64:
+            state = md5_process_block(block, state)
+
+    # Step 6: Convert final state back to bytes for the forged tag
+    forged_tag = b""
+    for item in state:
+        forged_tag += int32_to_bytes_le(item)
+
+    return forged_message, forged_tag
+
+
+from w1d4_test import test_length_extension_attack
+
+
+# test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
+
+# %%
+
+
+def hmac_md5(key: bytes, message: bytes) -> bytes:
+    """
+    Implement HMAC using MD5 as the underlying hash function.
+
+    Args:
+        key: Secret key for authentication
+        message: Message to authenticate
+
+    Returns:
+        HMAC tag (16 bytes for MD5)
+    """
+    block_size = 64  # MD5 block size in bytes - normalize the key length to this size
+    ipad = 0x36  # Inner padding byte
+    opad = 0x5C  # Outer padding byte
+    # TODO: Implement HMAC-MD5
+
+    # Step 1: Normalize the key length
+    # - If key longer than block_size, hash it with md5_hash
+    # - Otherwise, pad key to exactly block_size bytes with null bytes
+    if len(key) > block_size:
+        key = md5_hash(key)
+    else:
+        key = key + b"\x00" * (block_size - len(key))
+
+    # Step 2: Compute inner hash
+    # - compute Hash(ipad ⊕ key || message)
+    # Hint: Use bytes(k ^ ipad for k in key) for XOR operation
+    inner_hash = md5_hash(bytes(k ^ ipad for k in key) + message)
+
+    # Step 3: Compute HMAC
+    # - compute Hash(opad ⊕ key || inner_hash)
+    return md5_hash(bytes(k ^ opad for k in key) + inner_hash)
+
+
+def hmac_verify(key: bytes, message: bytes, tag: bytes) -> bool:
+    """
+    Verify an HMAC tag.
+
+    Args:
+        key: Secret key
+        message: Message to verify
+        tag: HMAC tag to check
+
+    Returns:
+        True if tag is valid
+    """
+    expected_tag = hmac_md5(key, message)
+    return expected_tag == tag
+
+
+from w1d4_test import test_hmac_md5
+from w1d4_test import test_hmac_verify
+
+
+test_hmac_md5(hmac_md5)
+test_hmac_verify(hmac_verify)
+
+from w1d4_test import test_hmac_security
+
+test_hmac_security(hmac_md5, length_extension_attack, hmac_verify)
 
 # %%
