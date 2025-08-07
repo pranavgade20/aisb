@@ -295,7 +295,6 @@ def md5_hash(message: bytes) -> bytes:
         block = message[i * 64 : (i + 1) * 64]
         blocklist.append(block)
         state = md5_process_block(block, state)
-    print(message, blocklist)
 
     #    - Update the current state to be the result of md5_process_block
     # 4. Convert final state to bytes:
@@ -478,7 +477,6 @@ def length_extension_attack(
         block = message[i * 64 : (i + 1) * 64]
         blocklist.append(block)
         state = md5_process_block(block, state)
-    print(message, blocklist)
 
     #    - Update the current state to be the result of md5_process_block
     # 4. Convert final state to bytes:
@@ -496,3 +494,46 @@ from w1d4_test import test_length_extension_attack
 
 
 test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
+
+
+import random
+from typing import List
+
+
+def _is_probable_prime(n: int, rounds: int = 5) -> bool:
+    """Return True if ``n`` passes a Miller-Rabin primality test."""
+    if n in (2, 3):
+        return True
+    if n <= 1 or n % 2 == 0:
+        return False
+
+    # Write n-1 as d * 2^s
+    s = 0
+    d = n - 1
+    while d % 2 == 0:
+        d //= 2
+        s += 1
+
+    for _ in range(rounds):
+        a = random.randrange(2, n - 2)
+        x = pow(a, d, n)
+        if x in (1, n - 1):
+            continue
+        for __ in range(s - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+
+
+def get_prime(bits: int, rng: random.Random | None = None) -> int:
+    if rng is None:
+        rng = random.Random()
+
+    while True:
+        candidate = rng.getrandbits(bits)
+        candidate |= (1 << (bits - 1)) | 1
+        if _is_probable_prime(candidate):
+            return candidate
