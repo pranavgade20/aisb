@@ -361,3 +361,130 @@ def demonstrate_md5_collision():
 
 
 demonstrate_md5_collision()
+
+
+def naive_mac(message: bytes, secret: bytes) -> bytes:
+    """
+    Naive message authentication: Hash(secret || message)
+
+    Args:
+        message: The message to authenticate
+        secret: Secret key known only to legitimate parties
+    Returns:
+        Authentication tag
+    """
+    # TODO: Implement naive MAC
+    # Concatenate secret and message, then hash the result
+    # Use the md5_hash function you implemented earlier
+
+    return md5_hash(secret + message)
+
+
+def naive_verify(message: bytes, secret: bytes, tag: bytes) -> bool:
+    """
+    Verify a message using the naive MAC.
+
+    Args:
+        message: The message to verify
+        secret: Secret key
+        tag: Authentication tag to check
+
+    Returns:
+        True if the tag is valid for the message
+    """
+    # TODO: Implement naive verification
+    # Compute the expected tag for the message and compare it with the provided tag
+    return naive_mac(message, secret) == tag
+
+
+from w1d4_test import test_naive_mac
+
+
+test_naive_mac(naive_mac, naive_verify)
+
+
+def length_extension_attack(
+    original_message: bytes,
+    original_tag: bytes,
+    secret_length: int,
+    additional_data: bytes,
+) -> tuple[bytes, bytes]:
+    """
+    Perform a length extension attack against the naive MAC.
+
+    This demonstrates how an attacker can forge valid MACs for new messages
+    without knowing the secret key.
+
+    Args:
+        original_message: Message with known valid MAC
+        original_tag: Valid MAC for original_message
+        secret_length: Length of the secret (often can be guessed/brute-forced)
+        additional_data: Data to append and authenticate
+
+    Returns:
+        (forged_message, forged_tag) - New message and its valid MAC
+    """
+    # TODO: Implement length extension attack
+    # Step 1: Determine the "glue padding" that MD5 applied to (secret || original_message)
+    # - The padding only depends on input length, not contents,
+    #   therefore you can use a dummy value of secret_length + len(original_message) to construct input to md5_padding(),
+    # - Extract just the padding part that was added as glue_padding
+    length = secret_length + len(original_message) % 64
+    paddinglen = 64 - length
+
+    # Step 2: Build the forged message that the attacker will present as
+    #   concatenation of original_message + glue_padding + additional_data
+    forgedmessage = original_message + b"\x00" * paddinglen + additional_data
+
+    # Step 3: Convert the original tag back to MD5 internal state
+    # - The tag represents the MD5 state after processing (secret || original_message || glue_padding)
+    # - Use bytes_to_int32_le to extract 4 32-bit words from the tag
+    state = []
+    for i in range(4):
+        state.append(bytes_to_int32_le(original_tag, 4 * i))
+
+    # Step 4: Determine what final padding is needed
+    # - Calculate total length: secret_length + len(original_message) + len(glue_padding) + len(additional_data)
+    # - Create dummy data of that length and apply md5_padding()
+    # - Extract the final padding that would be added
+    totallen = secret_length + len(original_message) + paddinglen + len(additional_data)
+    dummy = b"\x00" * totallen
+    dummy2 = md5_padding(dummy)
+    pad = dummy2[len(dummy) :]
+
+    # Step 5: Continue MD5 processing from the known state
+    # - Process (additional_data + final_padding) starting from the extracted state
+    # - Use md5_process_block for each 64-byte block
+    # 3. Process each 64-byte block:
+    #    - For each block, apply the md5_process_block function to the block and the current state
+    message = additional_data + pad
+    length = len(message)
+    blocknumber = length // 64  # len is divisible by 64
+    # slicing
+    blocklist = []
+    for i in range(blocknumber):
+        block = message[i * 64 : (i + 1) * 64]
+        blocklist.append(block)
+        state = md5_process_block(block, state)
+    print(message, blocklist)
+
+    #    - Update the current state to be the result of md5_process_block
+    # 4. Convert final state to bytes:
+
+    #    - convert the state values to little-endian bytes
+    hashbytes = b""
+    for statevalue in state:
+        statevalue = int32_to_bytes_le(statevalue)
+        #    - concatenate the bytes to get the final hash bytes
+        hashbytes = hashbytes + statevalue
+    return forgedmessage, hashbytes
+
+    # Step 6: Convert final state back to bytes for the forged tag
+
+    pass
+
+
+from w1d4_test import test_length_extension_attack
+
+
+test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
