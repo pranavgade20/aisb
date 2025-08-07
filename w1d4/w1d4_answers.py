@@ -863,22 +863,19 @@ def cbc_decrypt(ciphertext: bytes, key: bytes, iv: bytes) -> bytes:
     """
     # TODO: Implement CBC decryption
     # pi = aes_decrypt(ci) xor c[i-1]
-    
-    
-    
+
     encrypted = [iv]
     length = 16
-    
+
     output = b""
 
     for i in range(0, len(ciphertext), length):
         block = ciphertext[i : i + length]
-        
+
         decrypted_block = single_block_aes_decrypt(block, key)
         encrypted.append(block)
         xored_block = xor_bytes(encrypted[-2], decrypted_block)
         output += xored_block
-
 
     return remove_pkcs7_padding(output)
 
@@ -912,9 +909,7 @@ class VulnerableServer:
             # - Don't forget to include the IV in the returned value so that you can decrypt it later!
             pass
 
-    def decrypt_cookie(
-        self, cookie: bytes
-    ) -> Tuple[Literal[False], str] | Tuple[Literal[True], dict[str, str]]:
+    def decrypt_cookie(self, cookie: bytes) -> Tuple[Literal[False], str] | Tuple[Literal[True], dict[str, str]]:
         """
         Decrypt and validate a cookie.
 
@@ -950,10 +945,9 @@ class VulnerableServer:
             # - Return (False, "INVALID_COOKIE") if any other error is detected, including when the cookie is not valid JSON
             pass
 
+
 # %%
-def padding_oracle_attack_block(
-    oracle: Callable[[bytes], bool], iv: bytes, block: bytes
-) -> bytes:
+def padding_oracle_attack_block(oracle: Callable[[bytes], bool], iv: bytes, block: bytes) -> bytes:
     """
     Decrypt a single 16-byte ciphertext block using a padding oracle.
 
@@ -970,16 +964,30 @@ def padding_oracle_attack_block(
     # High-level algorithm:
     # 1. For each byte position from 15 down to 0:
     #    a. Calculate the target padding value for the step
-    #    b. Initialize modified IV bytes initialized to all zeroes
-    #    c. Set the modified IV bytes corresponding to already found intermediary bytes and the target padding
-    #    d. Try all 256 values for current position until padding is valid
+    for position in range(15, -1, -1):  # why
+        target_padding_value = 16 - position
+
+        #    b. Initialize modified IV bytes initialized to all zeroes
+        modified_IV = b"\x00" * 16
+        #    c. Set the modified IV bytes corresponding to already found intermediary bytes and the target padding
+        #    d. Try all 256 values for current position until padding is valid
+        for i in range(256):
+            modified_IV = modified_IV[:position] + int.to_bytes(i)  # + modified_IV[position + 1 :]
+            if oracle(modified_IV + block):
+                print(modified_IV)
+                break
+        break
+
     #    e. Calculate intermediate value byte from the IV byte that produced valid padding
+
     #    f. Record the intermediate value byte
     # 2. XOR intermediate values with original IV to get plaintext
     #
     # Hint:
     # - Use bytearray() if you need a mutable byte array, bytes() if you need an immutable one
     pass
+
+
 from w1d4_test import test_padding_oracle_attack_block
 
 
@@ -996,4 +1004,3 @@ def oracle(ciphertext):
 
 
 test_padding_oracle_attack_block(padding_oracle_attack_block, oracle_func=oracle)
-
