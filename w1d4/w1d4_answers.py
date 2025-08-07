@@ -386,3 +386,87 @@ from w1d4_test import test_naive_mac
 test_naive_mac(naive_mac, naive_verify)
 
 # %%
+
+
+def length_extension_attack(
+    original_message: bytes,
+    original_tag: bytes,
+    secret_length: int,
+    additional_data: bytes,
+) -> tuple[bytes, bytes]:
+    """
+    Perform a length extension attack against the naive MAC.
+
+    This demonstrates how an attacker can forge valid MACs for new messages
+    without knowing the secret key.
+
+    Args:
+        original_message: Message with known valid MAC
+        original_tag: Valid MAC for original_message
+        secret_length: Length of the secret (often can be guessed/brute-forced)
+        additional_data: Data to append and authenticate
+
+    Returns:
+        (forged_message, forged_tag) - New message and its valid MAC
+    """
+    # TODO: Implement length extension attack
+    # Step 1: Determine the "glue padding" that MD5 applied to (secret || original_message)
+    # - The padding only depends on input length, not contents,
+    #   therefore you can use a dummy value of secret_length + len(original_message) to construct input to md5_padding(),
+    # - Extract just the padding part that was added as glue_padding
+
+    dummy_secret = bytes([0] * secret_length)
+    padding_input = dummy_secret + original_message
+    padded = md5_padding(padding_input)
+
+    glue_padding = padded[len(padding_input) :]
+
+    # Step 2: Build the forged message that the attacker will present as
+    #   concatenation of original_message + glue_padding + additional_data
+
+    forged_message = original_message + glue_padding + additional_data
+
+    # Step 3: Convert the original tag back to MD5 internal state
+    # - The tag represents the MD5 state after processing (secret || original_message || glue_padding)
+    # - Use bytes_to_int32_le to extract 4 32-bit words from the tag
+
+    extracted_state = []
+
+    for i in range(4):
+        extracted_state.append(bytes_to_int32_le(original_tag[i * 4 : (i + 1) * 4], 0))
+
+    # Step 4: Determine what final padding is needed
+    # - Calculate total length: secret_length + len(original_message) + len(glue_padding) + len(additional_data)
+    # - Create dummy data of that length and apply md5_padding()
+    # - Extract the final padding that would be added
+
+    dummy_data = dummy_secret + forged_message
+    final_length = len(dummy_data)
+
+    dummy_padded = md5_padding(dummy_data)
+    final_padding = dummy_padded[final_length:]
+
+    # Step 5: Continue MD5 processing from the known state
+    # - Process (additional_data + final_padding) starting from the extracted state
+    # - Use md5_process_block for each 64-byte block
+
+    message = additional_data + final_padding
+
+    for j in range(len(message) // 64):
+        block = message[j * 64 : (j + 1) * 64]
+        extracted_state = md5_process_block(block, extracted_state)
+
+    hash = bytes([])
+
+    # Step 6: Convert final state back to bytes for the forged tag
+
+    for s in extracted_state:
+        hash += int32_to_bytes_le(s)
+
+    return forged_message, hash
+
+
+from w1d4_test import test_length_extension_attack
+
+
+test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
