@@ -615,3 +615,197 @@ from w1d4_test import test_encryption
 
 
 test_encryption(encrypt_rsa, decrypt_rsa, generate_keys)
+
+
+# %%
+
+
+def sign(private_key: Tuple[int, int], message: str) -> List[int]:
+    """Sign a UTF-8 message by raising bytes to the private exponent.
+
+    Similar to decryption but applied to plaintext:
+    1. Convert message to bytes
+    2. For each byte m, compute s = m^d mod n
+    3. Return list of signature values
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        message: The message to sign
+
+    Returns:
+        List of signature integers (one per byte)
+    """
+    # TODO: Implement signing
+    #    - Extract n and d from private_key
+    #    - Convert message to bytes
+    #    - Sign each byte with pow(byte, d, n)
+    n, d = private_key
+
+    sign = [pow(byte, d, n) for byte in message.encode("utf-8")]
+
+    return sign
+
+
+def verify(public_key: Tuple[int, int], message: str, signature: List[int]) -> bool:
+    """Verify an RSA signature.
+
+    Steps:
+    1. For each signature value s, compute m = s^e mod n
+    2. Check if recovered values match original message bytes
+    3. Handle invalid signatures gracefully
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The original message
+        signature: List of signature values to verify
+
+    Returns:
+        True if signature is valid, False otherwise
+    """
+    n, e = public_key
+
+    bytes = [pow(s, e, n) for s in signature]
+
+    if list(message.encode("utf-8")) == bytes:
+        return True
+    return False
+    # TODO: Implement verification
+    #    - Extract n and e from public_key
+    #    - Recover each byte with pow(s, e, n)
+    #    - Check if recovered bytes match original message
+    #    - Return False for any errors
+    pass
+
+
+from w1d4_test import test_signatures
+
+
+test_signatures(sign, verify, generate_keys)
+
+
+# %%
+
+# Oracle exercises
+
+
+# %%
+def add_pkcs7_padding(plaintext: bytes, block_size: int = 16) -> bytes:
+    """
+    Add PKCS#7 padding to plaintext.
+
+    Args:
+        plaintext: The data to pad
+        block_size: The cipher block size
+
+    Returns:
+        Padded plaintext that is a multiple of block_size
+    """
+
+    length = len(plaintext)
+
+    if length == 0:
+        append_len = block_size
+        print(append_len)
+    else:
+        append_len = block_size - length % block_size
+
+    padding = bytes([append_len] * append_len)
+
+    plaintext += padding
+
+    print(plaintext)
+    return plaintext
+
+
+from w1d4_test import test_add_pkcs7_padding
+
+
+test_add_pkcs7_padding(add_pkcs7_padding)
+
+
+# %%
+class InvalidPaddingError(Exception):
+    """Raised when PKCS#7 padding is invalid."""
+
+    pass
+
+
+def remove_pkcs7_padding(padded_text: bytes, block_size: int = 16) -> bytes:
+    """
+    Remove and validate PKCS#7 padding.
+
+    Args:
+        padded_text: The padded data
+        block_size: The cipher block size
+
+    Returns:
+        Original plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    # TODO: Implement PKCS#7 unpadding with validation
+
+    if not padded_text:
+        raise InvalidPaddingError
+
+    if len(padded_text) % block_size != 0:
+        raise InvalidPaddingError
+
+    padded_token = padded_text[-1]
+
+    if padded_token == 0x00:
+        raise InvalidPaddingError
+
+    length_to_remove = int(padded_token)
+
+    if length_to_remove > len(padded_text):
+        raise InvalidPaddingError
+
+    for i in range(length_to_remove):
+        if padded_text[-(i + 1)] != length_to_remove:
+            raise InvalidPaddingError
+
+    return padded_text[:-length_to_remove]
+    pass
+
+
+from w1d4_test import test_remove_pkcs7_padding
+
+
+test_remove_pkcs7_padding(remove_pkcs7_padding, InvalidPaddingError)
+
+
+# %%
+def xor_bytes(a: bytes, b: bytes) -> bytes:
+    """XOR two byte strings of equal length."""
+    assert len(a) == len(b), "Byte strings must have equal length"
+    return bytes(x ^ y for x, y in zip(a, b))
+
+
+def single_block_aes_encrypt(plaintext: bytes, key: bytes) -> bytes:
+    assert len(plaintext) == 16, "Plaintext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.encrypt(plaintext)
+
+
+def cbc_encrypt(plaintext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Encrypt plaintext using AES in CBC mode.
+
+    Args:
+        plaintext: The message to encrypt (will be padded)
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Ciphertext (same length as padded plaintext)
+    """
+    # TODO: Implement CBC encryption
+    pass
+
+
+from w1d4_test import test_cbc_encrypt
+
+
+test_cbc_encrypt(cbc_encrypt)
