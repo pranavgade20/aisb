@@ -470,3 +470,66 @@ from w1d4_test import test_length_extension_attack
 
 
 test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
+
+# %%
+
+
+def hmac_md5(key: bytes, message: bytes) -> bytes:
+    """
+    Implement HMAC using MD5 as the underlying hash function.
+
+    Args:
+        key: Secret key for authentication
+        message: Message to authenticate
+
+    Returns:
+        HMAC tag (16 bytes for MD5)
+    """
+    block_size = 64  # MD5 block size in bytes - normalize the key length to this size
+    ipad = 0x36  # Inner padding byte
+    opad = 0x5C  # Outer padding byte
+    # TODO: Implement HMAC-MD5
+
+    # Step 1: Normalize the key length
+    # - If key longer than block_size, hash it with md5_hash
+    # - Otherwise, pad key to exactly block_size bytes with null bytes
+    if len(key) > block_size:
+        key = md5_hash(key)
+    else:
+        while len(key) < block_size:
+            key += bytes([0])
+
+    # Step 2: Compute inner hash
+    # - compute Hash(ipad ⊕ key || message)
+    # Hint: Use bytes(k ^ ipad for k in key) for XOR operation
+    inner_hash = md5_hash(bytes(ipad ^ k for k in key) + message)
+
+    # Step 3: Compute HMAC
+    # - compute Hash(opad ⊕ key || inner_hash)
+    return md5_hash(bytes(opad ^ k for k in key) + inner_hash)
+
+
+def hmac_verify(key: bytes, message: bytes, tag: bytes) -> bool:
+    """
+    Verify an HMAC tag.
+
+    Args:
+        key: Secret key
+        message: Message to verify
+        tag: HMAC tag to check
+
+    Returns:
+        True if tag is valid
+    """
+    expected_tag = hmac_md5(key, message)
+    return expected_tag == tag
+
+
+from w1d4_test import test_hmac_md5
+from w1d4_test import test_hmac_verify
+
+
+test_hmac_md5(hmac_md5)
+test_hmac_verify(hmac_verify)
+
+# %%
