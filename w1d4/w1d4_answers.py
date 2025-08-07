@@ -1,7 +1,8 @@
-#%%
+# %%
 """
 Authors: Meeri and Chris
 """
+
 from typing import List
 import math
 from collections.abc import Callable
@@ -17,9 +18,6 @@ from Crypto.Cipher import AES
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from aisb_utils import report
-
-
-
 
 
 # MD5 uses four auxiliary functions that operate on three 32-bit words:
@@ -44,9 +42,7 @@ def md5_i(x: int, y: int, z: int) -> int:
 
 
 # Pre-computed sine-based constants using the formula T[i] = floor(2^32 * abs(sin(i+1)))
-MD5_T = [
-    int(math.floor((2**32) * abs(math.sin(i + 1)))) & 0xFFFFFFFF for i in range(64)
-]
+MD5_T = [int(math.floor((2**32) * abs(math.sin(i + 1)))) & 0xFFFFFFFF for i in range(64)]
 
 # Rotation amounts for each round
 MD5_S = [
@@ -122,19 +118,12 @@ MD5_S = [
 # But you can re-implement them yourself if you want to practice bit manipulation!
 def bytes_to_int32_le(data: bytes, offset: int) -> int:
     """Convert 4 bytes starting at offset to 32-bit little-endian integer."""
-    return (
-        data[offset]
-        | (data[offset + 1] << 8)
-        | (data[offset + 2] << 16)
-        | (data[offset + 3] << 24)
-    )
+    return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24)
 
 
 def int32_to_bytes_le(value: int) -> bytes:
     """Convert 32-bit integer to 4 bytes in little-endian format."""
-    return bytes(
-        [value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF]
-    )
+    return bytes([value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF])
 
 
 def int64_to_bytes_le(value: int) -> bytes:
@@ -150,7 +139,8 @@ def left_rotate(value: int, amount: int) -> int:
     value &= 0xFFFFFFFF
     return ((value << amount) | (value >> (32 - amount))) & 0xFFFFFFFF
 
-#%%
+
+# %%
 # === Start implementing from here ===
 def md5_padding(message: bytes) -> bytes:
     """
@@ -171,17 +161,16 @@ def md5_padding(message: bytes) -> bytes:
 
     # bytes?
 
-    message2 = message + b'\x80'
+    message2 = message + b"\x80"
     message2_length = len(message2)
-
 
     current_remainder = message2_length % 64
     if current_remainder <= 56:
         number_of_zero_bytes = 56 - current_remainder
-    else:    
+    else:
         number_of_zero_bytes = 64 + 56 - current_remainder
 
-    message3 = message2 + b'\x00' * number_of_zero_bytes
+    message3 = message2 + b"\x00" * number_of_zero_bytes
 
     message4_length = int64_to_bytes_le(len(message) * 8)
 
@@ -191,13 +180,15 @@ def md5_padding(message: bytes) -> bytes:
 from w1d4_test import test_left_rotate
 from w1d4_test import test_md5_padding_length
 from w1d4_test import test_md5_padding_content
+
 test_left_rotate(left_rotate)
 test_md5_padding_length(md5_padding)
 test_md5_padding_content(md5_padding)
 
-#%%
+# %%
 bin(0x80)
-#%%
+# %%
+
 
 def md5_process_block(block: bytes, state: List[int]) -> List[int]:
     """
@@ -215,13 +206,13 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
     # TODO: Implement MD5 block processing
     # 1. Convert 64-byte block into 16 32-bit words in little-endian order
     #    - use the bytes_to_int32_le function
-    
+
     words = []
     for i in range(16):
-        offset = i * 32 // 8 
+        offset = i * 32 // 8
         word = bytes_to_int32_le(block, offset)
         words.append(word)
-    
+
     A, B, C, D = state
 
     for i in range(64):
@@ -230,22 +221,23 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
             k = i
         elif i < 32:
             fun = md5_g
-            k = (5*i + 1) % 16
+            k = (5 * i + 1) % 16
         elif i < 48:
             fun = md5_h
-            k = (3*i + 5) % 16
+            k = (3 * i + 5) % 16
         elif i >= 48:
             fun = md5_i
-            k = (7*i) % 16
+            k = (7 * i) % 16
 
-        temp = A + fun(B,C,D) + words[k] + MD5_T[i]
+        temp = A + fun(B, C, D) + words[k] + MD5_T[i]
         masked = temp & 0xFFFFFFFF
 
         rotated = left_rotate(masked, MD5_S[i])
         rotated_plus_B = rotated + B
 
         rotated_masked = rotated_plus_B & 0xFFFFFFFF
-        
+
+        A, B, C, D = D, rotated_masked, B, C
 
     # 3. For each of 64 rounds (i from 0 to 63):
     #    - Choose function and message index k based on round:
@@ -258,15 +250,24 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
     #    - Left rotate the value by MD5_S[i] bits (use the left_rotate function)
     #    - Add B to the rotated value
     #    - Mask the result temp value to the low 32 bits
+
     #    - Rotate the state variables: A,B,C,D = D,temp,B,C
     # 4. Return the new state:
+    state[0] = (state[0] + A) & 0xFFFFFFFF
+    state[1] = (state[1] + B) & 0xFFFFFFFF
+    state[2] = (state[2] + C) & 0xFFFFFFFF
+    state[3] = (state[3] + D) & 0xFFFFFFFF
     #    - add the resulting values of A, B, C, D to the respective values in the state given in the argument
     #    - e.g., state[0] = (state[0] + A)
     #    - mask the new state values to the low 32 bits
-    pass
+    return state
+
+
 from w1d4_test import test_md5_process_block
+
 test_md5_process_block(md5_process_block)
-#%%
+# %%
+
 
 def md5_hash(message: bytes) -> bytes:
     """
@@ -293,13 +294,14 @@ def md5_hash(message: bytes) -> bytes:
 def md5_hex(message: bytes) -> str:
     """Compute MD5 hash and return as hex string."""
     return md5_hash(message).hex()
+
+
 from w1d4_test import test_md5_process_block
 from w1d4_test import test_md5
 
 
 test_md5_process_block(md5_process_block)
 test_md5(md5_hex)
-
 
 
 # Famous MD5 collision pair discovered by researchers
