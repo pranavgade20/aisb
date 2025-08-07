@@ -455,11 +455,147 @@ def hmac_verify(key: bytes, message: bytes, tag: bytes) -> bool:
     return expected_tag == tag
 
 
-from w1d4_test import test_hmac_md5
-from w1d4_test import test_hmac_verify
-
+from w1d4_test import test_hmac_md5, test_hmac_verify
 
 test_hmac_md5(hmac_md5)
 test_hmac_verify(hmac_verify)
 
 # %%
+
+
+import random
+from typing import List
+
+
+def _is_probable_prime(n: int, rounds: int = 5) -> bool:
+    """Return True if ``n`` passes a Miller-Rabin primality test."""
+    if n in (2, 3):
+        return True
+    if n <= 1 or n % 2 == 0:
+        return False
+
+    # Write n-1 as d * 2^s
+    s = 0
+    d = n - 1
+    while d % 2 == 0:
+        d //= 2
+        s += 1
+
+    for _ in range(rounds):
+        a = random.randrange(2, n - 2)
+        x = pow(a, d, n)
+        if x in (1, n - 1):
+            continue
+        for __ in range(s - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+
+
+def get_prime(bits: int, rng: random.Random | None = None) -> int:
+    if rng is None:
+        rng = random.Random()
+
+    while True:
+        candidate = rng.getrandbits(bits)
+        candidate |= (1 << (bits - 1)) | 1
+        if _is_probable_prime(candidate):
+            return candidate
+
+
+# %%
+
+
+def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+    """Generate RSA public and private keys.
+
+    Steps:
+    1. Generate two primes p and q of bits//2 length each
+    2. Ensure p ≠ q
+    3. Compute n = p × q and φ(n) = (p-1) × (q-1)
+    4. Choose e (try 65537 first, fall back if needed)
+    5. Compute d = e⁻¹ mod φ(n)
+
+    Args:
+        bits: Approximate bit length of the modulus n.
+
+    Returns:
+        ((n, e), (n, d)) - public and private key tuples
+    """
+    while True:
+        p = get_prime(bits // 2)
+        q = get_prime(bits // 2)
+        n = p * q
+        phi = (p - 1) * (q - 1)
+        e = 65537
+        if math.gcd(phi, e) <= 1:
+            d = pow(e, -1, phi)
+            return ((n, e), (n, d))
+
+
+from w1d4_test import test_generate_keys
+
+test_generate_keys(generate_keys)
+
+# %%
+
+
+def encrypt_rsa(public_key: Tuple[int, int], message: str) -> List[int]:
+    """Encrypt a UTF-8 string one byte at a time.
+
+    Process each byte of the message:
+    1. Convert message to UTF-8 bytes
+    2. For each byte b, compute c = b^e mod n
+    3. Return list of encrypted values
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The plaintext string
+
+    Returns:
+        List of encrypted integers (one per byte)
+    """
+    # TODO: Implement encryption
+    #    - Extract n and e from public_key
+    n, e = public_key
+    #    - Convert message to bytes with .encode("utf-8")
+    msg_bytes = message.encode("utf-8")
+    #    - Encrypt each byte with pow(byte, e, n)
+    return [pow(byte, e, n) for byte in msg_bytes]
+
+
+def decrypt_rsa(private_key: Tuple[int, int], ciphertext: List[int]) -> str:
+    """Decrypt a list of integers with the private key.
+
+    Process each encrypted value:
+    1. For each ciphertext c, compute m = c^d mod n
+    2. Collect decrypted values as bytes
+    3. Decode UTF-8 string
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        ciphertext: List of encrypted integers
+
+    Returns:
+        Decrypted string
+    """
+    # TODO: Implement decryption
+    #    - Extract n and d from private_key
+    n, d = private_key
+    #    - Decrypt each value with pow(c, d, n)
+    decrypted = [pow(c, d, n) for c in ciphertext]
+    #    - Convert to bytes and decode UTF-8
+    return bytes(decrypted).decode("utf-8")
+
+# from w1d4_test import test_encryption
+
+
+# test_encryption(encrypt_rsa, decrypt_rsa, generate_keys)
+
+pub, priv = generate_keys()
+message = "Hello, world!"
+encrypted = encrypt_rsa(pub, message)
+decrypted = decrypt_rsa(priv, encrypted)
