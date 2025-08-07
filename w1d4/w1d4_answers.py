@@ -802,6 +802,53 @@ def cbc_encrypt(plaintext: bytes, key: bytes, iv: bytes) -> bytes:
         Ciphertext (same length as padded plaintext)
     """
     # TODO: Implement CBC encryption
+
+    # Encryption: C[i] = AES(P[i] ⊕ C[i-1])
+    plaintext = add_pkcs7_padding(plaintext)
+
+    cipher = b""
+    previous = iv
+
+    for i in range(0, len(plaintext), 16):
+        block = plaintext[i : i + 16]
+        xor = xor_bytes(block, previous)
+        aes_block = single_block_aes_encrypt(xor, key)
+        cipher += aes_block
+        previous = aes_block
+    return cipher
+
+    print("plain text")
+
+    print(plaintext)
+
+    splits = [plaintext[i : block_size + i] for i in range(0, len(plaintext), block_size)]
+
+    print(len(splits))
+
+    # for i in range(16):
+    #     splits.append(bytes_to_int32_le(plaintext, i * 4))
+    print("splits")
+
+    cipher = []
+
+    first_block = splits[0]
+
+    first_xor = xor_bytes(first_block, iv)
+
+    c1 = single_block_aes_encrypt(first_xor, key)
+
+    cipher.append(c1)
+
+    print(cipher)
+
+    for c in range(1, len(splits)):
+        block = splits[c]
+        xor = xor_bytes(block, cipher[c - 1])
+        cipherblock = single_block_aes_encrypt(xor, key)
+        cipher.append(cipherblock)
+
+    print(cipher)
+    return cipher
     pass
 
 
@@ -809,3 +856,108 @@ from w1d4_test import test_cbc_encrypt
 
 
 test_cbc_encrypt(cbc_encrypt)
+
+
+# %%
+def single_block_aes_decrypt(ciphertext: bytes, key: bytes) -> bytes:
+    assert len(ciphertext) == 16, "Ciphertext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.decrypt(ciphertext)
+
+
+def cbc_decrypt(ciphertext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Decrypt ciphertext using AES in CBC mode.
+
+    Args:
+        ciphertext: The encrypted message
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Decrypted plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    # TODO: Implement CBC decryption
+
+    plaintext = b""
+    previous = iv
+
+    for i in range(0, len(ciphertext), 16):
+        block = ciphertext[i : i + 16]
+        aes_block = single_block_aes_decrypt(block, key)
+        xor = xor_bytes(aes_block, previous)
+        plaintext += xor
+        previous = block
+    return remove_pkcs7_padding(plaintext)
+
+    pass
+
+
+from w1d4_test import test_cbc_decrypt
+
+
+test_cbc_decrypt(cbc_decrypt, cbc_encrypt, InvalidPaddingError)
+
+
+# %%
+class VulnerableServer:
+    """
+    A server vulnerable to padding oracle attacks.
+    """
+
+    def __init__(self, key: bytes = None):
+        """Initialize with a random AES key."""
+        self.key = key or secrets.token_bytes(16)
+
+    def encrypt_cookie(self, cookie_content: dict[str, str]) -> bytes:
+        """Encrypt a cookie value."""
+        # TODO: Implement cookie encryption
+        # - Serialize cookie_content as a JSON string and encode it as bytes
+        # - Use the cbc_encrypt() function you implemented earlier
+        # - Don't forget to include the IV in the returned value so that you can decrypt it later!
+
+        print(cookie_content)
+        content = json.dumps(cookie_content).encode()
+
+        iv = secrets.token_bytes(16)
+        encrypted = cbc_encrypt(content, self.key, iv)
+        return iv + encrypted
+
+    def decrypt_cookie(self, cookie: bytes) -> Tuple[Literal[False], str] | Tuple[Literal[True], dict[str, str]]:
+        """
+        Decrypt and validate a cookie.
+
+        Returns:
+            (success, error_message)
+            - (True, None) if decryption succeeds
+            - (False, "PADDING_ERROR") if padding is invalid
+            - (False, "INVALID_COOKIE") for other errors
+
+        This is the padding oracle - it leaks whether padding is valid!
+        """
+        try:
+            if len(cookie) < 32:
+                return (False, "INVALID_COOKIE")
+            iv = cookie[:16]
+            cipher = cookie[16:]
+            decrypted = cbc_decrypt(cipher, self.key, iv)
+            return (True, json.loads(decrypted))
+        except InvalidPaddingError:
+            return (False, "PADDING_ERROR")
+        except Exception:
+            return (False, "INVALID_COOKIE")
+
+        # TODO: Implement the vulnerable decryption
+        # - Use the cbc_decrypt() function you implemented earlier
+        # - Return (False, "PADDING_ERROR") if cbc_decrypt() raises an InvalidPaddingError
+        # - Return (False, "INVALID_COOKIE") if any other error is detected, including when the cookie is not valid JSON
+        pass
+
+
+from w1d4_test import test_vulnerable_server
+
+
+test_vulnerable_server(VulnerableServer, cbc_encrypt)
