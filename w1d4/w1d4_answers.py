@@ -403,6 +403,12 @@ from w1d4_test import test_naive_mac
 test_naive_mac(naive_mac, naive_verify)
 
 
+# %%
+def calculate_glue(msg):
+    new_message = md5_padding(msg)
+    return new_message[len(msg) :]
+
+
 def length_extension_attack(
     original_message: bytes,
     original_tag: bytes,
@@ -424,17 +430,23 @@ def length_extension_attack(
     Returns:
         (forged_message, forged_tag) - New message and its valid MAC
     """
-    # TODO: Implement length extension attack
+
+    # Step 5: Continue MD5 processing from the known state
+    # - Process (additional_data + final_padding) starting from the extracted state
+    # - Use md5_process_block for each 64-byte block
+
+    # Step 6: Convert final state back to bytes for the forged tag
+
     # Step 1: Determine the "glue padding" that MD5 applied to (secret || original_message)
     # - The padding only depends on input length, not contents,
     #   therefore you can use a dummy value of secret_length + len(original_message) to construct input to md5_padding(),
     # - Extract just the padding part that was added as glue_padding
-    length = secret_length + len(original_message) % 64
-    paddinglen = 64 - length
+
+    glue_padding = calculate_glue(b"\x00" * (secret_length + len(original_message)))
 
     # Step 2: Build the forged message that the attacker will present as
     #   concatenation of original_message + glue_padding + additional_data
-    forgedmessage = original_message + b"\x00" * paddinglen + additional_data
+    forgedmessage = original_message + glue_padding + additional_data
 
     # Step 3: Convert the original tag back to MD5 internal state
     # - The tag represents the MD5 state after processing (secret || original_message || glue_padding)
@@ -447,7 +459,7 @@ def length_extension_attack(
     # - Calculate total length: secret_length + len(original_message) + len(glue_padding) + len(additional_data)
     # - Create dummy data of that length and apply md5_padding()
     # - Extract the final padding that would be added
-    totallen = secret_length + len(original_message) + paddinglen + len(additional_data)
+    totallen = secret_length + len(original_message) + len(glue_padding) + len(additional_data)
     dummy = b"\x00" * totallen
     dummy2 = md5_padding(dummy)
     pad = dummy2[len(dummy) :]
@@ -478,10 +490,6 @@ def length_extension_attack(
         #    - concatenate the bytes to get the final hash bytes
         hashbytes = hashbytes + statevalue
     return forgedmessage, hashbytes
-
-    # Step 6: Convert final state back to bytes for the forged tag
-
-    pass
 
 
 from w1d4_test import test_length_extension_attack
