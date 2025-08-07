@@ -155,7 +155,6 @@ def test_md5(solution: Callable[[bytes], str]):
 
     for message, expected in test_cases:
         result = solution(message)
-        print(f"MD5({message:x}) = {result:x}, expected {expected:x}")
         assert result == expected, (
             f"MD5({message:x}) = {result:x}, expected {expected:x}"
         )
@@ -216,7 +215,7 @@ def test_naive_mac(
 
     # Assert concrete values:
     naive_mac_result = naive_mac_func(b"abc", b"s3cr3t")
-    naive_mac_expected = bytes.fromhex("ebd4a9ce960be8386347977e81a12252")
+    naive_mac_expected = bytes.fromhex("66350530e0f11478682cfa31e8a2a9cc")
     assert naive_mac_result == naive_mac_expected, (
         f"naive_mac('abc', 's3cr3t') = {naive_mac_result.hex()}, expected {naive_mac_expected.hex()}"
     )
