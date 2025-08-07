@@ -867,7 +867,6 @@ def padding_oracle_attack_block(oracle: Callable[[bytes], bool], iv: bytes, bloc
 
 from w1d4_test import test_padding_oracle_attack_block
 
-
 # Try with internal oracle
 test_padding_oracle_attack_block(padding_oracle_attack_block)
 
@@ -883,3 +882,33 @@ def oracle(ciphertext):
 test_padding_oracle_attack_block(padding_oracle_attack_block, oracle_func=oracle)
 
 # %%
+
+
+# %%
+def padding_oracle_attack(oracle: Callable[[bytes], bool], ciphertext: bytes) -> bytes:
+    """
+    Decrypt an entire CBC-encrypted message using a padding oracle.
+
+    Args:
+        oracle: Function that returns True if padding is valid, False otherwise.
+        ciphertext: IV || Ciphertext (at least 32 bytes)
+
+    Returns:
+        Decrypted plaintext with padding removed
+    """
+    iv = ciphertext[:16]
+    blocks = [ciphertext[block_start : block_start + 16] for block_start in range(16, len(ciphertext), 16)]
+    # TODO: Implement full padding oracle attack
+    plaintext = b""
+    for current_block, prev_block in zip(reversed(blocks), reversed([iv] + blocks[:-1]), strict=True):
+        # - Use padding_oracle_attack_block() function from earlier
+        plaintext_block = padding_oracle_attack_block(oracle, prev_block, current_block)
+        plaintext = plaintext_block + plaintext
+
+    # - Don't forget to remove padding from the final plaintext (you can use remove_pkcs7_padding() from earlier)
+    return remove_pkcs7_padding(plaintext)
+
+
+from w1d4_test import test_padding_oracle_attack
+
+test_padding_oracle_attack(padding_oracle_attack, cbc_encrypt)
