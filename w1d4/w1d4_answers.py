@@ -150,7 +150,7 @@ def left_rotate(value: int, amount: int) -> int:
     value &= 0xFFFFFFFF
     return ((value << amount) | (value >> (32 - amount))) & 0xFFFFFFFF
 
-
+#%%
 # === Start implementing from here ===
 def md5_padding(message: bytes) -> bytes:
     """
@@ -169,35 +169,47 @@ def md5_padding(message: bytes) -> bytes:
         The result has length in bytes divisible by 64 and the last 8 bytes are the length of the original message.
     """
 
-    # md5_f
-    # md5_g
-    # md5_h
-    # md5_i
-    # MD5_T
-    # MD5_S
-    # bytes_to_int32_le
-    # int32_to_bytes_le
-    # int64_to_bytes_le
-    # left_rotate
+    # bytes?
+    if message == b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa':
+        pass
+    message2 = message + b'\x80'
+    message2_length = len(message2)
 
-    # TODO: Implement MD5 padding
-    # 1. Save original message length in bytes
-    # 2. Append 0x80 (the '1' bit)
-    # 3. Pad with zero bytes until the size modulo 64 is 56
-    # 4. Convert message length to bits
-    # 5. Append bit-length as 64-bit little-endian
 
-    
+    current_remainder = message2_length % 64
+    if current_remainder <= 56:
+        number_of_zero_bytes = 56 - current_remainder
+    else:    
+        number_of_zero_bytes = 64 + 56 - current_remainder
+
+    message3 = message2 + b'\x00' * number_of_zero_bytes
+
+    message4_length = int64_to_bytes_le(len(message))
+
+    return message3 + message4_length
+
+
+# md5_f
+# md5_g
+# md5_h
+# md5_i
+# MD5_T
+# MD5_S
+# bytes_to_int32_le
+# int32_to_bytes_le
+# int64_to_bytes_le
+# left_rotate
+
 
 from w1d4_test import test_left_rotate
 from w1d4_test import test_md5_padding_length
 from w1d4_test import test_md5_padding_content
-
-
 # test_left_rotate(left_rotate)
 test_md5_padding_length(md5_padding)
 test_md5_padding_content(md5_padding)
 
+#%%
+bin(0x80)
 #%%
 
 def md5_process_block(block: bytes, state: List[int]) -> List[int]:
