@@ -887,3 +887,113 @@ from w1d4_test import test_cbc_decrypt
 
 
 test_cbc_decrypt(cbc_decrypt, cbc_encrypt, InvalidPaddingError)
+
+
+class VulnerableServer:
+    """
+    A server vulnerable to padding oracle attacks.
+    """
+
+    def __init__(self, key: bytes = None):
+        """Initialize with a random AES key."""
+        self.key = key or secrets.token_bytes(16)
+
+    def encrypt_cookie(self, cookie_content: dict[str, str]) -> bytes:
+        """Encrypt a cookie value."""
+        if "SOLUTION":
+            plaintext = json.dumps(cookie_content).encode()
+            iv = secrets.token_bytes(16)
+            ciphertext = cbc_encrypt(plaintext, self.key, iv)
+            return iv + ciphertext
+        else:
+            # TODO: Implement cookie encryption
+            # - Serialize cookie_content as a JSON string and encode it as bytes
+            # - Use the cbc_encrypt() function you implemented earlier
+            # - Don't forget to include the IV in the returned value so that you can decrypt it later!
+            pass
+
+    def decrypt_cookie(
+        self, cookie: bytes
+    ) -> Tuple[Literal[False], str] | Tuple[Literal[True], dict[str, str]]:
+        """
+        Decrypt and validate a cookie.
+
+        Returns:
+            (success, error_message)
+            - (True, None) if decryption succeeds
+            - (False, "PADDING_ERROR") if padding is invalid
+            - (False, "INVALID_COOKIE") for other errors
+
+        This is the padding oracle - it leaks whether padding is valid!
+        """
+
+        if "SOLUTION":
+            try:
+                if len(cookie) < 32:
+                    return False, "INVALID_COOKIE"
+
+                iv = cookie[:16]
+                ciphertext = cookie[16:]
+
+                plaintext = cbc_decrypt(ciphertext, self.key, iv)
+                return True, json.loads(plaintext)
+
+            except InvalidPaddingError:
+                return False, "PADDING_ERROR"
+            except Exception as e:
+                print("Invalid cookie: ", e)
+                return False, "INVALID_COOKIE"
+        else:
+            # TODO: Implement the vulnerable decryption
+            # - Use the cbc_decrypt() function you implemented earlier
+            # - Return (False, "PADDING_ERROR") if cbc_decrypt() raises an InvalidPaddingError
+            # - Return (False, "INVALID_COOKIE") if any other error is detected, including when the cookie is not valid JSON
+            pass
+
+# %%
+def padding_oracle_attack_block(
+    oracle: Callable[[bytes], bool], iv: bytes, block: bytes
+) -> bytes:
+    """
+    Decrypt a single 16-byte ciphertext block using a padding oracle.
+
+    Args:
+        oracle: Function that takes IV||block and returns True if padding is valid, False otherwise.
+        iv:     The IV or previous ciphertext block (16 bytes)
+        block:  The ciphertext block to decrypt (16 bytes)
+
+    Returns:
+        Decrypted plaintext block (16 bytes)
+    """
+    # TODO: Implement single-block padding oracle attack
+    #
+    # High-level algorithm:
+    # 1. For each byte position from 15 down to 0:
+    #    a. Calculate the target padding value for the step
+    #    b. Initialize modified IV bytes initialized to all zeroes
+    #    c. Set the modified IV bytes corresponding to already found intermediary bytes and the target padding
+    #    d. Try all 256 values for current position until padding is valid
+    #    e. Calculate intermediate value byte from the IV byte that produced valid padding
+    #    f. Record the intermediate value byte
+    # 2. XOR intermediate values with original IV to get plaintext
+    #
+    # Hint:
+    # - Use bytearray() if you need a mutable byte array, bytes() if you need an immutable one
+    pass
+from w1d4_test import test_padding_oracle_attack_block
+
+
+# Try with internal oracle
+test_padding_oracle_attack_block(padding_oracle_attack_block)
+
+# Try with VulnerableServer as oracle
+vulnerable_server = VulnerableServer()
+
+
+def oracle(ciphertext):
+    result = vulnerable_server.decrypt_cookie(ciphertext)
+    return result == (False, "PADDING_ERROR")
+
+
+test_padding_oracle_attack_block(padding_oracle_attack_block, oracle_func=oracle)
+
