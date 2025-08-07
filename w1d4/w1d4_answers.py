@@ -295,7 +295,6 @@ def md5_hash(message: bytes) -> bytes:
         block = message[i * 64 : (i + 1) * 64]
         blocklist.append(block)
         state = md5_process_block(block, state)
-    print(message, blocklist)
 
     #    - Update the current state to be the result of md5_process_block
     # 4. Convert final state to bytes:
@@ -478,7 +477,6 @@ def length_extension_attack(
         block = message[i * 64 : (i + 1) * 64]
         blocklist.append(block)
         state = md5_process_block(block, state)
-    print(message, blocklist)
 
     #    - Update the current state to be the result of md5_process_block
     # 4. Convert final state to bytes:
@@ -497,10 +495,9 @@ from w1d4_test import test_length_extension_attack
 
 test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
 
-#%%
 
 import random
-from typing import Tuple, List
+from typing import List
 
 
 def _is_probable_prime(n: int, rounds: int = 5) -> bool:
@@ -540,52 +537,3 @@ def get_prime(bits: int, rng: random.Random | None = None) -> int:
         candidate |= (1 << (bits - 1)) | 1
         if _is_probable_prime(candidate):
             return candidate
-        
-
-#%%
-def euler(p, q):
-    return (p-1)*(q-1)
-
-def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
-    """Generate RSA public and private keys.
-
-    Steps:
-    1. Generate two primes p and q of bits//2 length each
-    2. Ensure p ≠ q
-    3. Compute n = p × q and φ(n) = (p-1) × (q-1)
-    4. Choose e (try 65537 first, fall back if needed)
-    5. Compute d = e⁻¹ mod φ(n)
-
-    Args:
-        bits: Approximate bit length of the modulus n.
-
-    Returns:
-        ((n, e), (n, d)) - public and private key tuples
-    """
-    p = get_prime(bits//2)
-    while True:
-        q = get_prime(bits//2)
-        if p != q:
-            break
-
-    n = p * q
-    totient = euler(p, q)
-    e = 65537
-    if math.gcd(e, totient) > 1:
-        raise ValueError("Incorrect e!")
-
-    d = pow(e, -1, totient)
-
-    return (n, e), (n, d)
-    # TODO: Implement key generation
-    #    - Generate p and q (bits//2 each)
-    #    - Ensure p ≠ q
-    #    - Compute n and φ(n)
-    #    - Choose e (check if coprime with φ)
-    #    - Compute d using pow(e, -1, phi)
-    pass
-from w1d4_test import test_generate_keys
-
-
-test_generate_keys(generate_keys)
-#%%
