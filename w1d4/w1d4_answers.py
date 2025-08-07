@@ -165,11 +165,11 @@ def md5_padding(message: bytes) -> bytes:
     # message = message.to_bytes()
     message = message + int(0x80).to_bytes()
 
-    while len(message) % 64 != :
+    while len(message) % 64 != 56:
         message += int(0x0).to_bytes()
-
-    message += message_length.to_bytes()
-
+    bits_length =  message_length * 8
+    bits = int64_to_bytes_le(bits_length)
+    message += bits
     return message
 
 
@@ -183,3 +183,112 @@ test_md5_padding_length(md5_padding)
 test_md5_padding_content(md5_padding)
 
 # %%
+
+def md5_process_block(block: bytes, state: List[int]) -> List[int]:
+    """
+    Process a single 512-bit block with MD5 algorithm.
+
+    Args:
+        block: 64-byte block to process
+        state: Current MD5 state: variables [A, B, C, D]
+
+    Returns:
+        Updated MD5 state
+    """
+    assert len(state) == 4, "State must be a list of 4 32-bit integers"
+    # TODO: Implement MD5 block processing
+    # 1. Convert 64-byte block into 16 32-bit words in little-endian order
+    #    - use the bytes_to_int32_le function
+    # 2. Initialize A, B, C, D from state
+    # 3. For each of 64 rounds (i from 0 to 63):
+    #    - Choose function and message index k based on round:
+    #      * Round 1 (i < 16): use md5_f, k = i
+    #      * Round 2 (i < 32): use md5_g, k = (5*i + 1) % 16
+    #      * Round 3 (i < 48): use md5_h, k = (3*i + 5) % 16
+    #      * Round 4 (i >= 48): use md5_i, k = (7*i) % 16
+    #    - Compute value: temp = A + function(B,C,D) + X[k] + MD5_T[i]
+    #    - Mask the value to the low 32 bits
+    #    - Left rotate the value by MD5_S[i] bits (use the left_rotate function)
+    #    - Add B to the rotated value
+    #    - Mask the result temp value to the low 32 bits
+    #    - Rotate the state variables: A,B,C,D = D,temp,B,C
+    # 4. Return the new state:
+    #    - add the resulting values of A, B, C, D to the respective values in the state given in the argument
+    #    - e.g., state[0] = (state[0] + A)
+    #    - mask the new state values to the low 32 bits
+    words = []
+    for i in range(16):
+        words.append(bytes_to_int32_le(block, i * 4))
+    A, B, C, D = state
+    for i in range(64):
+        k = None
+        md5_fn = None
+        if i < 16:
+            k = i
+            md5_fn = md5_f
+        elif i < 32:
+            k = (5 * i + 1) % 16
+            md5_fn = md5_g
+        elif i < 48:
+            k = (3 * i + 5) % 16
+            md5_fn = md5_h
+        elif i < 64:
+            k = (7 * i) % 16
+            md5_fn = md5_i
+        tmp = A + md5_fn(B, C, D) + words[k] + MD5_T[i]
+        tmp = tmp & 0xffffffff
+        tmp = left_rotate(tmp, MD5_S[i])
+        tmp += B
+        tmp = tmp & 0xffffffff
+        A,B,C,D = D,tmp,B,C
+    state = [
+        (state[0] + A) & 0xffffffff,
+        (state[1] + B) & 0xffffffff,
+        (state[2] + C) & 0xffffffff,
+        (state[3] + D) & 0xffffffff,
+    ]
+    return state
+
+
+def md5_hash(message: bytes) -> bytes:
+    """
+    Compute MD5 hash of message.
+
+    Args:
+        message: Input message as bytes
+
+    Returns:
+        16-byte MD5 hash
+    """
+    # TODO: Implement MD5 hash function
+    # 1. Initialize state with MD5 magic constants: [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+    # 2. Pad the message using md5_padding() to make the length in bytes divisible by 64
+    # 3. Process each 64-byte block:
+    #    - For each block, apply the md5_process_block function to the block and the current state
+    #    - Update the current state to be the result of md5_process_block
+    # 4. Convert final state to bytes:
+    #    - convert the state values to little-endian bytes
+    #    - concatenate the bytes to get the final hash bytes
+    state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+    msg = md5_padding(message)
+    for block in range(0, len(msg), 64):
+        state = md5_process_block(msg[block:block+64], state)
+    hashed = bytes()
+    for e in state:
+        print(e)
+        print(e.to_bytes(4))
+        hashed += e.to_bytes(4)
+    res = hashed.decode()
+    print(res)
+    return res
+
+
+def md5_hex(message: bytes) -> str:
+    """Compute MD5 hash and return as hex string."""
+    return md5_hash(message).hex()
+from w1d4_test import test_md5_process_block
+from w1d4_test import test_md5
+
+
+test_md5_process_block(md5_process_block)
+test_md5(md5_hex)
