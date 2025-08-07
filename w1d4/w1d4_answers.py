@@ -469,3 +469,301 @@ from w1d4_test import test_hmac_security
 test_hmac_security(hmac_md5, length_extension_attack, hmac_verify)
 
 # %%
+import random
+from typing import Tuple, List
+
+
+def _is_probable_prime(n: int, rounds: int = 5) -> bool:
+    """Return True if ``n`` passes a Miller-Rabin primality test."""
+    if n in (2, 3):
+        return True
+    if n <= 1 or n % 2 == 0:
+        return False
+
+    # Write n-1 as d * 2^s
+    s = 0
+    d = n - 1
+    while d % 2 == 0:
+        d //= 2
+        s += 1
+
+    for _ in range(rounds):
+        a = random.randrange(2, n - 2)
+        x = pow(a, d, n)
+        if x in (1, n - 1):
+            continue
+        for __ in range(s - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+
+
+def get_prime(bits: int, rng: random.Random | None = None) -> int:
+    if rng is None:
+        rng = random.Random()
+
+    while True:
+        candidate = rng.getrandbits(bits)
+        candidate |= (1 << (bits - 1)) | 1
+        if _is_probable_prime(candidate):
+            return candidate
+        
+# %%
+def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+    """Generate RSA public and private keys.
+
+    Steps:
+    1. Generate two primes p and q of bits//2 length each
+    2. Ensure p ≠ q
+    3. Compute n = p × q and φ(n) = (p-1) × (q-1)
+    4. Choose e (try 65537 first, fall back if needed)
+    5. Compute d = e⁻¹ mod φ(n)
+
+    Args:
+        bits: Approximate bit length of the modulus n.
+
+    Returns:
+        ((n, e), (n, d)) - public and private key tuples
+    """
+    # TODO: Implement key generation
+    #    - Generate p and q (bits//2 each)
+    #    - Ensure p ≠ q
+    #    - Compute n and φ(n)
+    #    - Choose e (check if coprime with φ)
+    #    - Compute d using pow(e, -1, phi)
+    p = get_prime(bits//2)
+    q = get_prime(bits//2)
+    while p==q:
+        q = get_prime(bits//2)
+    n = p*q
+    totient = (p-1)*(q-1)
+    e = 65537
+    if math.gcd(e,totient) != 1:
+        e = get_prime(5)
+    d = pow(e, -1, totient)
+    return ((n,e,), (n,d))
+
+from w1d4_test import test_generate_keys
+
+
+test_generate_keys(generate_keys)
+
+# %%
+def encrypt_rsa(public_key: Tuple[int, int], message: str) -> List[int]:
+    """Encrypt a UTF-8 string one byte at a time.
+
+    Process each byte of the message:
+    1. Convert message to UTF-8 bytes
+    2. For each byte b, compute c = b^e mod n
+    3. Return list of encrypted values
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The plaintext string
+
+    Returns:
+        List of encrypted integers (one per byte)
+    """
+    # TODO: Implement encryption
+    #    - Extract n and e from public_key
+    #    - Convert message to bytes with .encode("utf-8")
+    #    - Encrypt each byte with pow(byte, e, n)
+    #    - Return list of encrypted values
+    n,e = public_key
+    message = bytes(message, "utf-8")
+    bytelist = []
+    for b in message:
+        bytelist.append(pow(b, e, n))
+    return bytelist
+
+
+def decrypt_rsa(private_key: Tuple[int, int], ciphertext: List[int]) -> str:
+    """Decrypt a list of integers with the private key.
+
+    Process each encrypted value:
+    1. For each ciphertext c, compute m = c^d mod n
+    2. Collect decrypted values as bytes
+    3. Decode UTF-8 string
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        ciphertext: List of encrypted integers
+
+    Returns:
+        Decrypted string
+    """
+    n,d = private_key
+    byteslist = []
+    for value in ciphertext:
+        byteslist.append(pow(value,d,n))
+    return bytes(byteslist).decode("utf-8")
+
+from w1d4_test import test_encryption
+test_encryption(encrypt_rsa, decrypt_rsa, generate_keys)
+
+# %%
+def sign(private_key: Tuple[int, int], message: str) -> List[int]:
+    """Sign a UTF-8 message by raising bytes to the private exponent.
+
+    Similar to decryption but applied to plaintext:
+    1. Convert message to bytes
+    2. For each byte m, compute s = m^d mod n
+    3. Return list of signature values
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        message: The message to sign
+
+    Returns:
+        List of signature integers (one per byte)
+    """
+    n,d = private_key
+    message = bytes(message,"utf-8")
+    siglist = []
+    for m in message:
+        siglist.append(m**d % n)
+    return siglist
+    # TODO: Implement signing
+    #    - Extract n and d from private_key
+    #    - Convert message to bytes
+    #    - Sign each byte with pow(byte, d, n)
+
+
+def verify(public_key: Tuple[int, int], message: str, signature: List[int]) -> bool:
+    """Verify an RSA signature.
+
+    Steps:
+    1. For each signature value s, compute m = s^e mod n
+    2. Check if recovered values match original message bytes
+    3. Handle invalid signatures gracefully
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The original message
+        signature: List of signature values to verify
+
+    Returns:
+        True if signature is valid, False otherwise
+    """
+    n,e = public_key
+    message = bytes(message,"utf-8")
+    for i in range(len(signature)):
+        s = signature[i]
+        m = s**e % n
+        if message[i] != m:
+            return False
+    return True
+
+    # TODO: Implement verification
+    #    - Extract n and e from public_key
+    #    - Recover each byte with pow(s, e, n)
+    #    - Check if recovered bytes match original message
+    #    - Return False for any errors
+from w1d4_test import test_signatures
+test_signatures(sign, verify, generate_keys)
+
+# %%
+def add_pkcs7_padding(plaintext: bytes, block_size: int = 16) -> bytes:
+    """
+    Add PKCS#7 padding to plaintext.
+
+    Args:
+        plaintext: The data to pad
+        block_size: The cipher block size
+
+    Returns:
+        Padded plaintext that is a multiple of block_size
+    """
+    # TODO: Implement PKCS#7 padding according to the spec above
+    n = block_size - (len(plaintext) % block_size)
+    if n == 0:
+        n=16
+    padtext = plaintext+bytes([n]*n)
+    return padtext
+    
+from w1d4_test import test_add_pkcs7_padding
+
+
+test_add_pkcs7_padding(add_pkcs7_padding)# %%
+
+# %%
+# %%
+class InvalidPaddingError(Exception):
+    pass
+
+def remove_pkcs7_padding(padded_text: bytes, block_size: int = 16) -> bytes:
+    """
+    Remove and validate PKCS#7 padding.
+
+    Args:
+        padded_text: The padded data
+        block_size: The cipher block size
+
+    Returns:
+        Original plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    # TODO: Implement PKCS#7 unpadding with validation
+    if len(padded_text) == 0:
+        raise InvalidPaddingError
+    padlength = padded_text[-1]
+    if padded_text[-1] < 1 or padded_text[-1] > 16:
+        raise InvalidPaddingError
+    if len(padded_text) < padlength:
+        raise InvalidPaddingError
+    for i in range(padlength):
+        if padded_text[-(i+1)] != padlength:
+            raise InvalidPaddingError
+    return padded_text[:-padlength]
+        
+from w1d4_test import test_remove_pkcs7_padding
+test_remove_pkcs7_padding(remove_pkcs7_padding, InvalidPaddingError)
+
+# %%
+def xor_bytes(a: bytes, b: bytes) -> bytes:
+    """XOR two byte strings of equal length."""
+    assert len(a) == len(b), "Byte strings must have equal length"
+    return bytes(x ^ y for x, y in zip(a, b))
+
+
+def single_block_aes_encrypt(plaintext: bytes, key: bytes) -> bytes:
+    assert len(plaintext) == 16, "Plaintext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.encrypt(plaintext)
+
+
+def cbc_encrypt(plaintext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Encrypt plaintext using AES in CBC mode.
+
+    Args:
+        plaintext: The message to encrypt (will be padded)
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Ciphertext (same length as padded plaintext)
+    """
+    plaintext = add_pkcs7_padding(plaintext)
+    ciphertext = b""
+    prev_block = iv
+
+    for i in range(0,len(plaintext),16):
+        plainblock = plaintext[i:i+16]
+        postxor = xor_bytes(plainblock,prev_block)
+        encrypted_block = single_block_aes_encrypt(postxor,key)
+        ciphertext += encrypted_block
+        prev_block = encrypted_block
+    return ciphertext
+
+from w1d4_test import test_cbc_encrypt
+
+
+test_cbc_encrypt(cbc_encrypt)
+
+# %%
