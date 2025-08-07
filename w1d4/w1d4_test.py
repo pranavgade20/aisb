@@ -155,6 +155,7 @@ def test_md5(solution: Callable[[bytes], str]):
 
     for message, expected in test_cases:
         result = solution(message)
+        print(result, expected)
         assert result == expected, (
             f"MD5({message:x}) = {result:x}, expected {expected:x}"
         )
