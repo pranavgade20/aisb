@@ -170,8 +170,7 @@ def md5_padding(message: bytes) -> bytes:
     """
 
     # bytes?
-    if message == b'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa':
-        pass
+
     message2 = message + b'\x80'
     message2_length = len(message2)
 
@@ -184,21 +183,9 @@ def md5_padding(message: bytes) -> bytes:
 
     message3 = message2 + b'\x00' * number_of_zero_bytes
 
-    message4_length = int64_to_bytes_le(len(message))
+    message4_length = int64_to_bytes_le(len(message) * 8)
 
     return message3 + message4_length
-
-
-# md5_f
-# md5_g
-# md5_h
-# md5_i
-# MD5_T
-# MD5_S
-# bytes_to_int32_le
-# int32_to_bytes_le
-# int64_to_bytes_le
-# left_rotate
 
 
 from w1d4_test import test_left_rotate
