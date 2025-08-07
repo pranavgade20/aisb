@@ -1,4 +1,4 @@
-#%%
+# %%
 from typing import List
 import math
 from collections.abc import Callable
@@ -39,9 +39,7 @@ def md5_i(x: int, y: int, z: int) -> int:
 
 
 # Pre-computed sine-based constants using the formula T[i] = floor(2^32 * abs(sin(i+1)))
-MD5_T = [
-    int(math.floor((2**32) * abs(math.sin(i + 1)))) & 0xFFFFFFFF for i in range(64)
-]
+MD5_T = [int(math.floor((2**32) * abs(math.sin(i + 1)))) & 0xFFFFFFFF for i in range(64)]
 
 # Rotation amounts for each round
 MD5_S = [
@@ -117,19 +115,12 @@ MD5_S = [
 # But you can re-implement them yourself if you want to practice bit manipulation!
 def bytes_to_int32_le(data: bytes, offset: int) -> int:
     """Convert 4 bytes starting at offset to 32-bit little-endian integer."""
-    return (
-        data[offset]
-        | (data[offset + 1] << 8)
-        | (data[offset + 2] << 16)
-        | (data[offset + 3] << 24)
-    )
+    return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24)
 
 
 def int32_to_bytes_le(value: int) -> bytes:
     """Convert 32-bit integer to 4 bytes in little-endian format."""
-    return bytes(
-        [value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF]
-    )
+    return bytes([value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF])
 
 
 def int64_to_bytes_le(value: int) -> bytes:
@@ -170,13 +161,15 @@ def md5_padding(message: bytes) -> bytes:
     # 4. Convert message length to bits
     # 5. Append bit-length as 64-bit little-endian
     og_len = len(message)
-    message+=b'\x80'
-    while (len(message) % 64 != 56):
-        message+=b'\x00'
+    message += b"\x80"
+    while len(message) % 64 != 56:
+        message += b"\x00"
     # Append original message length as 64-bit little-endian integer
     len_bits = og_len * 8
     message += int64_to_bytes_le(len_bits)
     return message
+
+
 from w1d4_test import test_left_rotate
 from w1d4_test import test_md5_padding_length
 from w1d4_test import test_md5_padding_content
@@ -187,8 +180,11 @@ test_md5_padding_length(md5_padding)
 test_md5_padding_content(md5_padding)
 # %%
 
+
 def mask_32(input: int):
-    return 0x00000000FFFFFFFF & input 
+    return 0x00000000FFFFFFFF & input
+
+
 def md5_process_block(block: bytes, state: List[int]) -> List[int]:
     """
     Process a single 512-bit block with MD5 algorithm.
@@ -237,27 +233,27 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
             k = i
         elif i < 32:
             function = md5_g
-            k = (5*i + 1)%16
+            k = (5 * i + 1) % 16
         elif i < 48:
             function = md5_h
             k = (3 * i + 5) % 16
         else:
             function = md5_i
             k = (7 * i) % 16
-    
-        temp = A + function(B,C,D) + word_arr[k] + MD5_T[i]
+
+        temp = A + function(B, C, D) + word_arr[k] + MD5_T[i]
         temp = mask_32(temp)
         temp = left_rotate(temp, MD5_S[i])
         temp += B
         temp = mask_32(temp)
         A, B, C, D = D, temp, B, C
 
-    #print(f"state before masking {[hex(x) for x in state]}")
+    # print(f"state before masking {[hex(x) for x in state]}")
     state[0] = mask_32(state[0] + A)
     state[1] = mask_32(state[1] + B)
     state[2] = mask_32(state[2] + C)
     state[3] = mask_32(state[3] + D)
-    #print(f"state after masking {[hex(x) for x in state]}")
+    # print(f"state after masking {[hex(x) for x in state]}")
     # for i in range(len(state)):
     #     print(f"type of state[i] {type(state[i])}")
     #     state[i] = state[i] + stae_arr[i]
@@ -266,7 +262,8 @@ def md5_process_block(block: bytes, state: List[int]) -> List[int]:
     #     print(f"type of state[i] {type(state[i])}")
 
     return state
-    
+
+
 # %%
 
 
@@ -291,19 +288,21 @@ def md5_hash(message: bytes) -> bytes:
     #    - concatenate the bytes to get the final hash bytes
     state = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
     padded = md5_padding(message)
-    i = 0 
+    i = 0
     while i < len(padded):
-        block = padded[i:i+64]
+        block = padded[i : i + 64]
         state = md5_process_block(block, state)
         i += 64
 
     byte_array = [int32_to_bytes_le(x) for x in state]
-    return b''.join(byte_array)
+    return b"".join(byte_array)
 
 
 def md5_hex(message: bytes) -> str:
     """Compute MD5 hash and return as hex string."""
     return md5_hash(message).hex()
+
+
 from w1d4_test import test_md5_process_block
 from w1d4_test import test_md5
 
@@ -371,7 +370,6 @@ def naive_mac(message: bytes, secret: bytes) -> bytes:
     return md5_hash(new_message)
 
 
-
 def naive_verify(message: bytes, secret: bytes, tag: bytes) -> bool:
     """
     Verify a message using the naive MAC.
@@ -390,6 +388,8 @@ def naive_verify(message: bytes, secret: bytes, tag: bytes) -> bool:
     if check_tag == tag:
         return True
     return False
+
+
 from w1d4_test import test_naive_mac
 
 
@@ -443,7 +443,7 @@ def length_extension_attack(
     # Step 6: Convert final state back to bytes for the forged tag
     # 1
     dummy_len = secret_length + len(original_message)
-    dummy_data = b'\x80' * dummy_len
+    dummy_data = b"\x80" * dummy_len
     padded_message = md5_padding(dummy_data)
     glue_padding = padded_message[dummy_len:]
 
@@ -456,11 +456,13 @@ def length_extension_attack(
     og_state[3] = bytes_to_int32_le(original_tag, 96)
 
     total_len = secret_length + len(original_message) + len(glue_padding) + len(additional_data)
-    dummy_data = b'\x80' * total_len
+    dummy_data = b"\x80" * total_len
     padded_message = md5_padding(dummy_data)
     final_padding = padded_message[total_len:]
 
-    #...
+    # ...
+
+
 from w1d4_test import test_length_extension_attack
 
 
@@ -469,7 +471,7 @@ test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
 
 # %%
 import random
-from typing import Tuple, List
+from typing import List
 
 
 def _is_probable_prime(n: int, rounds: int = 5) -> bool:
@@ -511,7 +513,6 @@ def get_prime(bits: int, rng: random.Random | None = None) -> int:
             return candidate
 
 
-
 def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     """Generate RSA public and private keys.
 
@@ -534,18 +535,16 @@ def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
         p = get_prime(len_bits, None)
         q = get_prime(len_bits, None)
     n = p * q
-    phi = (p-1) * (q-1)
+    phi = (p - 1) * (q - 1)
     e = 65537
     if phi % e == 0:
         e = 3
         while phi % e == 0:
             e += 2
     d = pow(e, -1, phi)
-    #d = (1/e) % phi
+    # d = (1/e) % phi
     print(f"{((n, e), (n, d))}")
     return ((n, e), (n, d))
-    
-
 
     # TODO: Implement key generation
     #    - Generate p and q (bits//2 each)
@@ -553,7 +552,7 @@ def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     #    - Compute n and φ(n)
     #    - Choose e (check if coprime with φ)
     #    - Compute d using pow(e, -1, phi)
-    
+
 
 from w1d4_test import test_generate_keys
 
@@ -583,7 +582,7 @@ def encrypt_rsa(public_key: Tuple[int, int], message: str) -> List[int]:
     #    - Convert message to bytes with .encode("utf-8")
     #    - Encrypt each byte with pow(byte, e, n)
     #    - Return list of encrypted values
-    n ,e = public_key
+    n, e = public_key
     byte_msg = message.encode("utf-8")
     encrypted_bytes = []
     for i in range(len(byte_msg)):
@@ -617,8 +616,10 @@ def decrypt_rsa(private_key: Tuple[int, int], ciphertext: List[int]) -> str:
     for c in ciphertext:
         dec_byte = (pow(c, d, n)).to_bytes()
         dec_bytes.append(dec_byte)
-    bytes = b''.join(dec_bytes)
+    bytes = b"".join(dec_bytes)
     return bytes.decode("utf-8")
+
+
 # %%
 from w1d4_test import test_encryption
 
@@ -655,7 +656,6 @@ def sign(private_key: Tuple[int, int], message: str) -> List[int]:
         signed_bytes.append(enc_byte)
 
     return signed_bytes
-    
 
 
 def verify(public_key: Tuple[int, int], message: str, signature: List[int]) -> bool:
@@ -682,12 +682,12 @@ def verify(public_key: Tuple[int, int], message: str, signature: List[int]) -> b
     n, e = public_key
     dec_bytes = []
     for s in signature:
-        dec_byte = (pow(s, e, n))
+        dec_byte = pow(s, e, n)
         if dec_byte > 255:
             return False
-        #dec_byte.to_bytes()
+        # dec_byte.to_bytes()
         dec_bytes.append(dec_byte.to_bytes())
-    bytes = b''.join(dec_bytes)
+    bytes = b"".join(dec_bytes)
     checked_str = bytes.decode("utf-8")
     if checked_str == message:
         return True
@@ -698,4 +698,76 @@ from w1d4_test import test_signatures
 
 
 test_signatures(sign, verify, generate_keys)
+# %%
+
+
+def add_pkcs7_padding(plaintext: bytes, block_size: int = 16) -> bytes:
+    """
+    Add PKCS#7 padding to plaintext.
+
+    Args:
+        plaintext: The data to pad
+        block_size: The cipher block size
+
+    Returns:
+        Padded plaintext that is a multiple of block_size
+    """
+    # TODO: Implement PKCS#7 padding according to the spec above
+    padding_length = block_size - (len(plaintext) % block_size)
+    padding = bytes([padding_length] * padding_length)
+    return plaintext + padding
+
+
+from w1d4_test import test_add_pkcs7_padding
+
+
+test_add_pkcs7_padding(add_pkcs7_padding)
+
+
+# %%
+class InvalidPaddingError(Exception):
+    """Raised when PKCS#7 padding is invalid."""
+
+    pass
+
+
+def remove_pkcs7_padding(padded_text: bytes, block_size: int = 16) -> bytes:
+    """
+    Remove and validate PKCS#7 padding.
+
+    Args:
+        padded_text: The padded data
+        block_size: The cipher block size
+
+    Returns:
+        Original plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    # TODO: Implement PKCS#7 unpadding with validation
+    # print(f"padded last byte: {int(padded_text[-1])}")
+    if len(padded_text) == 0:
+        raise InvalidPaddingError
+    if int(padded_text[-1]) < 1 or int(padded_text[-1]) > 16:
+        raise InvalidPaddingError
+    checked_blocks = 0
+    paddedValue = padded_text[-1]
+    if paddedValue > len(padded_text):
+        raise InvalidPaddingError
+    for b in padded_text[::-1]:
+        if int(b) != paddedValue or (checked_blocks + 1 >= len(padded_text)):
+            raise InvalidPaddingError
+        checked_blocks += 1
+        if checked_blocks >= paddedValue:
+            break
+    if padded_text == "":
+        raise InvalidPaddingError
+    return padded_text[: len(padded_text) - checked_blocks]
+
+
+from w1d4_test import test_remove_pkcs7_padding
+
+
+test_remove_pkcs7_padding(remove_pkcs7_padding, InvalidPaddingError)
 # %%
