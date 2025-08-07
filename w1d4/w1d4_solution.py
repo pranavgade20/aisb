@@ -103,7 +103,7 @@ from aisb_utils import report
 """
 ### Exercise 1.1: Implementing MD5
 
-> **Difficulty**: 🔴🔴⚪⚪⚪  
+> **Difficulty**: 🔴🔴⚪⚪⚪
 > **Importance**: 🔵🔵🔵🔵⚪
 
 
@@ -117,7 +117,7 @@ MD5 processes data in 512-bit blocks and produces a 128-bit hash. On a high leve
 3. Processes the message in 512-bit blocks, updating the state after each block
 4. Concatenates the final state bytes to produce the final 128-bit hash.
 
-Processing of each 512-bit block involves updatung the state in 64 rounds. 
+Processing of each 512-bit block involves updatung the state in 64 rounds.
 Each round uses one of four auxiliary functions (F, G, H, I) and follows this pattern:
 ```
 A, B, C, D = D, (B + left_rotate((A + F(B,C,D) + X[k] + T[i]), s)), B, C
@@ -157,9 +157,7 @@ def md5_i(x: int, y: int, z: int) -> int:
 
 
 # Pre-computed sine-based constants using the formula T[i] = floor(2^32 * abs(sin(i+1)))
-MD5_T = [
-    int(math.floor((2**32) * abs(math.sin(i + 1)))) & 0xFFFFFFFF for i in range(64)
-]
+MD5_T = [int(math.floor((2**32) * abs(math.sin(i + 1)))) & 0xFFFFFFFF for i in range(64)]
 
 # Rotation amounts for each round
 MD5_S = [
@@ -235,19 +233,12 @@ MD5_S = [
 # But you can re-implement them yourself if you want to practice bit manipulation!
 def bytes_to_int32_le(data: bytes, offset: int) -> int:
     """Convert 4 bytes starting at offset to 32-bit little-endian integer."""
-    return (
-        data[offset]
-        | (data[offset + 1] << 8)
-        | (data[offset + 2] << 16)
-        | (data[offset + 3] << 24)
-    )
+    return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24)
 
 
 def int32_to_bytes_le(value: int) -> bytes:
     """Convert 32-bit integer to 4 bytes in little-endian format."""
-    return bytes(
-        [value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF]
-    )
+    return bytes([value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF])
 
 
 def int64_to_bytes_le(value: int) -> bytes:
@@ -355,9 +346,7 @@ def test_md5_padding_length(solution: Callable[[bytes], bytes]):
 
     for message, expected_len in test_cases:
         result = solution(message)
-        assert len(result) % 64 == 0, (
-            f"Padded length must be multiple of 64, got {len(result)}"
-        )
+        assert len(result) % 64 == 0, f"Padded length must be multiple of 64, got {len(result)}"
         assert len(result) == expected_len, (
             f"Padding {len(message)} bytes should result in {expected_len} bytes, got {len(result)}"
         )
@@ -372,9 +361,7 @@ def test_md5_padding_content(solution: Callable[[bytes], bytes]):
     ]
     for message, expected in test_cases:
         result = solution(message)
-        assert result == expected, (
-            f"Padding {message:x} = {result:x}, expected {expected:x}"
-        )
+        assert result == expected, f"Padding {message} = {result}, expected {expected}"
 
 
 test_left_rotate(left_rotate)
@@ -542,12 +529,10 @@ def test_md5_process_block(solution: Callable[[bytes, list], list]):
         # Check that all values are 32-bit integers
         for i, val in enumerate(result):
             assert isinstance(val, int), f"State[{i}] should be int, got {type(val)}"
-            assert 0 <= val <= 0xFFFFFFFF, (
-                f"State[{i}] = 0x{val:X} is not a 32-bit value"
-            )
+            assert 0 <= val <= 0xFFFFFFFF, f"State[{i}] = 0x{val} is not a 32-bit value"
 
         assert result == expected, (
-            f"md5_process_block({block}, [{', '.join([f'0x{x:X}' for x in state])}]) = [{', '.join([f'0x{x:X}' for x in result])}], expected [{', '.join([f'0x{x:X}' for x in expected])}]"
+            f"md5_process_block({block}, [{', '.join([f'0x{x}' for x in state])}]) = [{', '.join([f'0x{x}' for x in result])}], expected [{', '.join([f'0x{x}' for x in expected])}]"
         )
 
 
@@ -568,9 +553,7 @@ def test_md5(solution: Callable[[bytes], str]):
 
     for message, expected in test_cases:
         result = solution(message)
-        assert result == expected, (
-            f"MD5({message:x}) = {result:x}, expected {expected:x}"
-        )
+        assert result == expected, f"MD5({message}) = {result}, expected {expected}"
         print(f"✅ md5({message!r}) = {result}")
 
 
@@ -677,7 +660,7 @@ demonstrate_md5_collision()
 """
 #### Real-World Impact
 
-MD5 has been cryptographically broken since 2004. 
+MD5 has been cryptographically broken since 2004.
 Practical exploits are available since 2008 when the first rogue CA certificate was forged by Stevens et al.
 
 MD5-based certificates were universally rejected by browsers and operating systems only by early 2014. The weakness in MD5 was exploited, e.g., by [Flame malware](https://en.wikipedia.org/wiki/Flame_(malware)) (2012), where a nation-state actor used MD5 collisions to forge Microsoft certificates, making the malware appear to be legitimate Microsoft software.
@@ -686,7 +669,7 @@ MD5-based certificates were universally rejected by browsers and operating syste
 
 Because of these vulnerabilities, MD5 should never be used for security purposes. Modern alternatives include:
 - **SHA-256**: Part of SHA-2 family, no known practical attacks
-- **SHA-3**: Different construction from SHA-2, provides additional security margin  
+- **SHA-3**: Different construction from SHA-2, provides additional security margin
 - **BLAKE3**: Modern, fast, and secure hash function
 
 However, MD5 is still acceptable for non-security uses like checksums for data corruption detection.
@@ -700,7 +683,7 @@ In the next exercise, we'll see how hash functions are used to build authenticat
 
 Now that you understand how hash functions work internally, let's explore how they're used to build secure authentication systems. You'll discover why naive approaches fail in this exercise, and build a proper HMAC implementation in the next one.
 
-> **Difficulty**: 🔴🔴⚪⚪⚪  
+> **Difficulty**: 🔴🔴⚪⚪⚪
 > **Importance**: 🔵🔵🔵🔵⚪
 
 **What are Message Authentication Codes?**
@@ -711,7 +694,7 @@ Message authentication codes (MACs) ensure two critical properties:
 
 Unlike encryption, MACs doesn't hide the message content - it just proves the message is authentic and untampered.
 
-[HMAC](https://en.wikipedia.org/wiki/HMAC), or "hashed-based message authentication code", 
+[HMAC](https://en.wikipedia.org/wiki/HMAC), or "hashed-based message authentication code",
 is a type of MAC based on a cryptographic hash function and a secret key.
 
 A piece of data that provides authentication and integrity verification is also known as a *tag* (analogous to a *signature* in asymmetric cryptography).
@@ -734,7 +717,7 @@ HMAC is everywhere in modern security:
 
 - **API Authentication**: Services like AWS use HMAC signatures to authenticate API requests
 - **JWT Tokens**: JSON Web Tokens use HMAC to prevent tampering with claims
-- **Cookie Signing**: Web frameworks use HMAC to detect tampered session cookies  
+- **Cookie Signing**: Web frameworks use HMAC to detect tampered session cookies
 - **Webhook Verification**: GitHub, Stripe, etc. use HMAC to verify webhook authenticity
 """
 # %%
@@ -813,30 +796,18 @@ def test_naive_mac(
     assert tag1 != tag2, "Different messages should produce different MACs"
 
     # Test that verification works for legitimate messages
-    assert naive_verify_func(message1, secret, tag1), (
-        "Should verify correct message/tag pair"
-    )
-    assert naive_verify_func(message2, secret, tag2), (
-        "Should verify correct message/tag pair"
-    )
+    assert naive_verify_func(message1, secret, tag1), "Should verify correct message/tag pair"
+    assert naive_verify_func(message2, secret, tag2), "Should verify correct message/tag pair"
 
     # Test that verification fails for wrong message/tag combinations
-    assert not naive_verify_func(message1, secret, tag2), (
-        "Should reject wrong message/tag pair"
-    )
-    assert not naive_verify_func(message2, secret, tag1), (
-        "Should reject wrong message/tag pair"
-    )
+    assert not naive_verify_func(message1, secret, tag2), "Should reject wrong message/tag pair"
+    assert not naive_verify_func(message2, secret, tag1), "Should reject wrong message/tag pair"
 
     # Test that different secrets produce different MACs
     different_secret = b"different_secret"
     tag_different_secret = naive_mac_func(message1, different_secret)
-    assert tag1 != tag_different_secret, (
-        "Different secrets should produce different MACs"
-    )
-    assert not naive_verify_func(message1, different_secret, tag1), (
-        "Should reject MAC with wrong secret"
-    )
+    assert tag1 != tag_different_secret, "Different secrets should produce different MACs"
+    assert not naive_verify_func(message1, different_secret, tag1), "Should reject MAC with wrong secret"
 
     # Assert concrete values:
     naive_mac_result = naive_mac_func(b"abc", b"s3cr3t")
@@ -852,7 +823,7 @@ test_naive_mac(naive_mac, naive_verify)
 """
 #### Breaking the Naive Approach: Length Extension Attack
 
-The naive approach has a critical flaw: vulnerability to **length extension attacks**. The vulnerability follows from the MD5's Merkle-Damgård construction. 
+The naive approach has a critical flaw: vulnerability to **length extension attacks**. The vulnerability follows from the MD5's Merkle-Damgård construction.
 You'll find the explanation in the following text toggle, but you can also try to figure it out yourself if you want a challenge!
 
 <details>
@@ -920,12 +891,7 @@ def length_extension_attack(
         # Step 4: Continue hashing from the known state
         # We need to process (additional_data || final_padding)
         # The total message being hashed is: secret || original_message || glue_padding || additional_data
-        total_length = (
-            secret_length
-            + len(original_message)
-            + len(glue_padding)
-            + len(additional_data)
-        )
+        total_length = secret_length + len(original_message) + len(glue_padding) + len(additional_data)
 
         # Determine what final padding is needed
         temp_data = b"X" * total_length
@@ -995,9 +961,7 @@ def test_length_extension_attack(
     print()
 
     # Perform length extension attack
-    forged_message, forged_tag = length_extension_attack(
-        original_message, original_tag, len(secret), malicious_data
-    )
+    forged_message, forged_tag = length_extension_attack(original_message, original_tag, len(secret), malicious_data)
 
     print(f"Forged message: {forged_message}")
     print(f"Forged MAC:     {forged_tag.hex()}")
@@ -1008,9 +972,7 @@ def test_length_extension_attack(
     assert is_valid, "Forged MAC should be accepted by naive_verify"
     print(f"Forged MAC validates: 🚨 {is_valid}")
     print("💥 The attacker created a valid MAC without knowing the secret!")
-    print(
-        f"This could let them escalate '{original_message.decode()}' to admin privileges!"
-    )
+    print(f"This could let them escalate '{original_message.decode()}' to admin privileges!")
 
 
 test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
@@ -1019,10 +981,10 @@ test_length_extension_attack(length_extension_attack, naive_mac, naive_verify)
 """
 ### Exercise 1.3: Building proper HMAC implementation
 
-The length extension attack shows why we need a more sophisticated approach. 
+The length extension attack shows why we need a more sophisticated approach.
 We are going to implement HMAC according to RFC 2104 to see how it addresses the problem using a clever construction.
 
-> **Difficulty**: 🔴🔴🔴⚪⚪  
+> **Difficulty**: 🔴🔴🔴⚪⚪
 > **Importance**: 🔵🔵🔵🔵🔵
 
 
@@ -1036,8 +998,8 @@ HMAC(key, message) = Hash(opad ⊕ key || Hash(ipad ⊕ key || message))
 
 Where:
 - `ipad` = 0x36 repeated for block size (inner padding)
-- `opad` = 0x5C repeated for block size (outer padding)  
-- `key` is the secret key normalized to the hash function's block size 
+- `opad` = 0x5C repeated for block size (outer padding)
+- `key` is the secret key normalized to the hash function's block size
 - `⊕` is XOR operation
 - `||` is concatenation
 
@@ -1136,14 +1098,10 @@ def test_hmac_md5(hmac_md5_func: Callable[[bytes, bytes], bytes]):
     # Test that different keys produce different HMACs
     different_key = b"different_key"
     hmac_different_key = hmac_md5_func(different_key, message1)
-    assert hmac1_a != hmac_different_key, (
-        "Different keys should produce different HMACs"
-    )
+    assert hmac1_a != hmac_different_key, "Different keys should produce different HMACs"
 
     # Test that HMAC produces 16-byte output (MD5 hash length)
-    assert len(hmac1_a) == 16, (
-        f"HMAC-MD5 should produce 16-byte output, got {len(hmac1_a)}"
-    )
+    assert len(hmac1_a) == 16, f"HMAC-MD5 should produce 16-byte output, got {len(hmac1_a)}"
 
     # Test with RFC 2202 test vectors
     rfc_test_cases = [
@@ -1173,15 +1131,11 @@ def test_hmac_verify(hmac_verify_func: Callable[[bytes, bytes, bytes], bool]):
 
     # Test that verification fails with wrong key
     wrong_key = b"wrong_key"
-    assert not hmac_verify_func(wrong_key, message, expected_hmac), (
-        "Should reject HMAC with wrong key"
-    )
+    assert not hmac_verify_func(wrong_key, message, expected_hmac), "Should reject HMAC with wrong key"
 
     # Test that verification fails with tampered message
     tampered_message = b"Hello, HMAC verification modified!"
-    assert not hmac_verify_func(key, tampered_message, expected_hmac), (
-        "Should reject HMAC with tampered message"
-    )
+    assert not hmac_verify_func(key, tampered_message, expected_hmac), "Should reject HMAC with tampered message"
 
 
 test_hmac_md5(hmac_md5)
@@ -1228,9 +1182,7 @@ def test_hmac_security(hmac_md5, length_extension_attack, hmac_verify):
 
         # Check if the forged HMAC is valid
         is_valid = hmac_verify(secret, forged_message, forged_tag)
-        print(
-            f"Length extension attack on HMAC: {'FAILED ✅' if not is_valid else 'SUCCEEDED ✗'}"
-        )
+        print(f"Length extension attack on HMAC: {'FAILED ✅' if not is_valid else 'SUCCEEDED ✗'}")
 
     except Exception as e:
         print(f"Length extension attack failed with error: {e}")
@@ -1242,11 +1194,11 @@ test_hmac_security(hmac_md5, length_extension_attack, hmac_verify)
 """
 ### Exercise 1.4: Secure Password Storage
 
-Now that you understand how hash functions work, let's explore one of their most critical applications: storing passwords securely. 
+Now that you understand how hash functions work, let's explore one of their most critical applications: storing passwords securely.
 
-> **Difficulty**: 🔴🔴⚪⚪⚪  
+> **Difficulty**: 🔴🔴⚪⚪⚪
 > **Importance**: 🔵🔵🔵🔵⚪
-> 
+>
 > You should spend up to ~20 minutes on this exercise.
 
 Password storage is a fundamental security challenge that every application faces. Poor password storage has led to massive breaches affecting millions of users:
@@ -1318,7 +1270,7 @@ Open [hash-crack-cost.html](./resources/hash-crack-cost.html) in your browser an
 
 With unsalted or static salt hashes, an attacker can test each password guess against ALL hashes simultaneously. For example, computing MD5("password123") once tells you if ANY of the 1000 users has that password.
 
-With per-user salts, each password must be attacked individually. 
+With per-user salts, each password must be attacked individually.
 
 The values for unsalted and static salt options is the same because we are assuming a brute-force attack. The values would be different if we assumed a rainbow table attack.
 </details>
@@ -1342,7 +1294,7 @@ SHA-256 is not safe for hashing passwords primarily because of the vastly differ
 
 In asymmetric cryptography, SHA-256 typically hashes large, high-entropy inputs such as public keys, digital messages, or file contents. These inputs are often unpredictable and infeasible to brute-force. The role of the hash function here is to ensure integrity and collision resistance, which SHA-256 provides effectively.
 
-However, in the context of password hashing, the inputs (i.e., passwords) are usually short, low-entropy, and highly guessable. 
+However, in the context of password hashing, the inputs (i.e., passwords) are usually short, low-entropy, and highly guessable.
 </details>
 """
 
@@ -1400,7 +1352,7 @@ These functions are provided for you to use in your implementation - just copy t
 """
 
 import random
-from typing import Tuple, List
+from typing import List
 
 
 def _is_probable_prime(n: int, rounds: int = 5) -> bool:
@@ -1446,9 +1398,9 @@ def get_prime(bits: int, rng: random.Random | None = None) -> int:
 """
 ### Exercise 2.1: RSA Key Generation
 
-> **Difficulty**: 🔴🔴🔴⚪⚪  
+> **Difficulty**: 🔴🔴🔴⚪⚪
 > **Importance**: 🔵🔵🔵🔵🔵
-> 
+>
 > You should spend up to ~20 minutes on this exercise.
 
 Now we'll generate RSA key pairs. The process is:
@@ -1562,9 +1514,9 @@ test_generate_keys(generate_keys)
 """
 ### Exercise 2.2: RSA Encryption and Decryption
 
-> **Difficulty**: 🔴🔴⚪⚪⚪  
+> **Difficulty**: 🔴🔴⚪⚪⚪
 > **Importance**: 🔵🔵🔵🔵⚪
-> 
+>
 > You should spend up to ~15 minutes on this exercise.
 
 RSA encryption and decryption use modular exponentiation:
@@ -1724,9 +1676,9 @@ test_encryption(encrypt_rsa, decrypt_rsa, generate_keys)
 """
 ### Exercise 2.3: RSA Digital Signatures
 
-> **Difficulty**: 🔴🔴🔴⚪⚪  
+> **Difficulty**: 🔴🔴🔴⚪⚪
 > **Importance**: 🔵🔵🔵🔵⚪
-> 
+>
 > You should spend up to ~20 minutes on this exercise.
 
 RSA can also create digital signatures. The operations are "reversed" compared to encryption:
@@ -1911,13 +1863,13 @@ test_signatures(sign, verify, generate_keys)
 - **Why this matters**: Attackers can perform frequency analysis on encrypted communications, build dictionaries of common encrypted values (e.g., "Yes"→ciphertext₁, "No"→ciphertext₂), and recognize patterns in encrypted data
 - **Mitigations**: RSA-OAEP adds randomized padding before encryption, ensuring the same message encrypts to different ciphertexts each time, providing semantic security
 
-**2. Malleability** 
+**2. Malleability**
 - **Vulnerability**: RSA is multiplicatively homomorphic: E(m₁) × E(m₂) = E(m₁ × m₂)
 - **Why this matters**: Attackers can manipulate encrypted values without decrypting them - multiply a salary by E(2) to double it, or multiply by E(0) to zero it out, all while maintaining valid encryption
 - **Mitigations**: RSA-OAEP includes integrity checks and structured padding that makes malleated ciphertexts decrypt to invalid padding, preventing manipulation attacks
 
 **3. Small Message Space**
-- **Vulnerability**: Single bytes have only 256 possible values  
+- **Vulnerability**: Single bytes have only 256 possible values
 - **Why this matters**: Attackers can pre-compute encryptions of all possible byte values, then instantly "decrypt" any ciphertext by table lookup - no key needed
 - **Mitigations**: RSA-OAEP's randomized padding exponentially expands the effective message space, making brute force computationally infeasible
 
@@ -1935,7 +1887,7 @@ test_signatures(sign, verify, generate_keys)
 
 **RSA-OAEP for Encryption**: Provides semantic security, prevents chosen ciphertext attacks, includes integrity verification
 
-**RSA-PSS for Signatures**: Signs message hashes (not raw messages), adds randomized salt for security, provides strong unforgeability guarantees, much more efficient for long messages  
+**RSA-PSS for Signatures**: Signs message hashes (not raw messages), adds randomized salt for security, provides strong unforgeability guarantees, much more efficient for long messages
 
 **Side-Channel Protection**: Constant-time operations prevent timing attacks, blinding prevents power analysis, secure random number generation, protection against fault injection attacks
 
@@ -1946,7 +1898,7 @@ test_signatures(sign, verify, generate_keys)
 ## 3️⃣ Padding Oracle Attacks
 Now you'll implement one of the most elegant attacks in cryptography: the padding oracle attack. This attack demonstrates how a tiny information leak (whether padding is valid) can completely compromise encryption.
 
-It has been used to break popular frameworks and protocols. E.g., this attack was used to completely break ASP.NET's authentication cookies in 2010, allowing attackers to forge admin credentials. 
+It has been used to break popular frameworks and protocols. E.g., this attack was used to completely break ASP.NET's authentication cookies in 2010, allowing attackers to forge admin credentials.
 In 2015, the POODLE attack prompted final replacement of SSL with TLS.
 
 ### Why Learn about Padding Oracles Attacks?
@@ -1964,9 +1916,9 @@ Understanding this attack helps you **recognize similar vulnerabilities in AI sy
 <details>
 <summary>Vocabulary: Padding Oracle Terms</summary>
 
-- **Oracle**: A system that answers queries about secret information through observable differences in behavior (e.g., timing, error messages, etc.), without directly revealing the secret itself. 
+- **Oracle**: A system that answers queries about secret information through observable differences in behavior (e.g., timing, error messages, etc.), without directly revealing the secret itself.
 - **Ciphertext**: The encrypted data produced by an encryption algorithm.
-- **CBC Mode** (Cipher Block Chaining): Block cipher mode where each plaintext block is XORed with the previous ciphertext block before encryption, creating a dependency chain. 
+- **CBC Mode** (Cipher Block Chaining): Block cipher mode where each plaintext block is XORed with the previous ciphertext block before encryption, creating a dependency chain.
 - **Initialization Vector (IV)**: A random value used to initialize the first block of ciphertext in CBC mode (i.e., the first block of ciphertext is XORed with the IV).
 - **Side channel**: An unintended communication channel that leaks information through observable physical or behavioral characteristics of a system's implementation (e.g., time, power consumption, cache behavior, error messages,...)
 
@@ -2037,9 +1989,7 @@ def test_add_pkcs7_padding(add_pkcs7_padding_func):
 
     # Test 3: Input exactly one block
     result = add_pkcs7_padding_func(b"YELLOW SUBMARINE")
-    assert result == b"YELLOW SUBMARINE" + b"\x10" * 16, (
-        f"Full block failed: {result.hex()}"
-    )
+    assert result == b"YELLOW SUBMARINE" + b"\x10" * 16, f"Full block failed: {result.hex()}"
 
     # Test 4: Multi-block input
     result = add_pkcs7_padding_func(b"A" * 17)
@@ -2117,17 +2067,13 @@ def test_remove_pkcs7_padding(remove_pkcs7_padding_func, InvalidPaddingError):
     # Test 2: Valid full-block padding
     ciphertext = b"YELLOW SUBMARINE" + b"\x10" * 16
     result = remove_pkcs7_padding_func(ciphertext)
-    assert result == b"YELLOW SUBMARINE", (
-        f"Removing padding from {ciphertext} failed: {result}"
-    )
+    assert result == b"YELLOW SUBMARINE", f"Removing padding from {ciphertext} failed: {result}"
 
     # Test 3: Invalid padding length
     try:
         ciphertext = b"HELLO" + b"\x00" * 11
         remove_pkcs7_padding_func(ciphertext)
-        assert False, (
-            f"Removing padding from {ciphertext} should have raised InvalidPaddingError for zero padding"
-        )
+        assert False, f"Removing padding from {ciphertext} should have raised InvalidPaddingError for zero padding"
     except InvalidPaddingError:
         pass
 
@@ -2148,7 +2094,7 @@ def test_remove_pkcs7_padding(remove_pkcs7_padding_func, InvalidPaddingError):
         assert False, (
             f"Removing padding from {ciphertext} should have raised InvalidPaddingError for padding length exceeding data length"
         )
-    except InvalidPaddingError as e:
+    except InvalidPaddingError:
         pass
 
     # Test 6: Empty input
@@ -2174,7 +2120,7 @@ Now let's implement CBC (Cipher Block Chaining) mode encryption and decryption. 
 
 The formula for encryption and decryption (assuming AES as the underlying block cipher) are:
 
-- **Encryption:** `C[i] = AES(P[i] ⊕ C[i-1])` 
+- **Encryption:** `C[i] = AES(P[i] ⊕ C[i-1])`
 
 - **Decryption:** `P[i] = AES_decrypt(C[i]) ⊕ C[i-1]`
 
@@ -2254,16 +2200,12 @@ def test_cbc_encrypt(cbc_encrypt_func):
     # Test 1: Single block
     plaintext = b"HELLO WORLD!!!!!"  # 16 bytes
     ciphertext = cbc_encrypt_func(plaintext, key, iv)
-    assert len(ciphertext) == 32, (
-        f"Wrong length of ciphertext for plaintext {plaintext}: {len(ciphertext)}"
-    )
+    assert len(ciphertext) == 32, f"Wrong length of ciphertext for plaintext {plaintext}: {len(ciphertext)}"
 
     # Test: Block length not aligned with block size
     plaintext = b"HELLO WORLD"  # 11 bytes
     ciphertext = cbc_encrypt_func(plaintext, key, iv)
-    assert len(ciphertext) == 16, (
-        f"Wrong length of ciphertext for plaintext {plaintext}: {len(ciphertext)}"
-    )
+    assert len(ciphertext) == 16, f"Wrong length of ciphertext for plaintext {plaintext}: {len(ciphertext)}"
 
     # Test 2: Multiple blocks
     plaintext = b"A" * 33
@@ -2277,9 +2219,7 @@ def test_cbc_encrypt(cbc_encrypt_func):
     # In CBC, they should differ due to chaining
     block1 = ciphertext[:16]
     block2 = ciphertext[16:32]
-    assert block1 != block2, (
-        "Different blocks should produce different ciphertext (input: {plaintext})"
-    )
+    assert block1 != block2, "Different blocks should produce different ciphertext (input: {plaintext})"
 
 
 test_cbc_encrypt(cbc_encrypt)
@@ -2341,9 +2281,7 @@ def test_cbc_decrypt(cbc_decrypt_func, cbc_encrypt_func, InvalidPaddingError):
 
     # Test 1: Known ciphertext
     # First create a properly encrypted message
-    cipher = AES.new(
-        key, AES.MODE_CBC, iv
-    )  # test this with a library implementation of CBC
+    cipher = AES.new(key, AES.MODE_CBC, iv)  # test this with a library implementation of CBC
     plaintext = b"HELLO WORLD!"
     padded = plaintext + b"\x04" * 4  # Proper padding
     ciphertext = cipher.encrypt(padded)
@@ -2355,21 +2293,15 @@ def test_cbc_decrypt(cbc_decrypt_func, cbc_encrypt_func, InvalidPaddingError):
     bad_ciphertext = ciphertext[:-1] + b"\x00"  # Corrupt last byte
     try:
         cbc_decrypt_func(bad_ciphertext, key, iv)
-        assert False, (
-            "Should have raised InvalidPaddingError for ciphertext {bad_ciphertext}"
-        )
+        assert False, "Should have raised InvalidPaddingError for ciphertext {bad_ciphertext}"
     except InvalidPaddingError:
         pass
 
     # Test 3: Ciphertext not aligned with 16-byte blocks should raise error
-    misaligned_ciphertext = ciphertext[
-        :-5
-    ]  # Remove 5 bytes to make it not divisible by 16
+    misaligned_ciphertext = ciphertext[:-5]  # Remove 5 bytes to make it not divisible by 16
     try:
         cbc_decrypt_func(misaligned_ciphertext, key, iv)
-        assert False, (
-            "Should have raised a padding error for misaligned ciphertext {misaligned_ciphertext}"
-        )
+        assert False, "Should have raised a padding error for misaligned ciphertext {misaligned_ciphertext}"
     except Exception:
         pass  # Any exception is acceptable for misaligned input
 
@@ -2444,9 +2376,7 @@ class VulnerableServer:
             # - Don't forget to include the IV in the returned value so that you can decrypt it later!
             pass
 
-    def decrypt_cookie(
-        self, cookie: bytes
-    ) -> Tuple[Literal[False], str] | Tuple[Literal[True], dict[str, str]]:
+    def decrypt_cookie(self, cookie: bytes) -> Tuple[Literal[False], str] | Tuple[Literal[True], dict[str, str]]:
         """
         Decrypt and validate a cookie.
 
@@ -2494,9 +2424,7 @@ def test_vulnerable_server(VulnerableServer, cbc_encrypt):
 
     success, result = server.decrypt_cookie(cookie)
     assert success is True, f"Valid cookie should decrypt successfully, got {result}"
-    assert result == cookie_data, (
-        f"Decrypted cookie should match original: got {result}, expected {cookie_data}"
-    )
+    assert result == cookie_data, f"Decrypted cookie should match original: got {result}, expected {cookie_data}"
 
     # Test 2: Invalid padding oracle
     bad_cookie = cookie[:-1] + bytes([(cookie[-1] ^ 1)])  # Flip last bit
@@ -2548,7 +2476,7 @@ If the IV is predictable (e.g., a counter, timestamp, or fixed value), it enable
 1. Predict the next IV to be used
 2. Influence some part of the plaintext being encrypted
 
-Can learn information about other parts of the plaintext. 
+Can learn information about other parts of the plaintext.
 
 **Real-world example**: The BEAST attack (2011) exploited predictable IVs in TLS 1.0. In TLS 1.0, the IV for record n+1 was the last ciphertext block of record n, making it predictable. Attackers could:
 - Inject chosen plaintexts into the victim's TLS stream (e.g., via JavaScript)
@@ -2591,20 +2519,20 @@ Now for the main event! The padding oracle attack works by:
 That was a high-level overview. Let's dive into the details.
 
 #### Attacking a single block
-Let's start with a simplified situation where the message length is less than a single block. 
+Let's start with a simplified situation where the message length is less than a single block.
 We assume we have the ciphertext, which is (for the one-block case):
 
 ```
 IV || C[0]` = `IV || AES(P[0] ⊕ IV)
 ```
 
-(`||` denotes concatenation.) Our goal is to recover the plaintext `P[0] = AES_decrypt(C[0]) ⊕ IV`. Let's denote `intermediary = AES_decrypt(C[0])` to make this 
+(`||` denotes concatenation.) Our goal is to recover the plaintext `P[0] = AES_decrypt(C[0]) ⊕ IV`. Let's denote `intermediary = AES_decrypt(C[0])` to make this
 
 ```
 P[0] = AES_decrypt(C[0]) ⊕ IV = intermediary ⊕ IV
 ```
 
-We also assume we can query the oracle with arbitrary input - specifically, we can change the IV part of the ciphertext. 
+We also assume we can query the oracle with arbitrary input - specifically, we can change the IV part of the ciphertext.
 Let's start with IV equal to all zeroes and query the oracle (assuming block size of 8 for simplicity):
 
 <table style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 12px; margin: 20px;">
@@ -2828,7 +2756,7 @@ However, we can increase the value of IV by one and try again, until we succeed 
         </tr>
 </table>
 
-This gives us signal that the last byte of the plaintext for given IV is 0x01.  
+This gives us signal that the last byte of the plaintext for given IV is 0x01.
 Recall that that `P[0] = intermediary ⊕ IV`. Together, this gives us the last byte of intermediary (`intermediary = P[0] ⊕ IV`): 0x01 ⊕ 0x31 = 0x30.
 
 **Now that we've decrypted the last byte of the sample block to be 0x30**, we can move on to the second last byte.
@@ -2956,15 +2884,15 @@ P[0] = intermediary[0] ⊕ IV
 ```
 
 #### Attacking multiple blocks
-Extending the attack to work with longer messages is straightforward. Consider a ciphertext with multiple blocks: 
+Extending the attack to work with longer messages is straightforward. Consider a ciphertext with multiple blocks:
 
 ```
 IV || C[0] || C[1] || C[2] || ... || C[n]
 ```
 
-We start decryption of the last block C[n]. Since `P[n] = AES_decrypt(C[n]) ⊕ C[n-1]`, we can manipulate C[n-1] the same way we manipulated IV above. 
+We start decryption of the last block C[n]. Since `P[n] = AES_decrypt(C[n]) ⊕ C[n-1]`, we can manipulate C[n-1] the same way we manipulated IV above.
 
-After we recover the intermediary value `AES_decrypt(C[n])` by manipulating C[n-1], we continue to recover the intermediary value `AES_decrypt(C[n-1])` by manipulating C[n-2], and so on, until we recover `AES_decrypt(C[0])` by manipulating the prepended IV.  
+After we recover the intermediary value `AES_decrypt(C[n])` by manipulating C[n-1], we continue to recover the intermediary value `AES_decrypt(C[n-1])` by manipulating C[n-2], and so on, until we recover `AES_decrypt(C[0])` by manipulating the prepended IV.
 
 The beauty of this attack is that it scales efficiently - a 1KB message encrypted with AES-128 (16-byte blocks) would have ~64 blocks, requiring at most 256 * 16 * 8 = 262,144 oracle queries to completely decrypt, which is entirely feasible for an attacker. In practice, it's even less due to statistical optimizations.
 
@@ -2996,9 +2924,7 @@ Apply the explanation above to implement the `padding_oracle_attack_block()` fun
 
 
 # %%
-def padding_oracle_attack_block(
-    oracle: Callable[[bytes], bool], iv: bytes, block: bytes
-) -> bytes:
+def padding_oracle_attack_block(oracle: Callable[[bytes], bool], iv: bytes, block: bytes) -> bytes:
     """
     Decrypt a single 16-byte ciphertext block using a padding oracle.
 
@@ -3042,9 +2968,7 @@ def padding_oracle_attack_block(
                     break
 
             if not found:
-                raise ValueError(
-                    f"Failed to find valid padding for position {position}"
-                )
+                raise ValueError(f"Failed to find valid padding for position {position}")
 
         # Recover plaintext by XORing intermediate with original IV
         return bytes(x ^ y for x, y in zip(intermediate, iv))
@@ -3103,9 +3027,7 @@ def test_padding_oracle_attack_block(
 
     # Encrypt with random-ish IV
     iv = b"\x01\xf0\x00\x03\x02\x30\x04\x50\x06\x70\x08\x09\x10\x11\x23\x48"
-    cipher = AES.new(
-        secret_key, AES.MODE_CBC, iv
-    )  # test this with a library implementation of CBC
+    cipher = AES.new(secret_key, AES.MODE_CBC, iv)  # test this with a library implementation of CBC
     ciphertext = cipher.encrypt(padded_plaintext)
 
     # Run attack
@@ -3215,9 +3137,7 @@ def test_padding_oracle_attack(
     oracle_func = oracle_func or t_oracle
     recovered = padding_oracle_attack_func(oracle_func, ciphertext)
     print(f"Recovered plaintext in {oracle_call_count} oracle calls:", recovered)
-    assert recovered == original, (
-        f"Failed to recover original ({original!r}): {recovered!r}"
-    )
+    assert recovered == original, f"Failed to recover original ({original!r}): {recovered!r}"
 
 
 test_padding_oracle_attack(padding_oracle_attack, cbc_encrypt)
@@ -3228,7 +3148,7 @@ test_padding_oracle_attack(padding_oracle_attack, cbc_encrypt)
 
 ### Exercise 5: Combining Techniques to Break SSL - The POODLE Attack
 
-Congratulations! You've implemented one of the most elegant attacks in cryptography. 
+Congratulations! You've implemented one of the most elegant attacks in cryptography.
 
 Now that you've implemented a padding oracle attack, let's explore how one such attach was discovered to break SSL 3.0, affecting millions of web users worldwide, and triggering the end of SSLv3 support in browsers and servers.
 
@@ -3239,7 +3159,7 @@ In October 2014, Google researchers published details of POODLE - a devastating 
 POODLE worked by combining three techniques:
 
 1. **Downgrade Attack**: Force browsers to use SSL 3.0 instead of TLS
-2. **JavaScript Injection**: Make victim's browser send chosen requests  
+2. **JavaScript Injection**: Make victim's browser send chosen requests
 3. **Padding Oracle**: Use the SSL 3.0 padding weakness to decrypt byte-by-byte
 
 As long as the attacker had control over the network connection (Man-in-the-Middle, MitM) and could run JavaScript in the victim's browser, they could potentially decrypt parts of encrypted requests, e.g., authentication cookies for sites like Google, or banking sites.
@@ -3252,7 +3172,7 @@ _These assumptions are not far-fetched_:
 
 
 #### POODLE: Padding Oracle part
-The padding oracle attack is slightly different than the one you implemented above. SSL allows arbitrary values in padding, considering only the last one. 
+The padding oracle attack is slightly different than the one you implemented above. SSL allows arbitrary values in padding, considering only the last one.
 
 The attacker can manipulate the request length to ensure full padding (16 bytes) is used. The server should then accept only a request which deciphers to 0x10 (16) in the last byte (ignoring the rest), and fail otherwise.
 
@@ -3267,13 +3187,13 @@ All of this is possible with our assumption that the attacker can run JavaScript
 POST /path HTTP/1.1
 Cookie: name=value
 
-body 
+body
 ```
 
 The attacker can change the position of the cookie value, e.g., by changing the request path length. For example, by varying the URL path length (`/a` vs `/aaaaaaaaaa`), the attacker shifts where the cookie appears within the encrypted SSL blocks.
 
 #### POODLE: Downgrade Attack part
-The attack relies on the padding used in SSL 3.0. At the time of discovery, TLS 1.0 and 1.1 were already widely used, but many servers still supported SSL 3.0 for compatibility with older clients. 
+The attack relies on the padding used in SSL 3.0. At the time of discovery, TLS 1.0 and 1.1 were already widely used, but many servers still supported SSL 3.0 for compatibility with older clients.
 
 Clients would normally attempt to use the latest TLS version first, but many implement a protocol downgrade dance to work around server-side interoperability bugs. Unlike proper protocol version negotiation, this downgrade can be triggered by connection drops. An attacker that controls the network can interfere with any attempted handshake offering TLS 1.0 or later, forcing clients to fall back on SSL:
 
@@ -3297,7 +3217,7 @@ Attacker: 😈
 
 The POODLE attack is a great demonstration of how vulnerabilities arise in practice.
 
-- **Weaknesses combine**: POODLE combined a protocol downgrade, a padding oracle, and JavaScript injection. Each of these alone might not be critical, but together they created a devastating attack. This pattern is very common in security. 
+- **Weaknesses combine**: POODLE combined a protocol downgrade, a padding oracle, and JavaScript injection. Each of these alone might not be critical, but together they created a devastating attack. This pattern is very common in security.
 - **Protocol design is hard**: SSL 3.0 was designed by security experts and state-of-the-art when introduced, yet the underspecified part caused an exploitable weakness. It's also a reminder of the well-known mantra "Don't roll your own crypto".
 - **Yesterday's compatibility is tomorrow's vulnerability**: Things get obsolete over time and new weaknesses are discovered (the vulnerability persisted for **15 years** after TLS 1.0 was standardized!). Supporting legacy systems increases the complexity and attack surface. Whenever possible, kill legacy protocols/systems completely - don't just prefer modern versions, actively reject old ones.
 - **Implementation details matter**: Although the TLS protocol was designed to be more secure, security researchers later discovered that many TLS implementations (especially in network hardware) used SSLv3's padding verification code. When you implement a security protocol, validate everything and follow all the details of the specification, they are  there for a reason.
@@ -3372,7 +3292,7 @@ Always authenticate ciphertext, not plaintext. Verify MAC before attempting decr
 
 If possible, use AEAD (Authenticated Encryption with Associated Data) metods instead of CBC even with encrypt-then-MAC.
 
-Traditional encrypt-then-MAC APIs make the caller juggle two primitives and often get the order wrong. 
+Traditional encrypt-then-MAC APIs make the caller juggle two primitives and often get the order wrong.
 AEAD wraps both confidentiality and authenticity into one primitive: a single call encrypts and produces a tag; a single call decrypts and verifies the tag.
 
 **Give attackers nothing to measure**
@@ -3407,14 +3327,14 @@ Congratulations! You've implemented fundamental cryptographic primitives and dis
    - Small implementation errors can completely break security (one of the reasons for the **don't roll your own crypto** mantra)
    - Even "simple" operations like padding require careful validation
 
-2. **Naive Approaches Fail Spectacularly** 
+2. **Naive Approaches Fail Spectacularly**
    - Hash(secret||message) seems secure but enables length extension attacks
    - Textbook RSA without padding is completely broken
    - Information leaks as small as "padding valid/invalid" break encryption
 
 3. **Implementation Details Matter Enormously**
    - Timing differences leak information (side channels)
-   - Error messages must be identical for all failure cases  
+   - Error messages must be identical for all failure cases
    - Random number generation is critical for security
 
 4. **Real-World Attacks Combine Multiple Techniques**

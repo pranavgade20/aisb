@@ -1,6 +1,7 @@
 # Allow imports from parent directory
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from typing import List
@@ -16,8 +17,6 @@ import json
 from Crypto.Cipher import AES
 from aisb_utils import report
 import random
-from typing import Tuple, List
-
 
 
 @report
@@ -54,8 +53,6 @@ def test_left_rotate(solution: Callable[[int, int], int]):
         )
 
 
-
-
 @report
 def test_md5_padding_length(solution: Callable[[bytes], bytes]):
     """Test MD5 padding implementation with basic cases."""
@@ -71,14 +68,10 @@ def test_md5_padding_length(solution: Callable[[bytes], bytes]):
 
     for message, expected_len in test_cases:
         result = solution(message)
-        assert len(result) % 64 == 0, (
-            f"Padded length must be multiple of 64, got {len(result)}"
-        )
+        assert len(result) % 64 == 0, f"Padded length must be multiple of 64, got {len(result)}"
         assert len(result) == expected_len, (
             f"Padding {len(message)} bytes should result in {expected_len} bytes, got {len(result)}"
         )
-
-
 
 
 @report
@@ -90,11 +83,7 @@ def test_md5_padding_content(solution: Callable[[bytes], bytes]):
     ]
     for message, expected in test_cases:
         result = solution(message)
-        assert result == expected, (
-            f"Padding {message:x} = {result:x}, expected {expected:x}"
-        )
-
-
+        assert result == expected, f"Padding {message} = {result}, expected {expected}"
 
 
 @report
@@ -127,15 +116,11 @@ def test_md5_process_block(solution: Callable[[bytes, list], list]):
         # Check that all values are 32-bit integers
         for i, val in enumerate(result):
             assert isinstance(val, int), f"State[{i}] should be int, got {type(val)}"
-            assert 0 <= val <= 0xFFFFFFFF, (
-                f"State[{i}] = 0x{val:X} is not a 32-bit value"
-            )
+            assert 0 <= val <= 0xFFFFFFFF, f"State[{i}] = 0x{val} is not a 32-bit value"
 
         assert result == expected, (
-            f"md5_process_block({block}, [{', '.join([f'0x{x:X}' for x in state])}]) = [{', '.join([f'0x{x:X}' for x in result])}], expected [{', '.join([f'0x{x:X}' for x in expected])}]"
+            f"md5_process_block({block}, [{', '.join([f'0x{x}' for x in state])}]) = [{', '.join([f'0x{x}' for x in result])}], expected [{', '.join([f'0x{x}' for x in expected])}]"
         )
-
-
 
 
 @report
@@ -155,12 +140,8 @@ def test_md5(solution: Callable[[bytes], str]):
 
     for message, expected in test_cases:
         result = solution(message)
-        assert result == expected, (
-            f"MD5({message:x}) = {result:x}, expected {expected:x}"
-        )
+        assert result == expected, f"MD5({message}) = {result}, expected {expected}"
         print(f"✅ md5({message!r}) = {result}")
-
-
 
 
 @report
@@ -188,30 +169,18 @@ def test_naive_mac(
     assert tag1 != tag2, "Different messages should produce different MACs"
 
     # Test that verification works for legitimate messages
-    assert naive_verify_func(message1, secret, tag1), (
-        "Should verify correct message/tag pair"
-    )
-    assert naive_verify_func(message2, secret, tag2), (
-        "Should verify correct message/tag pair"
-    )
+    assert naive_verify_func(message1, secret, tag1), "Should verify correct message/tag pair"
+    assert naive_verify_func(message2, secret, tag2), "Should verify correct message/tag pair"
 
     # Test that verification fails for wrong message/tag combinations
-    assert not naive_verify_func(message1, secret, tag2), (
-        "Should reject wrong message/tag pair"
-    )
-    assert not naive_verify_func(message2, secret, tag1), (
-        "Should reject wrong message/tag pair"
-    )
+    assert not naive_verify_func(message1, secret, tag2), "Should reject wrong message/tag pair"
+    assert not naive_verify_func(message2, secret, tag1), "Should reject wrong message/tag pair"
 
     # Test that different secrets produce different MACs
     different_secret = b"different_secret"
     tag_different_secret = naive_mac_func(message1, different_secret)
-    assert tag1 != tag_different_secret, (
-        "Different secrets should produce different MACs"
-    )
-    assert not naive_verify_func(message1, different_secret, tag1), (
-        "Should reject MAC with wrong secret"
-    )
+    assert tag1 != tag_different_secret, "Different secrets should produce different MACs"
+    assert not naive_verify_func(message1, different_secret, tag1), "Should reject MAC with wrong secret"
 
     # Assert concrete values:
     naive_mac_result = naive_mac_func(b"abc", b"s3cr3t")
@@ -219,8 +188,6 @@ def test_naive_mac(
     assert naive_mac_result == naive_mac_expected, (
         f"naive_mac('abc', 's3cr3t') = {naive_mac_result.hex()}, expected {naive_mac_expected.hex()}"
     )
-
-
 
 
 @report
@@ -244,9 +211,7 @@ def test_length_extension_attack(
     print()
 
     # Perform length extension attack
-    forged_message, forged_tag = length_extension_attack(
-        original_message, original_tag, len(secret), malicious_data
-    )
+    forged_message, forged_tag = length_extension_attack(original_message, original_tag, len(secret), malicious_data)
 
     print(f"Forged message: {forged_message}")
     print(f"Forged MAC:     {forged_tag.hex()}")
@@ -257,11 +222,7 @@ def test_length_extension_attack(
     assert is_valid, "Forged MAC should be accepted by naive_verify"
     print(f"Forged MAC validates: 🚨 {is_valid}")
     print("💥 The attacker created a valid MAC without knowing the secret!")
-    print(
-        f"This could let them escalate '{original_message.decode()}' to admin privileges!"
-    )
-
-
+    print(f"This could let them escalate '{original_message.decode()}' to admin privileges!")
 
 
 @report
@@ -285,14 +246,10 @@ def test_hmac_md5(hmac_md5_func: Callable[[bytes, bytes], bytes]):
     # Test that different keys produce different HMACs
     different_key = b"different_key"
     hmac_different_key = hmac_md5_func(different_key, message1)
-    assert hmac1_a != hmac_different_key, (
-        "Different keys should produce different HMACs"
-    )
+    assert hmac1_a != hmac_different_key, "Different keys should produce different HMACs"
 
     # Test that HMAC produces 16-byte output (MD5 hash length)
-    assert len(hmac1_a) == 16, (
-        f"HMAC-MD5 should produce 16-byte output, got {len(hmac1_a)}"
-    )
+    assert len(hmac1_a) == 16, f"HMAC-MD5 should produce 16-byte output, got {len(hmac1_a)}"
 
     # Test with RFC 2202 test vectors
     rfc_test_cases = [
@@ -310,8 +267,6 @@ def test_hmac_md5(hmac_md5_func: Callable[[bytes, bytes], bytes]):
         )
 
 
-
-
 @report
 def test_hmac_verify(hmac_verify_func: Callable[[bytes, bytes, bytes], bool]):
     """Test HMAC verification function using Python's built-in hmac implementation as reference."""
@@ -324,17 +279,11 @@ def test_hmac_verify(hmac_verify_func: Callable[[bytes, bytes, bytes], bool]):
 
     # Test that verification fails with wrong key
     wrong_key = b"wrong_key"
-    assert not hmac_verify_func(wrong_key, message, expected_hmac), (
-        "Should reject HMAC with wrong key"
-    )
+    assert not hmac_verify_func(wrong_key, message, expected_hmac), "Should reject HMAC with wrong key"
 
     # Test that verification fails with tampered message
     tampered_message = b"Hello, HMAC verification modified!"
-    assert not hmac_verify_func(key, tampered_message, expected_hmac), (
-        "Should reject HMAC with tampered message"
-    )
-
-
+    assert not hmac_verify_func(key, tampered_message, expected_hmac), "Should reject HMAC with tampered message"
 
 
 @report
@@ -370,14 +319,10 @@ def test_hmac_security(hmac_md5, length_extension_attack, hmac_verify):
 
         # Check if the forged HMAC is valid
         is_valid = hmac_verify(secret, forged_message, forged_tag)
-        print(
-            f"Length extension attack on HMAC: {'FAILED ✅' if not is_valid else 'SUCCEEDED ✗'}"
-        )
+        print(f"Length extension attack on HMAC: {'FAILED ✅' if not is_valid else 'SUCCEEDED ✗'}")
 
     except Exception as e:
         print(f"Length extension attack failed with error: {e}")
-
-
 
 
 @report
@@ -413,8 +358,6 @@ def test_generate_keys(generate_keys):
     assert n_big.bit_length() >= 31, "32-bit key should have ~32-bit modulus"
 
     print("✓ Key generation tests passed!\n" + "=" * 60)
-
-
 
 
 @report
@@ -458,8 +401,6 @@ def test_encryption(encrypt, decrypt, generate_keys):
         pass  # Decryption with wrong key may fail
 
     print("✓ Encryption/decryption tests passed!\n" + "=" * 60)
-
-
 
 
 @report
@@ -506,8 +447,6 @@ def test_signatures(sign, verify, generate_keys):
     print("✓ All signature tests passed!\n" + "=" * 60)
 
 
-
-
 @report
 def test_add_pkcs7_padding(add_pkcs7_padding_func):
     # Test 1: Empty input
@@ -520,15 +459,11 @@ def test_add_pkcs7_padding(add_pkcs7_padding_func):
 
     # Test 3: Input exactly one block
     result = add_pkcs7_padding_func(b"YELLOW SUBMARINE")
-    assert result == b"YELLOW SUBMARINE" + b"\x10" * 16, (
-        f"Full block failed: {result.hex()}"
-    )
+    assert result == b"YELLOW SUBMARINE" + b"\x10" * 16, f"Full block failed: {result.hex()}"
 
     # Test 4: Multi-block input
     result = add_pkcs7_padding_func(b"A" * 17)
     assert result == b"A" * 17 + b"\x0f" * 15, f"Multi-block failed: {result.hex()}"
-
-
 
 
 @report
@@ -542,17 +477,13 @@ def test_remove_pkcs7_padding(remove_pkcs7_padding_func, InvalidPaddingError):
     # Test 2: Valid full-block padding
     ciphertext = b"YELLOW SUBMARINE" + b"\x10" * 16
     result = remove_pkcs7_padding_func(ciphertext)
-    assert result == b"YELLOW SUBMARINE", (
-        f"Removing padding from {ciphertext} failed: {result}"
-    )
+    assert result == b"YELLOW SUBMARINE", f"Removing padding from {ciphertext} failed: {result}"
 
     # Test 3: Invalid padding length
     try:
         ciphertext = b"HELLO" + b"\x00" * 11
         remove_pkcs7_padding_func(ciphertext)
-        assert False, (
-            f"Removing padding from {ciphertext} should have raised InvalidPaddingError for zero padding"
-        )
+        assert False, f"Removing padding from {ciphertext} should have raised InvalidPaddingError for zero padding"
     except InvalidPaddingError:
         pass
 
@@ -573,7 +504,7 @@ def test_remove_pkcs7_padding(remove_pkcs7_padding_func, InvalidPaddingError):
         assert False, (
             f"Removing padding from {ciphertext} should have raised InvalidPaddingError for padding length exceeding data length"
         )
-    except InvalidPaddingError as e:
+    except InvalidPaddingError:
         pass
 
     # Test 6: Empty input
@@ -584,8 +515,6 @@ def test_remove_pkcs7_padding(remove_pkcs7_padding_func, InvalidPaddingError):
         pass
 
 
-
-
 @report
 def test_cbc_encrypt(cbc_encrypt_func):
     key = b"YELLOW SUBMARINE"
@@ -594,16 +523,12 @@ def test_cbc_encrypt(cbc_encrypt_func):
     # Test 1: Single block
     plaintext = b"HELLO WORLD!!!!!"  # 16 bytes
     ciphertext = cbc_encrypt_func(plaintext, key, iv)
-    assert len(ciphertext) == 32, (
-        f"Wrong length of ciphertext for plaintext {plaintext}: {len(ciphertext)}"
-    )
+    assert len(ciphertext) == 32, f"Wrong length of ciphertext for plaintext {plaintext}: {len(ciphertext)}"
 
     # Test: Block length not aligned with block size
     plaintext = b"HELLO WORLD"  # 11 bytes
     ciphertext = cbc_encrypt_func(plaintext, key, iv)
-    assert len(ciphertext) == 16, (
-        f"Wrong length of ciphertext for plaintext {plaintext}: {len(ciphertext)}"
-    )
+    assert len(ciphertext) == 16, f"Wrong length of ciphertext for plaintext {plaintext}: {len(ciphertext)}"
 
     # Test 2: Multiple blocks
     plaintext = b"A" * 33
@@ -617,11 +542,7 @@ def test_cbc_encrypt(cbc_encrypt_func):
     # In CBC, they should differ due to chaining
     block1 = ciphertext[:16]
     block2 = ciphertext[16:32]
-    assert block1 != block2, (
-        "Different blocks should produce different ciphertext (input: {plaintext})"
-    )
-
-
+    assert block1 != block2, "Different blocks should produce different ciphertext (input: {plaintext})"
 
 
 @report
@@ -631,9 +552,7 @@ def test_cbc_decrypt(cbc_decrypt_func, cbc_encrypt_func, InvalidPaddingError):
 
     # Test 1: Known ciphertext
     # First create a properly encrypted message
-    cipher = AES.new(
-        key, AES.MODE_CBC, iv
-    )  # test this with a library implementation of CBC
+    cipher = AES.new(key, AES.MODE_CBC, iv)  # test this with a library implementation of CBC
     plaintext = b"HELLO WORLD!"
     padded = plaintext + b"\x04" * 4  # Proper padding
     ciphertext = cipher.encrypt(padded)
@@ -645,21 +564,15 @@ def test_cbc_decrypt(cbc_decrypt_func, cbc_encrypt_func, InvalidPaddingError):
     bad_ciphertext = ciphertext[:-1] + b"\x00"  # Corrupt last byte
     try:
         cbc_decrypt_func(bad_ciphertext, key, iv)
-        assert False, (
-            "Should have raised InvalidPaddingError for ciphertext {bad_ciphertext}"
-        )
+        assert False, "Should have raised InvalidPaddingError for ciphertext {bad_ciphertext}"
     except InvalidPaddingError:
         pass
 
     # Test 3: Ciphertext not aligned with 16-byte blocks should raise error
-    misaligned_ciphertext = ciphertext[
-        :-5
-    ]  # Remove 5 bytes to make it not divisible by 16
+    misaligned_ciphertext = ciphertext[:-5]  # Remove 5 bytes to make it not divisible by 16
     try:
         cbc_decrypt_func(misaligned_ciphertext, key, iv)
-        assert False, (
-            "Should have raised a padding error for misaligned ciphertext {misaligned_ciphertext}"
-        )
+        assert False, "Should have raised a padding error for misaligned ciphertext {misaligned_ciphertext}"
     except Exception:
         pass  # Any exception is acceptable for misaligned input
 
@@ -681,8 +594,6 @@ def test_cbc_decrypt(cbc_decrypt_func, cbc_encrypt_func, InvalidPaddingError):
         )
 
 
-
-
 @report
 def test_vulnerable_server(VulnerableServer, cbc_encrypt):
     server = VulnerableServer()
@@ -694,9 +605,7 @@ def test_vulnerable_server(VulnerableServer, cbc_encrypt):
 
     success, result = server.decrypt_cookie(cookie)
     assert success is True, f"Valid cookie should decrypt successfully, got {result}"
-    assert result == cookie_data, (
-        f"Decrypted cookie should match original: got {result}, expected {cookie_data}"
-    )
+    assert result == cookie_data, f"Decrypted cookie should match original: got {result}, expected {cookie_data}"
 
     # Test 2: Invalid padding oracle
     bad_cookie = cookie[:-1] + bytes([(cookie[-1] ^ 1)])  # Flip last bit
@@ -725,8 +634,6 @@ def test_vulnerable_server(VulnerableServer, cbc_encrypt):
     success, error = server.decrypt_cookie(ciphertext)
     assert success is False, f"Invalid cookie should fail, got {error}"
     assert error == "INVALID_COOKIE", f"Should return INVALID_COOKIE, got {error}"
-
-
 
 
 @report
@@ -766,9 +673,7 @@ def test_padding_oracle_attack_block(
 
     # Encrypt with random-ish IV
     iv = b"\x01\xf0\x00\x03\x02\x30\x04\x50\x06\x70\x08\x09\x10\x11\x23\x48"
-    cipher = AES.new(
-        secret_key, AES.MODE_CBC, iv
-    )  # test this with a library implementation of CBC
+    cipher = AES.new(secret_key, AES.MODE_CBC, iv)  # test this with a library implementation of CBC
     ciphertext = cipher.encrypt(padded_plaintext)
 
     # Run attack
@@ -776,8 +681,6 @@ def test_padding_oracle_attack_block(
     recovered = padding_oracle_attack_block_func(t_oracle, iv, ciphertext)
     print(f"Recovered plaintext block in {oracle_call_count} oracle calls:", recovered)
     assert recovered == padded_plaintext, f"Failed to recover: {recovered}"
-
-
 
 
 @report
@@ -821,6 +724,4 @@ def test_padding_oracle_attack(
     oracle_func = oracle_func or t_oracle
     recovered = padding_oracle_attack_func(oracle_func, ciphertext)
     print(f"Recovered plaintext in {oracle_call_count} oracle calls:", recovered)
-    assert recovered == original, (
-        f"Failed to recover original ({original!r}): {recovered!r}"
-    )
+    assert recovered == original, f"Failed to recover original ({original!r}): {recovered!r}"
