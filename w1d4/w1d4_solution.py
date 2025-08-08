@@ -381,6 +381,14 @@ test_left_rotate(left_rotate)
 test_md5_padding_length(md5_padding)
 test_md5_padding_content(md5_padding)
 
+"""
+<details>
+<summary>Hint</summary>
+When appending the the '1' bit 0x80, make sure you are indeed appending only one bit, not an integer. You can use, e.g., `b"\x80"`.
+</details>
+
+"""
+
 # %%
 """
 #### MD5 Implementation
