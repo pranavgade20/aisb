@@ -481,7 +481,7 @@ If rockyou.txt isn't in the default location, you might need to install and/or e
 
 ```bash
 sudo apt install wordlists
-sudo gunzip /usr/share/wordlists/rockyou.txt.gz
+optsudo gunzip /usr/share/wordlists/rockyou.txt.gz
 ```
 
 Or find it in another location:
