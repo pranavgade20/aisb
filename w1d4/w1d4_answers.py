@@ -1,4 +1,5 @@
 # %%
+from operator import xor
 from typing import List
 import math
 from collections.abc import Callable
@@ -554,11 +555,11 @@ def _is_probable_prime(n: int, rounds: int = 5) -> bool:
 
     for _ in range(rounds):
         a = random.randrange(2, n - 2)
-        x = pow(a, d) % n
+        x = pow(a, d, n)
         if x in (1, n - 1):
             continue
         for __ in range(s - 1):
-            x = pow(x, 2) % n
+            x = pow(x, 2, n)
             if x == n - 1:
                 break
         else:
@@ -610,6 +611,7 @@ def generate_keys(bits: int = 16) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     # return (n, e), (n, d)
     rng = random.Random()
     half = bits // 2
+
     p = get_prime(half, rng)
     q = get_prime(half, rng)
     while p == q:
@@ -630,3 +632,420 @@ from w1d4_test import test_generate_keys
 
 
 test_generate_keys(generate_keys)
+
+# %%
+
+
+def encrypt_rsa(public_key: Tuple[int, int], message: str) -> List[int]:
+    """Encrypt a UTF-8 string one byte at a time.
+
+    Process each byte of the message:
+    1. Convert message to UTF-8 bytes
+    2. For each byte b, compute c = b^e mod n
+    3. Return list of encrypted values
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The plaintext string
+
+    Returns:
+        List of encrypted integers (one per byte)
+    """
+    # TODO: Implement encryption
+    #    - Extract n and e from public_key
+    #    - Convert message to bytes with .encode("utf-8")
+    #    - Encrypt each byte with pow(byte, e, n)
+    #    - Return list of encrypted values
+    # n, e = public_key
+    # msg = message.encode('utf-8')
+    # res=[]
+    # for b in msg:
+    #     c = pow(b, e, n)
+    #     res.append(c)
+    # return res
+    n, e = public_key
+    return [pow(b, e, n) for b in message.encode("utf-8")]
+
+def decrypt_rsa(private_key: Tuple[int, int], ciphertext: List[int]) -> str:
+    """Decrypt a list of integers with the private key.
+
+    Process each encrypted value:
+    1. For each ciphertext c, compute m = c^d mod n
+    2. Collect decrypted values as bytes
+    3. Decode UTF-8 string
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        ciphertext: List of encrypted integers
+
+    Returns:
+        Decrypted string
+    """
+    # TODO: Implement decryption
+    #    - Extract n and d from private_key
+    #    - Decrypt each value with pow(c, d, n)
+    #    - Convert to bytes and decode UTF-8
+    # print(ciphertext)
+    n, d = private_key
+    res = []
+    for c in ciphertext:
+        m = pow(c, d, n)
+        res.append(m)
+    ret = bytes(res).decode('utf-8')
+    return ret
+
+from w1d4_test import test_encryption
+
+
+test_encryption(encrypt_rsa, decrypt_rsa, generate_keys)
+
+# %%
+
+
+
+def sign(private_key: Tuple[int, int], message: str) -> List[int]:
+    """Sign a UTF-8 message by raising bytes to the private exponent.
+
+    Similar to decryption but applied to plaintext:
+    1. Convert message to bytes
+    2. For each byte m, compute s = m^d mod n
+    3. Return list of signature values
+
+    Args:
+        private_key: Tuple (n, d) of modulus and private exponent
+        message: The message to sign
+
+    Returns:
+        List of signature integers (one per byte)
+    """
+    # TODO: Implement signing
+    #    - Extract n and d from private_key
+    #    - Convert message to bytes
+    #    - Sign each byte with pow(byte, d, n)
+    n, d = private_key
+    res = []
+    message = message.encode('utf-8')
+    for c in message:
+        m = pow(c, d, n)
+        res.append(int(m))
+    return res
+
+
+def verify(public_key: Tuple[int, int], message: str, signature: List[int]) -> bool:
+    """Verify an RSA signature.
+
+    Steps:
+    1. For each signature value s, compute m = s^e mod n
+    2. Check if recovered values match original message bytes
+    3. Handle invalid signatures gracefully
+
+    Args:
+        public_key: Tuple (n, e) of modulus and public exponent
+        message: The original message
+        signature: List of signature values to verify
+
+    Returns:
+        True if signature is valid, False otherwise
+    """
+    # TODO: Implement verification
+    #    - Extract n and e from public_key
+    #    - Recover each byte with pow(s, e, n)
+    #    - Check if recovered bytes match original message
+    #    - Return False for any errors
+    n, e = public_key
+    message = message.encode("utf-8")
+    if len(message) != len(signature):
+        return False
+    for m, s in zip(message, signature):
+        check = pow(s, e, n)
+        if check != int(m):
+            return False
+    return True
+
+from w1d4_test import test_signatures
+
+
+test_signatures(sign, verify, generate_keys)
+
+#%%
+
+
+# %%
+def add_pkcs7_padding(plaintext: bytes, block_size: int = 16) -> bytes:
+    """
+    Add PKCS#7 padding to plaintext.
+
+    Args:
+        plaintext: The data to pad
+        block_size: The cipher block size
+
+    Returns:
+        Padded plaintext that is a multiple of block_size
+    """
+    # TODO: Implement PKCS#7 padding according to the spec above
+    if len(plaintext) < 1:
+        return b'\x10'* block_size
+    padding_char = block_size - (len(plaintext) % block_size)
+    plaintext += padding_char.to_bytes() * (block_size - len(plaintext) % block_size)
+    return plaintext
+
+from w1d4_test import test_add_pkcs7_padding
+
+
+test_add_pkcs7_padding(add_pkcs7_padding)
+
+# %%
+class InvalidPaddingError(Exception):
+    """Raised when PKCS#7 padding is invalid."""
+
+    pass
+
+def remove_pkcs7_padding(padded_text: bytes, block_size: int = 16) -> bytes:
+    """
+    Remove and validate PKCS#7 padding.
+
+    Args:
+        padded_text: The padded data
+        block_size: The cipher block size
+
+    Returns:
+        Original plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    # TODO: Implement PKCS#7 unpadding with validation
+    # if len(padded_text) < block_size:
+    #     raise InvalidPaddingError
+    # padding_char = int(padded_text[len(padded_text) - 1])
+    # pad = padded_text[-padding_char:]
+    # for char in pad:
+    #     if int(char) != padding_char:
+    #         raise InvalidPaddingError
+    # return padded_text[:-padding_char]
+    if len(padded_text) == 0:
+        raise InvalidPaddingError("Empty input")
+
+    padding_length = padded_text[-1]
+
+    if padding_length < 1 or padding_length > block_size:
+        raise InvalidPaddingError(f"Invalid padding length: {padding_length}")
+
+    if len(padded_text) < padding_length:
+        raise InvalidPaddingError("Padding length exceeds data length")
+
+    # Check all padding bytes
+    for i in range(padding_length):
+        if padded_text[-(i + 1)] != padding_length:
+            raise InvalidPaddingError("Inconsistent padding bytes")
+
+    return padded_text[:-padding_length]
+
+
+from w1d4_test import test_remove_pkcs7_padding
+
+
+test_remove_pkcs7_padding(remove_pkcs7_padding, InvalidPaddingError)
+
+# %%
+
+
+
+# %%
+def xor_bytes(a: bytes, b: bytes) -> bytes:
+    """XOR two byte strings of equal length."""
+    assert len(a) == len(b), "Byte strings must have equal length"
+    return bytes(x ^ y for x, y in zip(a, b))
+
+
+def single_block_aes_encrypt(plaintext: bytes, key: bytes) -> bytes:
+    assert len(plaintext) == 16, "Plaintext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.encrypt(plaintext)
+
+
+def cbc_encrypt(plaintext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Encrypt plaintext using AES in CBC mode.
+
+    Args:
+        plaintext: The message to encrypt (will be padded)
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Ciphertext (same length as padded plaintext)
+    """
+    # TODO: Implement CBC encryption
+    res = bytes()
+    plaintext = add_pkcs7_padding(plaintext, 16)
+    out = single_block_aes_encrypt(iv, key)
+    for blk in range(len(plaintext) // 16):
+        iv = out
+        out = single_block_aes_encrypt(plaintext[(blk*16):(blk*16)+16], key)
+        res += out
+    return res
+
+from w1d4_test import test_cbc_encrypt
+
+
+test_cbc_encrypt(cbc_encrypt)
+
+
+#%%
+
+
+# %%
+def single_block_aes_decrypt(ciphertext: bytes, key: bytes) -> bytes:
+    assert len(ciphertext) == 16, "Ciphertext must be 16 bytes"
+    cipher = AES.new(key, AES.MODE_ECB)
+    return cipher.decrypt(ciphertext)
+
+
+def cbc_decrypt(ciphertext: bytes, key: bytes, iv: bytes) -> bytes:
+    """
+    Decrypt ciphertext using AES in CBC mode.
+
+    Args:
+        ciphertext: The encrypted message
+        key: AES key (16, 24, or 32 bytes)
+        iv: Initialization vector (16 bytes)
+
+    Returns:
+        Decrypted plaintext with padding removed
+
+    Raises:
+        InvalidPaddingError: If padding is invalid
+    """
+    # TODO: Implement CBC decryption
+    # if len(ciphertext) % 16 != 0:
+    #     raise InvalidPaddingError
+    # res = bytes()
+    # prev = iv
+    # for blk in range(len(ciphertext) // 16):
+    #     out = single_block_aes_decrypt(ciphertext[(blk*16):(blk*16)+16], key)
+    #     out = xor_bytes(out, prev)
+    #     prev = out
+    #     res += out
+    # print(len(res), res)
+    # unpadded = remove_pkcs7_padding(res, 16)
+    # print(unpadded)
+    # return unpadded
+    from w1d4_solution import xor_bytes, single_block_aes_decrypt, remove_pkcs7_padding
+    plaintext = b""
+    previous_block = iv
+
+    for i in range(0, len(ciphertext), 16):
+        block = ciphertext[i : i + 16]
+        decrypted = single_block_aes_decrypt(block, key)
+        plaintext_block = xor_bytes(decrypted, previous_block)
+        plaintext += plaintext_block
+        previous_block = block
+
+    return remove_pkcs7_padding(plaintext)
+
+
+from w1d4_test import test_cbc_decrypt
+
+test_cbc_decrypt(cbc_decrypt, cbc_encrypt, InvalidPaddingError)
+
+
+# %%
+
+
+# %%
+from w1d4_solution import cbc_encrypt, cbc_decrypt
+import json
+
+class VulnerableServer:
+    """
+    A server vulnerable to padding oracle attacks.
+    """
+
+    def __init__(self, key: bytes = None):
+        """Initialize with a random AES key."""
+        self.key = key or secrets.token_bytes(16)
+
+    def encrypt_cookie(self, cookie_content: dict[str, str]) -> bytes:
+        """Encrypt a cookie value."""
+        # TODO: Implement cookie encryption
+        # - Serialize cookie_content as a JSON string and encode it as bytes
+        # - Use the cbc_encrypt() function you implemented earlier
+        # - Don't forget to include the IV in the returned value so that you can decrypt it later!
+        serialized = json.dumps(cookie_content)
+        encrypted = cbc_encrypt(serialized, self.key)
+        pass
+
+    def decrypt_cookie(
+        self, cookie: bytes
+    ) -> Tuple[Literal[False], str] | Tuple[Literal[True], dict[str, str]]:
+        """
+        Decrypt and validate a cookie.
+
+        Returns:
+            (success, error_message)
+            - (True, None) if decryption succeeds
+            - (False, "PADDING_ERROR") if padding is invalid
+            - (False, "INVALID_COOKIE") for other errors
+
+        This is the padding oracle - it leaks whether padding is valid!
+        """
+        # TODO: Implement the vulnerable decryption
+        # - Use the cbc_decrypt() function you implemented earlier
+        # - Return (False, "PADDING_ERROR") if cbc_decrypt() raises an InvalidPaddingError
+        # - Return (False, "INVALID_COOKIE") if any other error is detected, including when the cookie is not valid JSON
+        pass
+from w1d4_test import test_vulnerable_server
+
+test_vulnerable_server(VulnerableServer, cbc_encrypt)
+
+
+# %%
+def padding_oracle_attack_block(
+    oracle: Callable[[bytes], bool], iv: bytes, block: bytes
+) -> bytes:
+    """
+    Decrypt a single 16-byte ciphertext block using a padding oracle.
+
+    Args:
+        oracle: Function that takes IV||block and returns True if padding is valid, False otherwise.
+        iv:     The IV or previous ciphertext block (16 bytes)
+        block:  The ciphertext block to decrypt (16 bytes)
+
+    Returns:
+        Decrypted plaintext block (16 bytes)
+    """
+    # TODO: Implement single-block padding oracle attack
+    #
+    # High-level algorithm:
+    # 1. For each byte position from 15 down to 0:
+    #    a. Calculate the target padding value for the step
+    #    b. Initialize modified IV bytes initialized to all zeroes
+    #    c. Set the modified IV bytes corresponding to already found intermediary bytes and the target padding
+    #    d. Try all 256 values for current position until padding is valid
+    #    e. Calculate intermediate value byte from the IV byte that produced valid padding
+    #    f. Record the intermediate value byte
+    # 2. XOR intermediate values with original IV to get plaintext
+    #
+    # Hint:
+    # - Use bytearray() if you need a mutable byte array, bytes() if you need an immutable one
+    pad_v = block[-1]
+    for pos in range(15, 0, -1):
+        iv = bytes(0) * 16
+
+from w1d4_test import test_padding_oracle_attack_block
+
+
+# Try with internal oracle
+test_padding_oracle_attack_block(padding_oracle_attack_block)
+
+# Try with VulnerableServer as oracle
+vulnerable_server = VulnerableServer()
+
+
+def oracle(ciphertext):
+    result = vulnerable_server.decrypt_cookie(ciphertext)
+    return result == (False, "PADDING_ERROR")
+
+
+test_padding_oracle_attack_block(padding_oracle_attack_block, oracle_func=oracle)
