@@ -117,7 +117,7 @@ MD5 processes data in 512-bit blocks and produces a 128-bit hash. On a high leve
 3. Processes the message in 512-bit blocks, updating the state after each block
 4. Concatenates the final state bytes to produce the final 128-bit hash.
 
-Processing of each 512-bit block involves updatung the state in 64 rounds. 
+Processing of each 512-bit block involves updating the state in 64 rounds. 
 Each round uses one of four auxiliary functions (F, G, H, I) and follows this pattern:
 ```
 A, B, C, D = D, (B + left_rotate((A + F(B,C,D) + X[k] + T[i]), s)), B, C
@@ -380,6 +380,14 @@ def test_md5_padding_content(solution: Callable[[bytes], bytes]):
 test_left_rotate(left_rotate)
 test_md5_padding_length(md5_padding)
 test_md5_padding_content(md5_padding)
+
+"""
+<details>
+<summary>Hint</summary>
+When appending the the '1' bit 0x80, make sure you are indeed appending only one bit, not an integer. You can use, e.g., `b"\x80"`.
+</details>
+
+"""
 
 # %%
 """
@@ -2292,6 +2300,8 @@ Now implement CBC decryption using the provided `single_block_aes_decrypt()` fun
 
 > **Difficulty**: 🔴🔴🔴⚪⚪
 > **Importance**: 🔵🔵🔵🔵⚪
+
+<!-- FIXME: reported by participant:  On CBC Encrypt (3.2), the excercise LIES to you. The plaintext is not padded (as the comments seem to imply will come in already padded). Do not fall for this! -->
 """
 
 
@@ -2451,8 +2461,7 @@ class VulnerableServer:
         Decrypt and validate a cookie.
 
         Returns:
-            (success, error_message)
-            - (True, None) if decryption succeeds
+            - (True, decrypted_cookie) if decryption succeeds, where decrypted_cookie is parsed as json from plaintext
             - (False, "PADDING_ERROR") if padding is invalid
             - (False, "INVALID_COOKIE") for other errors
 
@@ -2829,7 +2838,7 @@ However, we can increase the value of IV by one and try again, until we succeed 
 </table>
 
 This gives us signal that the last byte of the plaintext for given IV is 0x01.  
-Recall that that `P[0] = intermediary ⊕ IV`. Together, this gives us the last byte of intermediary (`intermediary = P[0] ⊕ IV`): 0x01 ⊕ 0x31 = 0x30.
+Recall that `P[0] = intermediary ⊕ IV`. Together, this gives us the last byte of intermediary (`intermediary = P[0] ⊕ IV`): 0x01 ⊕ 0x31 = 0x30.
 
 **Now that we've decrypted the last byte of the sample block to be 0x30**, we can move on to the second last byte.
 
@@ -3308,9 +3317,9 @@ The POODLE attack is a great demonstration of how vulnerabilities arise in pract
 **Here are some quiz questions for you:**
 
 <details>
-<summary><b>Question:</b> An attacker needs to decrypt a 20-byte session cookie. Approximately how many HTTPS requests will they need to make on average?</summary>
+<summary><b>Question:</b> An attacker needs to decrypt a 20-byte session cookie. Approximately how many HTTPS requests will they need to make?</summary>
 
-20 bytes × 256 attempts per byte = 5,120 requests on average. In practice, some extra requests may be needed to determine the size of cookies if unknown in advance.
+20 bytes × 256 attempts per byte = 5,120 requests in the worst case. In practice, some extra requests may be needed to determine the size of cookies if unknown in advance.
 </details>
 
 <br>
