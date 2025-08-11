@@ -34,8 +34,11 @@ def exec_sh(command: str, timeout: Optional[int] = 30) -> subprocess.CompletedPr
     """Execute a shell command and return the result."""
     return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
 
-
 def compile_vulnerable_binary(source_file: str, output_file: str, extra_flags: str = "") -> bool:
+    def exec_sh(command: str, timeout: Optional[int] = 30) -> subprocess.CompletedProcess:
+        """Execute a shell command and return the result."""
+        return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
+
     """Compile a C program with security features disabled for educational purposes."""
     flags = "-fno-stack-protector -z execstack -no-pie -g"
     cmd = f"gcc {flags} {extra_flags} -o {output_file} {source_file}"
@@ -248,7 +251,7 @@ def exploit_basic_overflow() -> str:
 from w2d1_re_test import test_basic_overflow
 
 
-test_basic_overflow(exploit_basic_overflow)
+test_basic_overflow(exploit_basic_overflow, compile_vulnerable_binary)
 ```
 
 ## Exercise 2: Finding Hidden Passwords
@@ -461,7 +464,7 @@ def create_shellcode_exploit(buffer_size: int = 128, shellcode: Optional[bytes] 
 from w2d1_re_test import test_shellcode_basics
 
 
-test_shellcode_basics()
+test_shellcode_basics(create_shellcode_exploit)
 ```
 
 ## Exercise 5: Modern Protections and Bypasses (optional)
@@ -515,8 +518,7 @@ def check_binary_protections(binary_path: str) -> dict:
     pass
 from w2d1_re_test import test_protection_checking
 
-
-test_protection_checking()
+test_protection_checking(exec_sh)
 ```
 
 ## Exercise 6: Bypassing Protections (optional)

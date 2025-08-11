@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W1 Attack Vector Matrix - RAND Framework Coverage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .attack-matrix {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .attack-category {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background-color: #34495e;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .attack-vectors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2px;
+            background-color: #ecf0f1;
+        }
+
+        .attack-vector {
+            background-color: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .attack-vector:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .attack-vector.covered {
+            background-color: #d5f4e6;
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+
+        .attack-vector.not-covered {
+            background-color: #fadbd8;
+            border-color: #e74c3c;
+            color: #c0392b;
+        }
+
+        .vector-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .vector-details {
+            display: none;
+            font-size: 11px;
+            text-align: left;
+            margin-top: 8px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding-top: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .attack-vector.expanded {
+            height: auto;
+            min-height: 200px;
+        }
+
+        .attack-vector.expanded .vector-details {
+            display: block;
+        }
+
+        .vector-details.covered-details {
+            color: #27ae60;
+        }
+
+        .vector-details.not-covered-details {
+            color: #c0392b;
+        }
+
+        .stats {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+
+        .legend-covered {
+            background-color: #d5f4e6;
+            border-color: #27ae60;
+        }
+
+        .legend-not-covered {
+            background-color: #fadbd8;
+            border-color: #e74c3c;
+        }
+
+        .legend-unclicked {
+            background-color: #ecf0f1;
+            border-color: #bdc3c7;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🎯 W1 Attack Vector Matrix</h1>
+        <div class="subtitle">Based on RAND "Securing AI Model Weights" Framework Table 5.1</div>
+
+        <div class="instructions">
+            <strong>How to Use:</strong> This matrix organizes attack vectors by category (rows) and individual vectors
+            (columns).
+            Click on each attack vector to see if it was covered during Week 1 exercises.
+            Green squares show what you've already learned, red squares highlight gaps to explore later!
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box legend-covered"></div>
+                <span>Covered in W1</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box legend-not-covered"></div>
+                <span>Not Covered</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box legend-unclicked"></div>
+                <span>Click to Check</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="attack-matrix" id="attackMatrix"></div>
+
+    <div class="stats" id="stats">
+        Click attack vectors to see your coverage across all categories!
+    </div>
+
+    <script>
+        const attackCategories = [
+            {
+                name: "Running Unauthorized Code",
+                vectors: [
+                    {
+                        name: "Exploiting vulnerabilities for which a patch exists",
+                        covered: true,
+                        details: "✅ <strong>W1D5 - Penetration Testing:</strong> Exploited web application vulnerabilities and privilege escalation flaws"
+                    },
+                    {
+                        name: "Exploiting reported but not (fully) patched vulnerabilities",
+                        covered: false,
+                        details: "❌ <strong>Not directly practiced in W1</strong><br>Advanced exploitation of partial patches or incomplete fixes was not covered"
+                    },
+                    {
+                        name: "Finding and exploiting individual zero-days",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Zero-day discovery requires advanced techniques beyond the scope of W1"
+                    },
+                    {
+                        name: "Direct access to zero-days at scale",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Large-scale zero-day operations are nation-state level capabilities"
+                    }
+                ]
+            },
+            {
+                name: "Compromising Existing Credentials",
+                vectors: [
+                    {
+                        name: "Social engineering",
+                        covered: false,
+                        details: "❌ <strong>Not directly practiced in W1</strong><br>Social engineering techniques were mentioned in threat modeling discussions but not actively practiced"
+                    },
+                    {
+                        name: "Password brute-forcing and cracking",
+                        covered: true,
+                        details: "✅ <strong>W1D4 - Cryptography:</strong> Implemented password cracking economics analysis<br>✅ <strong>W1D5 - Penetration Testing:</strong> Cracked ZIP file passwords and user password hashes using John the Ripper"
+                    },
+                    {
+                        name: "Exploitation of exposed credentials",
+                        covered: true,
+                        details: "✅ <strong>W1D5 - Penetration Testing:</strong> Discovered credentials in backup files and configuration leaks<br>✅ <strong>W1D2 - Network Security:</strong> Intercepted credentials through network traffic analysis"
+                    },
+                    {
+                        name: "Expanding illegitimate access (e.g., escalating privileges)",
+                        covered: true,
+                        details: "✅ <strong>W1D5 - Penetration Testing:</strong> Escalated privileges using SUID binaries and sudo misconfigurations"
+                    }
+                ]
+            },
+            {
+                name: "Undermining the Access Control System Itself",
+                vectors: [
+                    {
+                        name: "Encryption/authentication vulnerabilities",
+                        covered: true,
+                        details: "✅ <strong>W1D1 - Cryptography:</strong> Broke LCG-based stream ciphers and naive MAC implementations<br>✅ <strong>W1D4 - Cryptography:</strong> Executed padding oracle attacks against CBC mode encryption"
+                    },
+                    {
+                        name: "Intentional backdoors in algorithms, protocols, or products",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Backdoor discovery and exploitation techniques were not demonstrated"
+                    },
+                    {
+                        name: "Code vulnerabilities (in the access control system)",
+                        covered: true,
+                        details: "✅ <strong>W1D1 - Linux & Networks:</strong> Exploited command injection and buffer overflows<br>✅ <strong>W1D5 - Penetration Testing:</strong> Exploited custom SUID binary vulnerabilities"
+                    },
+                    {
+                        name: "Access to secret material undermining a protocol",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Advanced cryptographic protocol attacks using leaked secrets were not explored"
+                    }
+                ]
+            },
+            {
+                name: "Bypassing Primary Security System Altogether",
+                vectors: [
+                    {
+                        name: "Incorrect configuration or security policy implementation",
+                        covered: true,
+                        details: "✅ <strong>W1D5 - Penetration Testing:</strong> Exploited misconfigured sudo permissions and world-writable system files<br>✅ <strong>W1D2 - Network Security:</strong> Bypassed improperly configured network controls"
+                    },
+                    {
+                        name: "Additional (less secure) copies of sensitive data",
+                        covered: true,
+                        details: "✅ <strong>W1D5 - Penetration Testing:</strong> Found sensitive backup files exposed through web servers"
+                    },
+                    {
+                        name: "Alternative (less secure) authentication or access schemes",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Attacks on fallback authentication mechanisms were not explored"
+                    }
+                ]
+            },
+            {
+                name: "AI-Specific Attack Vectors",
+                vectors: [
+                    {
+                        name: "Discovering existing vulnerabilities in the ML stack",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>AI/ML specific vulnerabilities were discussed conceptually but not practically exploited"
+                    },
+                    {
+                        name: "Intentional ML supply chain compromise",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>AI-specific supply chain attacks were not practically explored"
+                    },
+                    {
+                        name: "Prompt-triggered code execution",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Prompt injection leading to code execution was not demonstrated"
+                    },
+                    {
+                        name: "Model extraction",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Model extraction attacks through API inference were not practiced"
+                    },
+                    {
+                        name: "Model distillation",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Model distillation techniques for unauthorized model copying were not explored"
+                    }
+                ]
+            },
+            {
+                name: "Nontrivial Access to Data or Networks",
+                vectors: [
+                    {
+                        name: "Digital access to air-gapped networks",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Air-gap bypass techniques were not explored in practical exercises"
+                    },
+                    {
+                        name: "Side-channel attacks (including TEMPEST)",
+                        covered: true,
+                        details: "✅ <strong>W1D4 - Cryptography:</strong> Explored timing attacks and information leakage through padding oracles<br>✅ <strong>W1D2 - Network Security:</strong> Analyzed traffic patterns for information disclosure"
+                    },
+                    {
+                        name: "Eavesdropping and wiretaps",
+                        covered: true,
+                        details: "✅ <strong>W1D2 - Network Security:</strong> Intercepted and analyzed network traffic using Wireshark and mitmproxy<br>✅ <strong>W1D3 - HTTPS Interception:</strong> Performed man-in-the-middle attacks on encrypted communications"
+                    }
+                ]
+            },
+            {
+                name: "Unauthorized Physical Access to Systems",
+                vectors: [
+                    {
+                        name: "Direct physical access to sensitive systems",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Physical security attacks were mentioned in threat modeling but not practiced"
+                    },
+                    {
+                        name: "Malicious placement of portable devices",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Physical device attacks like malicious USB drops were not demonstrated"
+                    },
+                    {
+                        name: "Physical access to devices in other locations",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Remote physical access scenarios were not explored"
+                    },
+                    {
+                        name: "Evasion of physical access control systems",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Physical security bypass techniques were not demonstrated"
+                    },
+                    {
+                        name: "Penetration of physical hardware security",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Hardware tampering and security module attacks were not covered"
+                    },
+                    {
+                        name: "Armed break-in",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Physical security scenarios involving force were not discussed"
+                    },
+                    {
+                        name: "Military takeover",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Nation-state physical operations were not covered"
+                    }
+                ]
+            },
+            {
+                name: "Supply Chain Attacks",
+                vectors: [
+                    {
+                        name: "Services and equipment the organization uses",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Supply chain compromise techniques were discussed but not demonstrated"
+                    },
+                    {
+                        name: "Code and infrastructure incorporated into the codebase",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Software supply chain attacks were mentioned but not practiced"
+                    },
+                    {
+                        name: "Vendors with access to information",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Third-party vendor compromise scenarios were not explored"
+                    }
+                ]
+            },
+            {
+                name: "Human Intelligence",
+                vectors: [
+                    {
+                        name: "Bribes and cooperation",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Human intelligence operations were mentioned in threat modeling but obviously not practiced"
+                    },
+                    {
+                        name: "Extortion",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Coercion-based attacks were discussed in threat modeling but not demonstrated"
+                    },
+                    {
+                        name: "Candidate placement",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Long-term infiltration strategies were not covered"
+                    },
+                    {
+                        name: "Organizational leverage attacks",
+                        covered: false,
+                        details: "❌ <strong>Not covered in W1</strong><br>Strategic organizational manipulation was not explored"
+                    },
+                    {
+                        name: "Organizationally approved access (insider threats)",
+                        covered: true,
+                        details: "✅ <strong>W1D3 - Threat Modeling:</strong> Analyzed insider threat vectors in STRIDE methodology<br>✅ <strong>W1D5 - Penetration Testing:</strong> Simulated malicious insider access through compromised user accounts"
+                    }
+                ]
+            }
+        ];
+
+        let clickedCount = 0;
+        let coveredCount = 0;
+        let totalVectors = 0;
+
+        function createAttackMatrix() {
+            const matrix = document.getElementById('attackMatrix');
+
+            // Calculate total vectors
+            totalVectors = attackCategories.reduce((sum, category) => sum + category.vectors.length, 0);
+
+            attackCategories.forEach((category, categoryIndex) => {
+                // Create category container
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'attack-category';
+
+                // Create category header
+                const headerElement = document.createElement('div');
+                headerElement.className = 'category-header';
+                headerElement.textContent = category.name;
+                categoryElement.appendChild(headerElement);
+
+                // Create vectors grid
+                const vectorsGrid = document.createElement('div');
+                vectorsGrid.className = 'attack-vectors-grid';
+
+                category.vectors.forEach((vector, vectorIndex) => {
+                    const vectorElement = document.createElement('div');
+                    vectorElement.className = 'attack-vector';
+
+                    // Create vector name
+                    const nameElement = document.createElement('div');
+                    nameElement.className = 'vector-name';
+                    nameElement.textContent = vector.name;
+                    vectorElement.appendChild(nameElement);
+
+                    // Create details element (hidden initially)
+                    const detailsElement = document.createElement('div');
+                    detailsElement.className = vector.covered ?
+                        'vector-details covered-details' :
+                        'vector-details not-covered-details';
+                    detailsElement.innerHTML = vector.details;
+                    vectorElement.appendChild(detailsElement);
+
+                    vectorElement.onclick = () => toggleCoverage(categoryIndex, vectorIndex);
+                    vectorElement.id = `vector-${categoryIndex}-${vectorIndex}`;
+                    vectorsGrid.appendChild(vectorElement);
+                });
+
+                categoryElement.appendChild(vectorsGrid);
+                matrix.appendChild(categoryElement);
+            });
+        }
+
+        function toggleCoverage(categoryIndex, vectorIndex) {
+            const vector = attackCategories[categoryIndex].vectors[vectorIndex];
+            const cell = document.getElementById(`vector-${categoryIndex}-${vectorIndex}`);
+
+            // Toggle expanded class
+            cell.classList.toggle('expanded');
+
+            // Mark as clicked if not already
+            if (!cell.classList.contains('covered') && !cell.classList.contains('not-covered')) {
+                clickedCount++;
+                if (vector.covered) {
+                    coveredCount++;
+                    cell.classList.add('covered');
+                } else {
+                    cell.classList.add('not-covered');
+                }
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            const percentage = Math.round((coveredCount / totalVectors) * 100);
+
+            document.getElementById('stats').innerHTML =
+                `📊 Progress: ${clickedCount}/${totalVectors} checked | ✅ ${coveredCount} covered (${percentage}%) | ❌ ${clickedCount - coveredCount} gaps identified`;
+
+            if (clickedCount === totalVectors) {
+                document.getElementById('stats').innerHTML +=
+                    `<br><br>🎉 <strong>Matrix complete!</strong> You've mapped all ${totalVectors} attack vectors from the RAND framework to your W1 experience across ${attackCategories.length} categories!`;
+            }
+        }
+
+        // Initialize the matrix
+        createAttackMatrix();
+    </script>
+</body>
+
+</html>

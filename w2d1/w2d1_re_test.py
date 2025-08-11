@@ -6,11 +6,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import subprocess
 import struct
 import sys
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Callable
 
 
 
-def test_basic_overflow(exploit_basic_overflow: callable):
+def test_basic_overflow(exploit_basic_overflow: Callable, compile_vulnerable_binary: Callable):
     """Test the basic buffer overflow exploit."""
     print("Testing basic buffer overflow...")
 
@@ -39,12 +39,12 @@ def test_basic_overflow(exploit_basic_overflow: callable):
     else:
         print("✗ Exploit failed. Output:")
         print(stdout)
-        exit(1)
+        sys.exit(1)
 
 
 
 
-def test_password_extraction(find_password_in_binary: callable):
+def test_password_extraction(find_password_in_binary: Callable):
     """Test password extraction from binary."""
     print("\nTesting password extraction...")
 
@@ -66,12 +66,12 @@ def test_password_extraction(find_password_in_binary: callable):
         return True
     else:
         print("✗ Password incorrect")
-        exit(1)
+        sys.exit(1)
 
 
 
 
-def test_shellcode_basics():
+def test_shellcode_basics(create_shellcode_exploit: Callable):
     """Test basic shellcode creation."""
     print("\nTesting shellcode exploit creation...")
 
@@ -89,7 +89,7 @@ def test_shellcode_basics():
 
 
 
-def test_protection_checking():
+def test_protection_checking(exec_sh):
     """Test binary protection checking."""
     print("\nTesting protection checking...")
 

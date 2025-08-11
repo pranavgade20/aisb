@@ -32,8 +32,11 @@ def exec_sh(command: str, timeout: Optional[int] = 30) -> subprocess.CompletedPr
     """Execute a shell command and return the result."""
     return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
 
-
 def compile_vulnerable_binary(source_file: str, output_file: str, extra_flags: str = "") -> bool:
+    def exec_sh(command: str, timeout: Optional[int] = 30) -> subprocess.CompletedProcess:
+        """Execute a shell command and return the result."""
+        return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
+
     """Compile a C program with security features disabled for educational purposes."""
     flags = "-fno-stack-protector -z execstack -no-pie -g"
     cmd = f"gcc {flags} {extra_flags} -o {output_file} {source_file}"
@@ -255,7 +258,7 @@ def exploit_basic_overflow() -> str:
         pass
 
 
-def test_basic_overflow(exploit_basic_overflow: Callable):
+def test_basic_overflow(exploit_basic_overflow: Callable, compile_vulnerable_binary: Callable):
     """Test the basic buffer overflow exploit."""
     print("Testing basic buffer overflow...")
 
@@ -284,10 +287,10 @@ def test_basic_overflow(exploit_basic_overflow: Callable):
     else:
         print("✗ Exploit failed. Output:")
         print(stdout)
-        exit(1)
+        sys.exit(1)
 
 
-test_basic_overflow(exploit_basic_overflow)
+test_basic_overflow(exploit_basic_overflow, compile_vulnerable_binary)
 
 # %%
 """
@@ -368,7 +371,7 @@ def test_password_extraction(find_password_in_binary: Callable):
         return True
     else:
         print("✗ Password incorrect")
-        exit(1)
+        sys.exit(1)
 
 
 test_password_extraction(find_password_in_binary)
@@ -572,7 +575,7 @@ def create_shellcode_exploit(buffer_size: int = 128, shellcode: Optional[bytes] 
         pass
 
 
-def test_shellcode_basics():
+def test_shellcode_basics(create_shellcode_exploit: Callable):
     """Test basic shellcode creation."""
     print("\nTesting shellcode exploit creation...")
 
@@ -588,7 +591,7 @@ def test_shellcode_basics():
         return False
 
 
-test_shellcode_basics()
+test_shellcode_basics(create_shellcode_exploit)
 
 # %%
 """
@@ -637,6 +640,10 @@ def check_binary_protections(binary_path: str) -> dict:
         Dictionary of protection_name: enabled (bool)
     """
     if "SOLUTION":
+        def exec_sh(command: str, timeout: Optional[int] = 30) -> subprocess.CompletedProcess:
+            """Execute a shell command and return the result."""
+            return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
+
         protections = {
             "NX": False,
             "PIE": False,
@@ -685,7 +692,7 @@ def check_binary_protections(binary_path: str) -> dict:
         pass
 
 
-def test_protection_checking():
+def test_protection_checking(exec_sh):
     """Test binary protection checking."""
     print("\nTesting protection checking...")
 
@@ -714,8 +721,7 @@ def test_protection_checking():
         print("\n✗ Could not identify protection differences")
         return False
 
-
-test_protection_checking()
+test_protection_checking(exec_sh)
 
 """
 ## Exercise 6: Bypassing Protections (optional)
