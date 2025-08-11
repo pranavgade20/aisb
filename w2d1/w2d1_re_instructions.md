@@ -18,6 +18,8 @@ By the end of this module, you'll be able to:
 
 Let's start by setting up our helper functions and understanding the tools we'll use.
 
+Copy these functions to your solutions file:
+
 
 ```python
 
@@ -25,10 +27,10 @@ Let's start by setting up our helper functions and understanding the tools we'll
 import subprocess
 import struct
 import sys
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Callable
 
 
-def exec_sh(command: str, timeout: Optional[int] = 30, check_retcode: bool = True) -> subprocess.CompletedProcess:
+def exec_sh(command: str, timeout: Optional[int] = 30) -> subprocess.CompletedProcess:
     """Execute a shell command and return the result."""
     return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
 

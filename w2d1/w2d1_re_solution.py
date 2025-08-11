@@ -18,15 +18,17 @@ By the end of this module, you'll be able to:
 4. Understand modern security mitigations
 
 Let's start by setting up our helper functions and understanding the tools we'll use.
+
+Copy these functions to your solutions file:
 """
 
 import subprocess
 import struct
 import sys
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Callable
 
 
-def exec_sh(command: str, timeout: Optional[int] = 30, check_retcode: bool = True) -> subprocess.CompletedProcess:
+def exec_sh(command: str, timeout: Optional[int] = 30) -> subprocess.CompletedProcess:
     """Execute a shell command and return the result."""
     return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
 
@@ -148,13 +150,13 @@ The stack layout looks like this:
    // You should see something like:
 
     bool main(void)
-    
+
     {
       bool bVar1;
       int iVar2;
       char acStack_18 [20];
       uint local_4;
-      
+
       local_4 = 0;
       puts("=== Secure Login System v1.0 ===");
       printf("Enter the password: ");
@@ -253,7 +255,7 @@ def exploit_basic_overflow() -> str:
         pass
 
 
-def test_basic_overflow(exploit_basic_overflow: callable):
+def test_basic_overflow(exploit_basic_overflow: Callable):
     """Test the basic buffer overflow exploit."""
     print("Testing basic buffer overflow...")
 
@@ -344,7 +346,7 @@ def find_password_in_binary() -> str:
         pass
 
 
-def test_password_extraction(find_password_in_binary: callable):
+def test_password_extraction(find_password_in_binary: Callable):
     """Test password extraction from binary."""
     print("\nTesting password extraction...")
 
