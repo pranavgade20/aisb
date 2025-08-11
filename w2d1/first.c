@@ -2,7 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-int main() {
+int main()
+{
     char password[16];
     int authorized = 0;
 
@@ -12,19 +13,26 @@ int main() {
     gets(password);
     printf("authorized: %d\n", authorized);
 
-    if (strcmp(password, "secret123") == 0) {
+    if (strcmp(password, "secret123") == 0)
+    {
         authorized = 1;
         printf("Password correct!\n");
-    } else {
+    }
+    else
+    {
         printf("Wrong password.\n");
     }
 
-    if (authorized) {
+    if (authorized)
+    {
         printf("Access granted! Welcome to the secure system.\n");
         printf("Flag: AISB{woo}\n");
         return 0;
-    } else {
+    }
+    else
+    {
         printf("Access denied.\n");
         return 1;
     }
 }
+
