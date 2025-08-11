@@ -1,16 +1,18 @@
 # Allow imports from parent directory
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-import subprocess
 import struct
+import subprocess
 import sys
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple
+
+from w2d1.w2d1_re_solution import check_binary_protections, compile_vulnerable_binary, create_shellcode_exploit, exec_sh
 
 
-
-def test_basic_overflow(exploit_basic_overflow: callable):
+def test_basic_overflow(exploit_basic_overflow: Callable):
     """Test the basic buffer overflow exploit."""
     print("Testing basic buffer overflow...")
 
@@ -22,12 +24,7 @@ def test_basic_overflow(exploit_basic_overflow: callable):
     # Run the exploit
     exploit = exploit_basic_overflow()
     proc = subprocess.Popen(
-        [' ./first'],
-        shell=True,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
+        [" ./first"], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
 
     stdout, stderr = proc.communicate(input=exploit)
@@ -39,27 +36,20 @@ def test_basic_overflow(exploit_basic_overflow: callable):
     else:
         print("✗ Exploit failed. Output:")
         print(stdout)
-        exit(1)
+        sys.exit(1)
 
 
-
-
-def test_password_extraction(find_password_in_binary: callable):
+def test_password_extraction(find_password_in_binary: Callable):
     """Test password extraction from binary."""
     print("\nTesting password extraction...")
 
     password = find_password_in_binary()
 
     proc = subprocess.Popen(
-        [' ./first'],
-        shell=True,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
+        [" ./first"], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
 
-    stdout, stderr = proc.communicate(input=password + '\n')
+    stdout, stderr = proc.communicate(input=password + "\n")
 
     if "Password correct!" in stdout and "Flag: AISB{woo}" in stdout:
         print(f"✓ Found the password: '{password}'")
@@ -69,8 +59,6 @@ def test_password_extraction(find_password_in_binary: callable):
         exit(1)
 
 
-
-
 def test_shellcode_basics():
     """Test basic shellcode creation."""
     print("\nTesting shellcode exploit creation...")
@@ -78,15 +66,13 @@ def test_shellcode_basics():
     try:
         exploit = create_shellcode_exploit()
         print(f"✓ Created shellcode exploit: {len(exploit)} bytes")
-        print(f"Exploit structure:")
-        print("  - NOP sled: " + str(exploit.count(b'\\x90')) + " bytes")
-        print("  - Contains syscall: " + str(b'\x0f\x05' in exploit))
+        print("Exploit structure:")
+        print("  - NOP sled: " + str(exploit.count(b"\\x90")) + " bytes")
+        print("  - Contains syscall: " + str(b"\x0f\x05" in exploit))
         return True
     except Exception as e:
         print(f"✗ Failed to create exploit: {e}")
         return False
-
-
 
 
 def test_protection_checking():

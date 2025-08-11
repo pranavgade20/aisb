@@ -20,6 +20,7 @@ By the end of this module, you'll be able to:
 Let's start by setting up our helper functions and understanding the tools we'll use.
 """
 
+from pathlib import Path
 import subprocess
 import struct
 import sys
@@ -28,7 +29,8 @@ from typing import Optional, Tuple
 
 def exec_sh(command: str, timeout: Optional[int] = 30, check_retcode: bool = True) -> subprocess.CompletedProcess:
     """Execute a shell command and return the result."""
-    return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
+    source_path = Path(__file__).parent
+    return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)#, cwd=str(source_path))
 
 
 def compile_vulnerable_binary(source_file: str, output_file: str, extra_flags: str = "") -> bool:
