@@ -188,23 +188,18 @@ The stack layout looks like this:
 
 #### Step 5: Additional Analysis Techniques
 
-9. **Cross-references**:
-    - Right-click on `gets` → References → Find References To
-    - This shows where dangerous functions are called
-
-10. **String analysis**:
+9. **String analysis**:
     - Window → Defined Strings
     - Look for interesting strings like passwords or flags
-    - Double-click strings to see where they're used
 
-11. **Function graph view**:
+10. **Function graph view**:
     - In a function, click the graph icon (or press G)
     - Shows control flow visually
     - Useful for understanding complex logic
 
 #### Step 6: Document Your Findings
 
-12. **Add comments in Ghidra**:
+11. **Add comments in Ghidra**:
     - Right-click any line → Comments → Set...
     - Document your understanding:
       ```
@@ -212,7 +207,7 @@ The stack layout looks like this:
       ; Buffer is 16 bytes, can overflow into authorized variable
       ```
 
-13. **Rename variables for clarity**:
+12. **Rename variables for clarity**:
     - Right-click on `local_28` → Rename Variable
     - Change to `password_buffer`
     - Do the same for `local_18` → `is_authorized`
