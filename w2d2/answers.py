@@ -350,7 +350,7 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     """
     # 1. Create a new cgroup directory with path /sys/fs/cgroup/{cgroup_name} - you will write files in this directory to configure the cgroup
     path = f'/sys/fs/cgroup/{cgroup_name}'
-    os.makedirs(path)
+    os.makedirs(path, exist_ok=True)
     # 2. Enable controllers (+cpu +memory +pids) in parent cgroup
     with open('/sys/fs/cgroup/cgroup.subtree_control', 'w') as f:
         f.write("+cpu +memory +pids")
@@ -386,5 +386,40 @@ def add_process_to_cgroup(cgroup_name, pid=None):
 
 from w2d2_test import test_add_process_to_cgroup
 test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
+
+# %%
+def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    """
+    Run a command in both a cgroup and chroot environment
+    
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into
+        command: Command to run
+        memory_limit: Memory limit for the cgroup
+    """
+    # 1. Create cgroup with memory limit
+    create_cgroup(cgroup_name, memory_limit)
+    # 2. Handle command format (None, string, list)
+    if command is None:
+        command = ['/bin/sh']
+    elif isinstance(command, str):
+        command = ['/bin/sh', '-c', command]
+    # 3. Create shell script that:
+    #    - Adds process to cgroup
+    #    - Executes chroot with command
+    script = f"""
+    echo $$ > /sys/fs/cgroup/{cgroup_name}/cgroup.procs
+    chroot {chroot_dir} {' '.join(command)}
+    """
+    # 4. Run with timeout and error handling
+    result = subprocess.run(['sh', '-c', script], timeout=60)
+    return result
+
+
+from w2d2_test import test_memory_simple
+from w2d2_test import test_run_in_cgroup_chroot
+
+test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup=create_cgroup)
 
 # %%

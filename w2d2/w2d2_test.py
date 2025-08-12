@@ -23,6 +23,12 @@ import glob
 import random
 from pathlib import Path
 
+# Architecture detection
+TARGET_ARCH, TARGET_VARIANT = {
+    'x86_64': ('amd64', None), 'amd64': ('amd64', None),
+    'arm64': ('arm64', 'v8'), 'aarch64': ('arm64', 'v8'),
+    'armv7l': ('arm', 'v7'), 'armv6l': ('arm', 'v6')
+}.get(platform.machine().lower(), ('amd64', None))
 
 def test_parse_image_reference(parse_image_reference):
     """Test the image reference parsing function."""
@@ -331,7 +337,7 @@ def test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup):
 
 
 
-def test_memory_simple(cgroup_name="demo", memory_limit="100M"):
+def test_memory_simple(cgroup_name="demo", memory_limit="100M", create_cgroup=None):
     """
     Simple memory test that matches the user's manual example exactly
     """
@@ -395,7 +401,7 @@ EOF
 
 
 
-def test_run_in_cgroup_chroot(run_in_cgroup_chroot):
+def test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup):
     """Test the combined cgroup-chroot execution function."""
     print("Testing combined cgroup-chroot execution...")
     
@@ -406,7 +412,7 @@ def test_run_in_cgroup_chroot(run_in_cgroup_chroot):
     else:
         print("⚠ Basic combined execution failed")
 
-    test_memory_simple(cgroup_name="demo_comprehensive", memory_limit="50M")
+    test_memory_simple(cgroup_name="demo_comprehensive", memory_limit="50M", create_cgroup=create_cgroup)
     
     print("✓ Combined cgroup-chroot tests completed!\n" + "=" * 60)
 
