@@ -302,48 +302,47 @@ test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifes
 #         with tarfile.open(fileobj=BytesIO(resp.content), mode="r:gz") as tar:
 #             tar.extractall(output_dir)
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List, Dict, Any
 import os
-import tarfile
-import requests
-from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Dict, List
+
 
 def download_and_extract_single_layer(
-    registry: str, 
-    image: str, 
-    layer: Dict[str, Any], 
-    headers: Dict[str, str], 
+    registry: str,
+    image: str,
+    layer: Dict[str, Any],
+    headers: Dict[str, str],
     output_dir: str,
     layer_index: int,
-    total_layers: int
+    total_layers: int,
 ) -> str:
     """Download and extract a single layer."""
     digest = layer["digest"]
     url = f"https://{registry}/v2/{image}/blobs/{digest}"
-    
+
     print(f"Downloading layer {layer_index + 1}/{total_layers}: {digest[:12]}...")
-    
+
     resp = requests.get(url, headers=headers, stream=True)
     resp.raise_for_status()
-    
+
     # Extract the layer
     with tarfile.open(fileobj=BytesIO(resp.content), mode="r:gz") as tar:
         tar.extractall(output_dir)
-    
+
     return f"Layer {layer_index + 1}/{total_layers} ({digest[:12]}) extracted"
 
+
 def download_and_extract_layers(
-    registry: str, 
-    image: str, 
-    layers: List[Dict[str, Any]], 
-    headers: Dict[str, str], 
+    registry: str,
+    image: str,
+    layers: List[Dict[str, Any]],
+    headers: Dict[str, str],
     output_dir: str,
-    max_workers: int = 4
+    max_workers: int = 4,
 ) -> None:
     """
     Download and extract all layers to the output directory using parallel processing.
-    
+
     Args:
         registry: Registry hostname
         image: Image name
@@ -354,24 +353,17 @@ def download_and_extract_layers(
     """
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
-    
+
     # Use ThreadPoolExecutor for parallel downloads
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all download tasks
         future_to_layer = {
             executor.submit(
-                download_and_extract_single_layer,
-                registry,
-                image,
-                layer,
-                headers,
-                output_dir,
-                i,
-                len(layers)
+                download_and_extract_single_layer, registry, image, layer, headers, output_dir, i, len(layers)
             ): (i, layer)
             for i, layer in enumerate(layers)
         }
-        
+
         # Process completed downloads
         for future in as_completed(future_to_layer):
             layer_index, layer = future_to_layer[future]
@@ -382,6 +374,7 @@ def download_and_extract_layers(
                 digest = layer["digest"][:12]
                 print(f"Error downloading layer {layer_index + 1} ({digest}): {e}")
                 raise
+
 
 from w2d2_test import test_download_and_extract_layers
 
@@ -566,3 +559,50 @@ def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="10
 from w2d2_test import test_memory_simple, test_run_in_cgroup_chroot
 
 test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup)
+
+
+# %%
+def create_cgroup_comprehensive_part1(cgroup_name, memory, cpu):
+    """
+    Create a cgroup with comprehensive settings - Part 1: Basic setup
+
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (not implemented yet)
+    """
+    cgroup_dir = Path(f"/sys/fs/cgroup/{cgroup_name}")
+    cgroup_dir.mkdir(exist_ok=True)
+    (cgroup_dir / "cgroup.subtree_control").write_text("+cpu +memory +pids")
+    if memory is not None:
+        (cgroup_dir / "memory.max").write_text(memory)
+        (cgroup_dir / "memory.swap.max").write_text("0")
+    if cpu is not None:
+        (cgroup_dir / "cpu.max").write_text(cpu)
+    return str(cgroup_dir)
+
+
+from w2d2_test import test_create_cgroup_comprehensive_part1
+
+test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
+
+# %%
+
+
+def create_cgroup_comprehensive(cgroup_name, memory_limit=None, cpu_limit=None):
+    """
+    Create a cgroup with comprehensive settings - Part 2: Advanced OOM and Process Management
+    
+    This builds on Part 1 by adding advanced Out-of-Memory handling, process assignment,
+    and comprehensive monitoring capabilities for production-ready container isolation.
+    
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (not implemented yet)
+    """
+    pass
+from w2d2_test import test_memory_comprehensive
+from w2d2_test import test_create_cgroup_comprehensive
+
+test_create_cgroup_comprehensive(test_memory_comprehensive)
