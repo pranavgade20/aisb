@@ -627,7 +627,7 @@ def test_namespace_isolation(run_in_cgroup_chroot_namespaced):
 
 
 
-def test_bridge_interface():
+def test_bridge_interface(create_bridge_interface):
     """Test bridge interface creation"""
     print("Testing bridge interface creation...")
     

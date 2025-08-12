@@ -573,3 +573,36 @@ from w2d2_test import test_namespace_isolation
 test_namespace_isolation(run_in_cgroup_chroot_namespaced) 
 
 # %%
+import uuid
+
+def create_bridge_interface():
+    """
+    Create and configure bridge0 interface with IP address
+    """
+    # Check if running as root
+    if os.geteuid() != 0:
+        print("⚠ Warning: Bridge interface creation requires root privileges")
+        print("Critical failure - bridge interface creation requires root privileges")
+        sys.exit(1)  # Exit the Python process on critical failure
+
+    #   - see docs: https://linux.die.net/man/8/ip
+    #   - Check if bridge0 already exists
+    check = exec_sh('ip link show bridge0', check_retcode=False)
+    #   - Remove existing bridge if present
+    if check.returncode == 0:
+        exec_sh('ip link del bridge0', check_retcode=False)
+
+    #   - Create bridge0 interface
+    exec_sh('ip link add bridge0 type bridge', check_retcode=False)
+    #   - Configure bridge0 with IP 10.0.0.1/24
+    exec_sh('ip addr add 10.0.0.1/24 dev bridge0', check_retcode=False)
+    #   - Bring bridge0 up
+    exec_sh('ip link set bridge0 up', check_retcode=False)
+
+    return True
+
+from w2d2_test import test_bridge_interface
+
+# Run the test
+test_bridge_interface(create_bridge_interface)
+# %%
