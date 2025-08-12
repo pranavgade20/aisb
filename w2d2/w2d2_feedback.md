@@ -6,3 +6,6 @@ TARGET_ARCH, TARGET_VARIANT were missing from test files
 
 Exercise 3.3
 Tests were missing create_cgroup function
+
+Exercise 3.5
+It works even without step 2 in the pseudocode (the main improvement from the previous exercise).

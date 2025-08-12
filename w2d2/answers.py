@@ -450,3 +450,38 @@ from w2d2_test import test_create_cgroup_comprehensive_part1
 test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
 
 # %%
+def create_cgroup_comprehensive(cgroup_name, memory_limit=None, cpu_limit=None):
+    """
+    Create a cgroup with comprehensive settings - Part 2: Advanced OOM and Process Management
+    
+    This builds on Part 1 by adding advanced Out-of-Memory handling, process assignment,
+    and comprehensive monitoring capabilities for production-ready container isolation.
+    
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (not implemented yet)
+    """
+    # 1. Call create_cgroup_comprehensive_part1() 
+    cgroup_path = create_cgroup_comprehensive_part1(cgroup_name, memory_limit, cpu_limit)
+    # 2. Enable OOM group killing + assign process + set OOM score (see the documentation!)
+    oom_group_path = f'{cgroup_path}/memory.oom.group'
+    oom_score_path = f'/proc/self/oom_score_adj'
+
+    with open(oom_group_path, 'w') as f:
+        f.write('1')
+
+    add_process_to_cgroup(cgroup_name)
+
+    with open(oom_score_path, 'w') as f:
+        f.write('500')
+
+    # 3. Return cgroup path
+    return cgroup_path
+
+from w2d2_test import test_memory_comprehensive
+from w2d2_test import test_create_cgroup_comprehensive
+
+test_create_cgroup_comprehensive(test_memory_comprehensive)
+
+# %%
