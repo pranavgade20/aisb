@@ -114,3 +114,118 @@ def parse_image_reference(image_ref: str) -> Tuple[str, str, str]:
 from w2d2_test import test_parse_image_reference
 
 test_parse_image_reference(parse_image_reference)
+
+
+# %%
+def get_auth_token(registry: str, image: str) -> Dict[str, str]:
+    """
+    Get authentication headers for Docker registry access.
+
+    Args:
+        registry: Registry hostname (e.g., "registry-1.docker.io")
+        image: Image name (e.g., "library/hello-world")
+
+    Returns:
+        Dictionary of headers to include in registry requests
+    """
+    if "SOLUTION":
+        headers = {}
+        if registry == "registry-1.docker.io":
+            # Get auth token for Docker Hub
+            token_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:{image}:pull"
+            token_resp = requests.get(token_url)
+            token_resp.raise_for_status()
+            token = token_resp.json()["token"]
+            headers["Authorization"] = f"Bearer {token}"
+        return headers
+    else:
+        # TODO: Authentication implementation
+        # 1. Initialize empty headers dictionary
+        # 2. Check if registry is Docker Hub (registry-1.docker.io)
+        # 3. For Docker Hub, construct token URL with service and scope parameters
+        # 4. Make HTTP request to auth.docker.io/token
+        # 5. Parse JSON response to extract token
+        # 6. Add Authorization header with Bearer token
+        # 7. Return headers dictionary
+        return {}  # Placeholder return
+
+
+# %%
+def get_target_manifest(
+    registry: str, image: str, tag: str, headers: Dict[str, str], target_arch: str, target_variant: Optional[str] = None
+) -> str:
+    """
+    Get the manifest digest for the target architecture.
+
+    Args:
+        registry: Registry hostname
+        image: Image name
+        tag: Image tag
+        headers: Authentication headers
+        target_arch: Target architecture (e.g., "amd64", "arm64")
+        target_variant: Optional architecture variant (e.g., "v8")
+
+    Returns:
+        Manifest digest for the target architecture
+
+    Raises:
+        ValueError: If target architecture is not found
+    """
+    # TODO: Implement manifest discovery
+    # 1. Build manifest list URL
+    # 2. Make HTTP request with headers
+    # 3. Parse JSON response
+    # 4. Find manifest matching target_arch and target_variant
+    # 5. Return the digest, or raise ValueError if not found
+    manifest_url = "https://" + registry + "/v2/" + image + "/manifests/" + tag
+    resp = requests.get(manifest_url, headers=headers)
+    resp.raise_for_status()
+    response = resp.json()
+
+    for manifest in response["manifests"]:
+        if manifest["platform"]["architecture"] == target_arch:
+            if target_variant is None:
+                print("digest: " + manifest["digest"])
+                return manifest["digest"]
+            else:
+                # if manifest["platform"].get("variant") == target_variant:
+                if "variant" in manifest["platform"] and manifest["platform"]["variant"] == target_variant:
+                    return manifest["digest"]
+    raise ValueError
+
+
+# %%
+
+from w2d2_test import test_get_target_manifest
+
+test_get_target_manifest(get_target_manifest, get_auth_token)
+
+
+# %%
+def get_manifest_layers(
+    registry: str, image: str, manifest_digest: str, headers: Dict[str, str]
+) -> List[Dict[str, Any]]:
+    """
+    Get the layer information from a manifest.
+
+    Args:
+        registry: Registry hostname
+        image: Image name
+        manifest_digest: Manifest digest
+        headers: Authentication headers
+
+    Returns:
+        List of layer dictionaries with 'digest' and 'size' keys
+    """
+    # TODO: Implement manifest processing
+    # 1. Build manifest URL using digest
+    # 2. Add Accept header for v2 manifest format
+    # 3. Make HTTP request
+    # 4. Parse JSON and extract layers
+    # 5. Return list of layer dictionaries
+    return []  # Placeholder return
+
+
+from w2d2_test import test_get_manifest_layers
+
+test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifest)
