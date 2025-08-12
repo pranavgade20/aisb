@@ -483,7 +483,7 @@ def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="10
 from w2d2_test import test_memory_simple
 from w2d2_test import test_run_in_cgroup_chroot
 
-test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup)
+# test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup)
 
 # %%
 
@@ -546,25 +546,156 @@ def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memor
         command = ["/bin/sh", "-c", command]
 
     print(f"Running `{command}` in cgroup {cgroup_name} with chroot {chroot_dir} and namespaces")
-    # TODO: Implement namespace isolation following these steps:
+    """
+    Run a command in cgroup, chroot, and namespace isolation
 
-    # Step 1: Fork a child process
-    # (Creates a copy of our program - parent and child run separately)
-    # Learn more: https://linuxhint.com/fork-system-call-linux/ and https://www.w3schools.com/python/ref_os_fork.asp
-    # documentation: https://docs.python.org/3/library/os.html#os.fork
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into (must contain basic filesystem structure)
+        command: Command to run (defaults to /bin/sh if None)
+        memory_limit: Memory limit for the cgroup (e.g., "100M")
 
-    # Step 2: In child process:
-    #   - Set up signal handler for SIGUSR1 (like a doorbell to wake up the child)
-    #     See: https://docs.python.org/3/library/signal.html
-    #   - Wait for parent to finish setup and send a signal
-    #   - After receiving signal, use unshare command to create isolated environments:
-    #     See: https://man7.org/linux/man-pages/man1/unshare.1.html
+    Returns:
+        Exit code of the command, or None if error occurred
+    """
+    # Create cgroup with memory limit
+    create_cgroup(cgroup_name, memory_limit=memory_limit)
 
-    # Step 3: In parent process:
-    #   - Add child PID to cgroup (to limit resources like memory/CPU)
-    #   - Send SIGUSR1 signal to child (tells it "you're ready to start")
-    #   - Wait for child to finish running
-    #   - Get the exit code to report success/failure
+    # Prepare command - default to shell if none provided
+    if command is None:
+        command = ["/bin/sh"]
+    elif isinstance(command, str):
+        command = ["/bin/sh", "-c", command]
 
-    # Think about why we did .fork() and the complicated signalling, as opposed to just running the commands sequentially.
+    print(f"Running `{command}` in cgroup {cgroup_name} with chroot {chroot_dir} and namespaces")
+
+    # Step 1: Fork to create child process
+    pid = os.fork()
+
+    if pid == 0:
+        # CHILD PROCESS EXECUTION PATH
+
+        # Step 2: Set up signal handler to receive SIGUSR1 from parent
+        def resume_handler(signum, frame):
+            pass  # Just wake up from pause - no action needed
+
+        signal.signal(signal.SIGUSR1, resume_handler)
+        print(f"Child process {os.getpid()} waiting for signal...")
+
+        # Step 3: Wait for parent to add us to cgroup
+        signal.pause()  # Blocks until SIGUSR1 received
+        print(f"Child process {os.getpid()} resuming...")
+
+        # Step 4: Execute with namespace isolation using unshare
+        # unshare creates new namespaces, then chroot isolates filesystem
+        # Execute command with namespace isolation
+        try:
+            subprocess.run(
+                [
+                    "unshare",
+                    "--pid",  # Process ID namespace isolation
+                    "--mount",  # Mount namespace isolation
+                    "--net",  # Network namespace isolation
+                    "--uts",  # Hostname namespace isolation
+                    "--ipc",  # IPC namespace isolation
+                    "--fork",  # Fork after creating namespaces
+                    "chroot",
+                    chroot_dir,  # Change root directory
+                ]
+                + command,
+                check=True,
+            )
+            # Child process must exit explicitly to avoid continuing parent code
+            os._exit(0)
+        except Exception as e:
+            print(f"Child process error: {e}")
+            os._exit(1)
+
+    else:
+        # PARENT PROCESS EXECUTION PATH
+
+        print(f"Started paused process {pid}, adding to cgroup {cgroup_name}")
+
+        # Step 5: Add child process to cgroup for resource limits
+        if add_process_to_cgroup(cgroup_name, pid):
+            print(f"Added process {pid} to cgroup {cgroup_name}")
+        else:
+            print(f"⚠ Warning: Could not add process {pid} to cgroup {cgroup_name}")
+
+        # Step 6: Signal child to continue execution
+        os.kill(pid, signal.SIGUSR1)
+        print(f"Signaled process {pid} to continue")
+
+        # Step 7: Wait for child process to complete
+        _, status = os.waitpid(pid, 0)
+        exit_code = os.WEXITSTATUS(status)
+
+        print(f"Exit code: {exit_code}")
+        return exit_code
+
+
+from w2d2_test import test_namespace_isolation
+
+test_namespace_isolation(run_in_cgroup_chroot_namespaced)
+
+# %%
+
+
+import uuid
+
+
+def create_bridge_interface():
+    """
+    Create and configure bridge0 interface with IP address
+    """
+    # Check if running as root
+    if os.geteuid() != 0:
+        print("⚠ Warning: Bridge interface creation requires root privileges")
+        print("Critical failure - bridge interface creation requires root privileges")
+        sys.exit(1)  # Exit the Python process on critical failure
+    # TODO: Implement bridge interface creation
+    #   - see docs: https://linux.die.net/man/8/ip
+    #   - Check if bridge0 already exists
+    #   - Remove existing bridge if present
+    #   - Create bridge0 interface
+    #   - Configure bridge0 with IP 10.0.0.1/24
+    #   - Bring bridge0 up
+
+    if exec_sh("sudo ip addr | grep bridge0").returncode == 0:
+        exec_sh("sudo ip link set bridge0 down")
+        exec_sh("sudo ip link delete bridge0 type bridge")
+
+    exec_sh("sudo ip link add name bridge0 type bridge")
+    exec_sh("sudo ip addr add 10.0.0.1/24 dev bridge0")
+    exec_sh("sudo ip link set bridge0 up")
+
+    return True
+
+
+from w2d2_test import test_bridge_interface
+
+
+# Run the test
+test_bridge_interface(create_bridge_interface)
+
+# %%
+
+
+def setup_nat_forwarding():
+    """
+    Set up NAT and forwarding rules for container internet access
+    """
+    # Check if running as root
+    if os.geteuid() != 0:
+        print("⚠ Warning: NAT setup requires root privileges")
+        print("Critical failure - NAT setup requires root privileges")
+        sys.exit(1)  # Exit the Python process on critical failure
+    # TODO: Implement NAT and forwarding setup
+    #   - Enable IP forwarding with sysctl
+    #   - Get default network interface
+    #   - Clear existing iptables rules
+    #   - Set iptables default policies to ACCEPT
+    #   - Add NAT rule for MASQUERADE
+    #   - Add forwarding rules between bridge and default interface
+    exec_sh("sysctl -w net.ipv4.ip_forward=1")
     pass

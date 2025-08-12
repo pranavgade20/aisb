@@ -22,6 +22,22 @@ import glob
 import random
 from pathlib import Path
 
+
+def exec_sh(command: str, timeout: Optional[int | None] = 30, check_retcode=True) -> subprocess.CompletedProcess:
+    """
+    Execute shell commands with consistent parameters.
+
+    Args:
+        command: Shell command to execute (can be multiline)
+        timeout: Optional timeout in seconds
+
+    Returns:
+        CompletedProcess object with result
+    """
+
+    return subprocess.run(command, shell=True, capture_output=True, text=True, check=check_retcode, timeout=timeout)
+
+
 TARGET_ARCH, TARGET_VARIANT = {
     "x86_64": ("amd64", None),
     "amd64": ("amd64", None),
@@ -537,7 +553,7 @@ def test_create_cgroup_comprehensive(test_memory_comprehensive):
     print("✓ Complete comprehensive cgroup creation tests completed!\n" + "=" * 60)
 
 
-def test_namespace_isolation():
+def test_namespace_isolation(run_in_cgroup_chroot_namespaced):
     """
     Test that namespaces provide proper isolation by checking:
     1. Different hostname (UTS namespace)
@@ -586,7 +602,7 @@ def test_namespace_isolation():
     return True
 
 
-def test_bridge_interface():
+def test_bridge_interface(create_bridge_interface):
     """Test bridge interface creation"""
     print("Testing bridge interface creation...")
 
@@ -610,7 +626,7 @@ def test_bridge_interface():
     return result
 
 
-def test_nat_forwarding():
+def test_nat_forwarding(setup_nat_forwarding):
     """Test NAT and forwarding setup"""
     print("Testing NAT and forwarding setup...")
 
@@ -631,7 +647,7 @@ def test_nat_forwarding():
     return result
 
 
-def test_bridge_network():
+def test_bridge_network(setup_bridge_network):
     """Test complete bridge network setup"""
     print("Testing complete bridge network setup...")
 
@@ -647,7 +663,7 @@ def test_bridge_network():
     return result
 
 
-def test_container_network():
+def test_container_network(create_container_network, cleanup_container_network):
     """Test container network creation"""
     print("Testing container network creation...")
 
@@ -676,7 +692,7 @@ def test_container_network():
     return netns_name is not None
 
 
-def test_networked_container():
+def test_networked_container(run_networked_container):
     """Test networked container functionality"""
     print("Testing networked container...")
 
@@ -702,12 +718,12 @@ def test_networked_container():
     return result == 0
 
 
-def test_callback(syscall_line, pid):
+def test_callback(syscall_line, pid, alerts):
     alerts.append((syscall_line, pid))
     print(f"🚨 TEST ALERT: {syscall_line}")
 
 
-def test_syscall_monitoring():
+def test_syscall_monitoring(monitor_container_syscalls):
     """Test basic syscall monitoring"""
     print("Testing syscall monitoring...")
 
