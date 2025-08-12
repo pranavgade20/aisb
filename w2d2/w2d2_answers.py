@@ -1,6 +1,7 @@
 # %%
 
 
+from pathlib import Path
 import requests
 import tarfile
 import json
@@ -37,15 +38,6 @@ TARGET_ARCH, TARGET_VARIANT = {
     "armv6l": ("arm", "v6"),
 }.get(platform.machine().lower(), ("amd64", None))
 
-print(f"Detected architecture: {TARGET_ARCH} {TARGET_VARIANT if TARGET_VARIANT else ''}")
-
-# Safety checks
-if not os.path.exists("/.dockerenv"):
-    print(
-        "❌ ERROR: Not in Docker container or Docker container is not properly set up! Run inside the provided container."
-    )
-    sys.exit(1)
-print("✅ Environment checks passed")
 
 # %%
 # %load_ext autoreload
@@ -347,10 +339,6 @@ def pull_layers(
 from w2d2_test import test_pull_layers_complete
 
 # test_pull_layers_complete(pull_layers)
-
-
-pull_layers("alpine:latest", "./extracted_alpine")
-pull_layers("python:3.12-alpine", "./extracted_python")
 # %%
 
 import subprocess
@@ -378,34 +366,65 @@ def run_chroot(
     """
     # TODO: Implement chroot command execution
     # 1. Handle different command formats (None, string, list)
-    if isinstance(command, str):
-        chroot = ["chroot", chroot_dir] + [command]
-    elif isinstance(command, list):
-        chroot = ["chroot", chroot_dir] + command
-    elif command is None:
-        chroot = ["chroot", chroot_dir] + "/bin/sh"
-    else:
-        raise ValueError
+    if command is None:
+        command = ["/bin/sh"]
+    elif isinstance(command, str):
+        command = ["/bin/sh", "-c", command]
 
-    try:
-        result = subprocess.run(
-            chroot,
-            timeout=5,
-            capture_output=True,
-        )
-        print(result)
-    except Exception as e:
-        print(e)
-        result = None
-    # 2. Build the chroot command: ['chroot', chroot_dir] + command
-    # 3. Execute with subprocess.run() with timeout and output capture
-    # 4. Print execution details and results
-    # 5. Handle TimeoutExpired and other exceptions
-    # 6. Return the result or None on error
-    return None
+    print(f"Running chroot {chroot_dir} with command: {' '.join(command)}")
+
+    result = subprocess.run(["chroot", chroot_dir] + command, capture_output=True, text=True, timeout=30)
+    print(f"Exit code: {result.returncode}")
+    if result.stdout:
+        print(f"stdout:\n{result.stdout}")
+    if result.stderr:
+        print(f"stderr:\n{result.stderr}")
 
 
 from w2d2_test import test_run_chroot
 
 # Run the test
-test_run_chroot(run_chroot)
+# test_run_chroot(run_chroot)
+
+# %%
+
+import signal
+import time
+
+
+def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
+    """
+    Create a cgroup with specified limits
+
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (stretch)
+
+    Returns:
+        Path to the created cgroup
+    """
+    # TODO: Implement basic cgroup creation
+    # 1. Create a new cgroup directory with path /sys/fs/cgroup/{cgroup_name} - you will write files in this directory to configure the cgroup
+    # 2. Enable controllers (+cpu +memory +pids) in parent cgroup
+    # 3. Set memory limit if specified - write the memory limit to {cgroup_path}/memory.max, which will tell the kernel how much memory the cgroup can use
+    # 4. Return the cgroup path
+    # 5. Handle errors and return None on failure
+    cgroup_dir = Path(f"/sys/fs/cgroup/{cgroup_name}")
+    cgroup_dir.mkdir(exist_ok=True)
+    (cgroup_dir / "cgroup.subtree_control").write_text("+cpu +memory +pids")
+    if memory_limit is not None:
+        (cgroup_dir / "memory.max").write_text(memory_limit)
+    if cpu_limit is not None:
+        (cgroup_dir / "cpu.max").write_text(cpu_limit)
+    return str(cgroup_dir)
+
+
+from w2d2_test import test_create_cgroup
+
+test_create_cgroup(create_cgroup)
+# %%
+
+# %%
+
+# %%
