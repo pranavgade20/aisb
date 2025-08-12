@@ -1,6 +1,5 @@
 # %%
-%load_ext autoreload
-%autoreload 2
+
 
 import requests
 import tarfile
@@ -49,8 +48,8 @@ if not os.path.exists("/.dockerenv"):
 print("✅ Environment checks passed")
 
 # %%
-%load_ext autoreload
-%autoreload 2
+# %load_ext autoreload
+# %autoreload 2
 
 
 def parse_image_reference(image_ref: str) -> Tuple[str, str, str]:
@@ -75,11 +74,11 @@ def parse_image_reference(image_ref: str) -> Tuple[str, str, str]:
     # - Use rsplit(':', 1) to handle image names that might contain colons
     # - Default to 'latest' tag if none is specified
 
-    colon_splits = image_ref.split(':')
+    colon_splits = image_ref.split(":")
     if len(colon_splits) == 1:
         s = colon_splits[0]
-        tag = 'latest'
-    else:        
+        tag = "latest"
+    else:
         s, tag = image_ref.split(":")
 
     slash_splits = s.split("/")
@@ -101,14 +100,15 @@ test_parse_image_reference(parse_image_reference)
 # %load_ext autoreload
 # %autoreload 2
 
+
 def get_auth_token(registry: str, image: str) -> Dict[str, str]:
     """
     Get authentication headers for Docker registry access.
-    
+
     Args:
         registry: Registry hostname (e.g., "registry-1.docker.io")
         image: Image name (e.g., "library/hello-world")
-        
+
     Returns:
         Dictionary of headers to include in registry requests
     """
@@ -123,18 +123,20 @@ def get_auth_token(registry: str, image: str) -> Dict[str, str]:
 
     # 3. For Docker Hub, construct token URL with service and scope parameters
     # 4. Make HTTP request to auth.docker.io/token
-    url = f"https://auth.docker.io/token?service={registry}&scope=repository:{image}:pull"
+    url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:{image}:pull"
     req = requests.get(url, headers)
 
     # 5. Parse JSON response to extract token
     js_req = req.json()
 
     # 6. Add Authorization header with Bearer token
-    token = js_req['token']
-    headers['Authorization'] = f"Bearer {token}"
+    token = js_req["token"]
+    headers["Authorization"] = f"Bearer {token}"
 
     # 7. Return headers dictionary
     return headers
+
+
 from w2d2_test import test_get_auth_token
 
 test_get_auth_token(get_auth_token)
@@ -157,11 +159,12 @@ https://{registry}/v2/{image}/manifests/{tag}
 """
 
 
-def get_target_manifest(registry: str, image: str, tag: str, headers: Dict[str, str], 
-                       target_arch: str, target_variant: Optional[str] = None) -> str:
+def get_target_manifest(
+    registry: str, image: str, tag: str, headers: Dict[str, str], target_arch: str, target_variant: Optional[str] = None
+) -> str:
     """
     Get the manifest digest for the target architecture.
-    
+
     Args:
         registry: Registry hostname
         image: Image name
@@ -169,10 +172,10 @@ def get_target_manifest(registry: str, image: str, tag: str, headers: Dict[str, 
         headers: Authentication headers
         target_arch: Target architecture (e.g., "amd64", "arm64")
         target_variant: Optional architecture variant (e.g., "v8")
-        
+
     Returns:
         Manifest digest for the target architecture
-        
+
     Raises:
         ValueError: If target architecture is not found
     """
@@ -182,22 +185,22 @@ def get_target_manifest(registry: str, image: str, tag: str, headers: Dict[str, 
     # 3. Parse JSON response
     # 4. Find manifest matching target_arch and target_variant
     # 5. Return the digest, or raise ValueError if not found
-    
+
     manifest_list_url = f"https://{registry}/v2/{image}/manifests/{tag}"
     print(f"Fetching manifest list from: {manifest_list_url}")
-    
+
     resp = requests.get(manifest_list_url, headers=headers)
     resp.raise_for_status()
     manifest_list = resp.json()
-    
+
     # Find the manifest for our target architecture
     target_manifest = None
-    for manifest in manifest_list.get('manifests', []):
-        platform = manifest.get('platform', {})
-        if platform.get('architecture') == target_arch:
+    for manifest in manifest_list.get("manifests", []):
+        platform = manifest.get("platform", {})
+        if platform.get("architecture") == target_arch:
             # Check variant if specified
             if target_variant:
-                if platform.get('variant') == target_variant:
+                if platform.get("variant") == target_variant:
                     target_manifest = manifest
                     break
             else:
@@ -207,32 +210,36 @@ def get_target_manifest(registry: str, image: str, tag: str, headers: Dict[str, 
 
     if not target_manifest:
         available_archs = []
-        for manifest in manifest_list.get('manifests', []):
-            platform = manifest.get('platform', {})
-            arch_str = platform.get('architecture', 'unknown')
-            if platform.get('variant'):
+        for manifest in manifest_list.get("manifests", []):
+            platform = manifest.get("platform", {})
+            arch_str = platform.get("architecture", "unknown")
+            if platform.get("variant"):
                 arch_str += f" {platform.get('variant')}"
             available_archs.append(arch_str)
-        
-        raise ValueError(f"No manifest found for architecture {target_arch}"
-                        f"{f' variant {target_variant}' if target_variant else ''}. "
-                        f"Available: {', '.join(available_archs)}")
 
-    manifest_digest = target_manifest['digest']
+        raise ValueError(
+            f"No manifest found for architecture {target_arch}"
+            f"{f' variant {target_variant}' if target_variant else ''}. "
+            f"Available: {', '.join(available_archs)}"
+        )
+
+    manifest_digest = target_manifest["digest"]
     print(f"Found manifest for {target_arch}: {manifest_digest}")
     return manifest_digest
 
 
-def get_manifest_layers(registry: str, image: str, manifest_digest: str, headers: Dict[str, str]) -> List[Dict[str, Any]]:
+def get_manifest_layers(
+    registry: str, image: str, manifest_digest: str, headers: Dict[str, str]
+) -> List[Dict[str, Any]]:
     """
     Get the layer information from a manifest.
-    
+
     Args:
         registry: Registry hostname
         image: Image name
         manifest_digest: Manifest digest
         headers: Authentication headers
-        
+
     Returns:
         List of layer dictionaries with 'digest' and 'size' keys
     """
@@ -244,26 +251,31 @@ def get_manifest_layers(registry: str, image: str, manifest_digest: str, headers
     # 5. Return list of layer dictionaries
     manifest_url = f"https://{registry}/v2/{image}/manifests/{manifest_digest}"
     headers_copy = headers.copy()
-    headers_copy['Accept'] = 'application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.manifest.v1+json'
-    
+    headers_copy["Accept"] = (
+        "application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.manifest.v1+json"
+    )
+
     print(f"Fetching manifest from: {manifest_url}")
     resp = requests.get(manifest_url, headers=headers_copy)
     resp.raise_for_status()
     manifest = resp.json()
-    
+
     print(f"Manifest type: {manifest.get('mediaType', 'unknown')}")
-    layers = manifest.get('layers', [])
+    layers = manifest.get("layers", [])
     print(f"Number of layers: {len(layers)}")
-    
-    return layers # Placeholder return
+
+    return layers  # Placeholder return
+
 
 # %%
 
-def download_and_extract_layers(registry: str, image: str, layers: List[Dict[str, Any]], 
-                               headers: Dict[str, str], output_dir: str) -> None:
+
+def download_and_extract_layers(
+    registry: str, image: str, layers: List[Dict[str, Any]], headers: Dict[str, str], output_dir: str
+) -> None:
     """
     Download and extract all layers to the output directory.
-    
+
     Args:
         registry: Registry hostname
         image: Image name
@@ -280,16 +292,63 @@ def download_and_extract_layers(registry: str, image: str, layers: List[Dict[str
     #    c. Extract as gzipped tar to output_dir
     print(len(layers))
     for layer in layers:
-        x = layer
-        pass
-        get_target_manifest(registry=registry,image=image)
-        pass
-        
-    # 3. Print progress information
-    pass
+        blob_url = f"https://{registry}/v2/{image}/blobs/{layer['digest']}"
+
+        blob_resp = requests.get(blob_url, stream=True, headers=headers)
+
+        tar = tarfile.open(fileobj=BytesIO(blob_resp.content), mode="r:gz")
+        tar.extractall(path=output_dir)
+
+
 from w2d2_test import test_download_and_extract_layers
 
-test_download_and_extract_layers(download_and_extract_layers, get_auth_token, 
-                                get_target_manifest, get_manifest_layers)
+test_download_and_extract_layers(download_and_extract_layers, get_auth_token, get_target_manifest, get_manifest_layers)
 
+# %%
+
+
+def pull_layers(
+    image_ref: str, output_dir: str, target_arch: str = TARGET_ARCH, target_variant: Optional[str] = TARGET_VARIANT
+) -> None:
+    """
+    Pull and extract Docker image layers for a specific architecture.
+
+    Args:
+        image_ref: Docker image reference (various formats supported)
+        output_dir: Directory to extract layers to
+        target_arch: Target architecture (default: auto-detected)
+        target_variant: Target architecture variant (default: auto-detected)
+    """
+    # TODO: Implement complete pull_layers function
+    # Use all the functions you've implemented above:
+    # 1. parse_image_reference()
+    # 2. get_auth_token()
+    # 3. get_target_manifest()
+    # 4. get_manifest_layers()
+    # 5. download_and_extract_layers()
+    registry, image, tag = parse_image_reference(image_ref=image_ref)
+    auth_headers = get_auth_token(registry=registry, image=image)
+    manifest_ = get_target_manifest(
+        registry=registry,
+        image=image,
+        tag=tag,
+        headers=auth_headers,
+        target_arch=target_arch,
+        target_variant=target_variant,
+    )
+    layers = get_manifest_layers(registry=registry, image=image, manifest_digest=manifest_, headers=auth_headers)
+    download_and_extract_layers(
+        registry=registry, image=image, layers=layers, headers=auth_headers, output_dir=output_dir
+    )
+
+    pass
+
+
+from w2d2_test import test_pull_layers_complete
+
+test_pull_layers_complete(pull_layers)
+
+
+pull_layers("alpine:latest", "./extracted_alpine")
+pull_layers("python:3.12-alpine", "./extracted_python")
 # %%
