@@ -138,3 +138,54 @@ def get_auth_token(registry: str, image: str) -> Dict[str, str]:
 from w2d2_test import test_get_auth_token
 
 test_get_auth_token(get_auth_token)
+
+# %%
+
+
+def get_target_manifest(
+    registry: str, image: str, tag: str, headers: Dict[str, str], target_arch: str, target_variant: Optional[str] = None
+) -> str:
+    """
+    Get the manifest digest for the target architecture.
+
+    Args:
+        registry: Registry hostname
+        image: Image name
+        tag: Image tag
+        headers: Authentication headers
+        target_arch: Target architecture (e.g., "amd64", "arm64")
+        target_variant: Optional architecture variant (e.g., "v8")
+
+    Returns:
+        Manifest digest for the target architecture
+
+    Raises:
+        ValueError: If target architecture is not found
+    """
+    # Implement manifest discovery
+    # 1. Build manifest list URL
+    url = f"https://{registry}/v2/{image}/manifests/{tag}"
+    # 2. Make HTTP request with headers
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    # 3. Parse JSON response
+    manifest_list = response.json()["manifests"]
+    # 4. Find manifest matching target_arch and target_variant
+    for manifest in manifest_list:
+        platform = manifest["platform"]
+        proposed_architecture = platform["architecture"]
+        if "variant" in list(platform.keys()):
+            proposed_variant = platform["variant"]
+        else:
+            proposed_variant = None
+        if proposed_architecture == target_arch and target_variant == proposed_variant:
+            return manifest["digest"]
+    # 5. Return the digest, or raise ValueError if not found
+    raise ValueError("Architecture and variant did not match anything in manifest list.")
+
+
+from w2d2_test import test_get_target_manifest
+
+test_get_target_manifest(get_target_manifest, get_auth_token)
+
+# %%
