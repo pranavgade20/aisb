@@ -325,7 +325,7 @@ def test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup):
     print("✓ Process assignment tests completed!\n" + "=" * 60)
 
 
-def test_memory_simple(cgroup_name="demo", memory_limit="100M"):
+def test_memory_simple(cgroup_name="demo", memory_limit="100M", create_cgroup=None):
     """
     Simple memory test that matches the user's manual example exactly
     """
@@ -387,7 +387,7 @@ EOF
     return process.returncode
 
 
-def test_run_in_cgroup_chroot(run_in_cgroup_chroot):
+def test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup):
     """Test the combined cgroup-chroot execution function."""
     print("Testing combined cgroup-chroot execution...")
 
@@ -398,7 +398,7 @@ def test_run_in_cgroup_chroot(run_in_cgroup_chroot):
     else:
         print("⚠ Basic combined execution failed")
 
-    test_memory_simple(cgroup_name="demo_comprehensive", memory_limit="50M")
+    test_memory_simple(cgroup_name="demo_comprehensive", memory_limit="50M", create_cgroup=create_cgroup)
 
     print("✓ Combined cgroup-chroot tests completed!\n" + "=" * 60)
 

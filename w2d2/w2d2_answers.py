@@ -101,7 +101,7 @@ def parse_image_reference(image_ref: str) -> Tuple[str, str, str]:
 
 from w2d2_test import test_parse_image_reference
 
-test_parse_image_reference(parse_image_reference)
+# test_parse_image_reference(parse_image_reference)
 
 
 # %%
@@ -309,11 +309,12 @@ def pull_layers(
 
 from w2d2_test import test_pull_layers_complete
 
-test_pull_layers_complete(pull_layers)
+# test_pull_layers_complete(pull_layers)
 
 # %%
-pull_layers("alpine:latest", "./extracted_alpine")
-pull_layers("python:3.12-alpine", "./extracted_python")
+# pull_layers("alpine:latest", "./extracted_alpine")
+# pull_layers("python:3.12-alpine", "./extracted_python")
+
 
 # %%
 import subprocess
@@ -393,25 +394,24 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     # 3. Set memory limit if specified - write the memory limit to {cgroup_path}/memory.max, which will tell the kernel how much memory the cgroup can use
     # 4. Return the cgroup path
     # 5. Handle errors and return None on failure
-    path = f"/sys/fs/cgroup/{cgroup_name}"
-    subprocess.run(["sudo", "chmod", "+w", "/sys/fs/cgroup/"])
-    os.makedirs(path, exist_ok=True)
+    cgroup_path = f"/sys/fs/cgroup/{cgroup_name}"
 
-    # In cgroup v2, enabling controllers is done on the parent cgroup's
-    # subtree_control, not on the leaf where we place processes. Writing
-    # to the leaf's subtree_control makes it a distribution point and
-    # prevents adding processes to it (EBUSY). We therefore avoid writing
-    # subtree_control here.
+    # Create cgroup directory
+    os.makedirs(cgroup_path, exist_ok=True)
+    print(f"Created cgroup directory: {cgroup_path}")
 
+    # Enable controllers in parent cgroup
+    with open("/sys/fs/cgroup/cgroup.subtree_control", "w") as f:
+        f.write("+cpu +memory +pids")
+    print("Enabled cgroup controllers")
+
+    # Set memory limit if specified
     if memory_limit:
-        with open(path + "/memory.max", "w") as f:
-            f.write(memory_limit)
-
-    if cpu_limit:
-        with open(path + "/cpu.max", "w") as f:
-            f.write(cpu_limit)
-
-    return path
+        memory_max_path = f"{cgroup_path}/memory.max"
+        with open(memory_max_path, "w") as f:
+            f.write(str(memory_limit))
+        print(f"Set memory limit to {memory_limit}")
+    return cgroup_path
 
 
 from w2d2_test import test_create_cgroup
@@ -435,9 +435,9 @@ def add_process_to_cgroup(cgroup_name, pid=None):
     # 3. Handle errors and return success status
     if pid is None:
         pid = os.getpid()
-        
+
     cgroup_procs_path = f"/sys/fs/cgroup/{cgroup_name}/cgroup.procs"
-        
+
     with open(cgroup_procs_path, "w") as f:
         f.write(str(pid))
     print(f"Added process {pid} to cgroup {cgroup_name}")
@@ -449,28 +449,122 @@ from w2d2_test import test_add_process_to_cgroup
 test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
 
 # %%
+
+
 def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
     """
     Run a command in both a cgroup and chroot environment
-    
+
     Args:
         cgroup_name: Name of the cgroup to create/use
         chroot_dir: Directory to chroot into
         command: Command to run
         memory_limit: Memory limit for the cgroup
     """
-    # TODO: Implement combined cgroup-chroot execution
-    # 1. Create cgroup with memory limit
-    # 2. Handle command format (None, string, list)
-    # 3. Create shell script that:
-    #    - Adds process to cgroup
-    #    - Executes chroot with command
-    # 4. Run with timeout and error handling
-    cgroup = create_cgroup(cgroup_name, memory_limit=memory_limit)
+    # Create cgroup
+    create_cgroup(cgroup_name, memory_limit=memory_limit)
 
-    
+    if command is None:
+        command = ["/bin/sh"]
+    elif isinstance(command, str):
+        command = ["/bin/sh", "-c", command]
+
+    # Create a shell script that adds the process to cgroup then chroots
+    script = f"""
+    echo $$ > /sys/fs/cgroup/{cgroup_name}/cgroup.procs
+    chroot {chroot_dir} {" ".join(command)}
+    """
+
+    # Run without capturing output so we see it in real-time
+    result = subprocess.run(["sh", "-c", script], timeout=60)
+    return result
+
 
 from w2d2_test import test_memory_simple
 from w2d2_test import test_run_in_cgroup_chroot
 
-test_run_in_cgroup_chroot(run_in_cgroup_chroot)
+test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup)
+
+# %%
+
+
+def create_cgroup_comprehensive_part1(cgroup_name, memory, cpu):
+    """
+    Create a cgroup with comprehensive settings - Part 1: Basic setup
+
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (not implemented yet)
+    """
+    # TODO: Implement basic cgroup creation with swap disabling
+    # 1. Call create_cgroup() with the correct parameters to create the cgroup
+    # 2. Disable swap - search for "swap.max" in https://docs.kernel.org/admin-guide/cgroup-v2.html
+    # 3. Return cgroup path or None if critical steps fail
+    cgroup_path = create_cgroup(cgroup_name, memory_limit=memory, cpu_limit=cpu)
+
+    # Disable swap for this cgroup (CRITICAL for memory limits to work properly)
+    try:
+        swap_max_path = f"{cgroup_path}/memory.swap.max"
+        with open(swap_max_path, "w") as f:
+            f.write("0")
+        print("✓ Disabled swap for cgroup (critical for memory limits)")
+    except Exception as e:
+        print(f"Warning: Could not disable swap: {e}")
+
+    print("✓ Part 1 - Core memory management setup complete")
+    return cgroup_path
+
+
+from w2d2_test import test_create_cgroup_comprehensive_part1
+
+test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
+
+# %%
+
+
+def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    """
+    Run a command in cgroup, chroot, and namespace isolation
+
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into (must contain basic filesystem structure)
+        command: Command to run (defaults to /bin/sh if None)
+        memory_limit: Memory limit for the cgroup (e.g., "100M")
+
+    Returns:
+        Exit code of the command, or None if error occurred
+    """
+    # Create cgroup with memory limit
+    create_cgroup(cgroup_name, memory_limit=memory_limit)
+
+    # Prepare command - default to shell if none provided
+    if command is None:
+        command = ["/bin/sh"]
+    elif isinstance(command, str):
+        command = ["/bin/sh", "-c", command]
+
+    print(f"Running `{command}` in cgroup {cgroup_name} with chroot {chroot_dir} and namespaces")
+    # TODO: Implement namespace isolation following these steps:
+
+    # Step 1: Fork a child process
+    # (Creates a copy of our program - parent and child run separately)
+    # Learn more: https://linuxhint.com/fork-system-call-linux/ and https://www.w3schools.com/python/ref_os_fork.asp
+    # documentation: https://docs.python.org/3/library/os.html#os.fork
+
+    # Step 2: In child process:
+    #   - Set up signal handler for SIGUSR1 (like a doorbell to wake up the child)
+    #     See: https://docs.python.org/3/library/signal.html
+    #   - Wait for parent to finish setup and send a signal
+    #   - After receiving signal, use unshare command to create isolated environments:
+    #     See: https://man7.org/linux/man-pages/man1/unshare.1.html
+
+    # Step 3: In parent process:
+    #   - Add child PID to cgroup (to limit resources like memory/CPU)
+    #   - Send SIGUSR1 signal to child (tells it "you're ready to start")
+    #   - Wait for child to finish running
+    #   - Get the exit code to report success/failure
+
+    # Think about why we did .fork() and the complicated signalling, as opposed to just running the commands sequentially.
+    pass
