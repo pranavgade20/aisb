@@ -62,7 +62,6 @@ def test_parse_image_reference(parse_image_reference):
 
 
 
-
 def test_get_auth_token(get_auth_token):
     """Test the authentication token retrieval."""
     print("Testing authentication token retrieval...")

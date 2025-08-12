@@ -283,3 +283,35 @@ from w2d2_test import test_download_and_extract_layers
 test_download_and_extract_layers(download_and_extract_layers, get_auth_token, 
                                 get_target_manifest, get_manifest_layers)
 # %%
+
+
+def pull_layers(image_ref: str, output_dir: str, target_arch: str = TARGET_ARCH, 
+                target_variant: Optional[str] = TARGET_VARIANT) -> None:
+    """
+    Pull and extract Docker image layers for a specific architecture.
+    
+    Args:
+        image_ref: Docker image reference (various formats supported)
+        output_dir: Directory to extract layers to
+        target_arch: Target architecture (default: auto-detected)
+        target_variant: Target architecture variant (default: auto-detected)
+    """
+    # TODO: Implement complete pull_layers function
+    # Use all the functions you've implemented above:
+    # 1. parse_image_reference()
+    registry, image, tag = parse_image_reference(image_ref)
+    # 2. get_auth_token()
+    headers = get_auth_token(registry, image)
+    # 3. get_target_manifest()
+    manifest_digest = get_target_manifest(registry, image, tag, headers, target_arch, target_variant)
+    # 4. get_manifest_layers()
+    layers = get_manifest_layers(registry, image, manifest_digest, headers)
+    # 5. download_and_extract_layers()
+    download_and_extract_layers(registry, image, layers, headers, output_dir)
+from w2d2_test import test_pull_layers_complete
+
+test_pull_layers_complete(pull_layers)
+
+# %%
+pull_layers("alpine:latest", "./extracted_alpine")
+pull_layers("python:3.12-alpine", "./extracted_python") 
