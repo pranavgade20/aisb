@@ -9,3 +9,7 @@ Tests were missing create_cgroup function
 
 Exercise 3.5
 It works even without step 2 in the pseudocode (the main improvement from the previous exercise).
+
+Exercise 4.1
+run_in_cgroup_chroot_namespaced missing as an argument in the test.
+Also, whenever we had to make changes in test file, we also had to reload the kernel and execute all the cells.

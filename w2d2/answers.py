@@ -485,3 +485,91 @@ from w2d2_test import test_create_cgroup_comprehensive
 test_create_cgroup_comprehensive(test_memory_comprehensive)
 
 # %%
+def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    """
+    Run a command in cgroup, chroot, and namespace isolation
+    
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into (must contain basic filesystem structure)
+        command: Command to run (defaults to /bin/sh if None)
+        memory_limit: Memory limit for the cgroup (e.g., "100M")
+    
+    Returns:
+        Exit code of the command, or None if error occurred
+    """
+    # Create cgroup with memory limit
+    create_cgroup(cgroup_name, memory_limit=memory_limit)
+    
+    # Prepare command - default to shell if none provided
+    if command is None:
+        command = ['/bin/sh']
+    elif isinstance(command, str):
+        command = ['/bin/sh', '-c', command]
+    
+    print(f"Running `{command}` in cgroup {cgroup_name} with chroot {chroot_dir} and namespaces")
+
+    # Step 1: Fork to create child process
+    pid = os.fork()
+    
+    if pid == 0:
+        # CHILD PROCESS EXECUTION PATH
+        
+        # Step 2: Set up signal handler to receive SIGUSR1 from parent
+        def resume_handler(signum, frame):
+            pass  # Just wake up from pause - no action needed
+        
+        signal.signal(signal.SIGUSR1, resume_handler)
+        print(f"Child process {os.getpid()} waiting for signal...")
+        
+        # Step 3: Wait for parent to add us to cgroup
+        signal.pause()  # Blocks until SIGUSR1 received
+        print(f"Child process {os.getpid()} resuming...")
+        
+        # Step 4: Execute with namespace isolation using unshare
+        # unshare creates new namespaces, then chroot isolates filesystem
+        # Execute command with namespace isolation
+        try:
+            subprocess.run([
+                'unshare',
+                '--pid',    # Process ID namespace isolation
+                '--mount',  # Mount namespace isolation  
+                '--net',    # Network namespace isolation
+                '--uts',    # Hostname namespace isolation
+                '--ipc',    # IPC namespace isolation
+                '--fork',   # Fork after creating namespaces
+                'chroot', chroot_dir  # Change root directory
+            ] + command, check=True)
+            # Child process must exit explicitly to avoid continuing parent code
+            os._exit(0)
+        except Exception as e:
+            print(f"Child process error: {e}")
+            os._exit(1)
+        
+    else:
+        # PARENT PROCESS EXECUTION PATH
+        
+        print(f"Started paused process {pid}, adding to cgroup {cgroup_name}")
+        
+        # Step 5: Add child process to cgroup for resource limits
+        if add_process_to_cgroup(cgroup_name, pid):
+            print(f"Added process {pid} to cgroup {cgroup_name}")
+        else:
+            print(f"⚠ Warning: Could not add process {pid} to cgroup {cgroup_name}")
+        
+        # Step 6: Signal child to continue execution
+        os.kill(pid, signal.SIGUSR1)
+        print(f"Signaled process {pid} to continue")
+        
+        # Step 7: Wait for child process to complete
+        _, status = os.waitpid(pid, 0)
+        exit_code = os.WEXITSTATUS(status)
+        
+        print(f"Exit code: {exit_code}")
+        return exit_code
+    
+from w2d2_test import test_namespace_isolation
+
+test_namespace_isolation(run_in_cgroup_chroot_namespaced) 
+
+# %%

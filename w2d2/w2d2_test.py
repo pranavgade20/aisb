@@ -23,6 +23,20 @@ import glob
 import random
 from pathlib import Path
 
+def exec_sh(command: str, timeout: Optional[int | None] = 30, check_retcode=True) -> subprocess.CompletedProcess:
+    """
+    Execute shell commands with consistent parameters.
+    
+    Args:
+        command: Shell command to execute (can be multiline)
+        timeout: Optional timeout in seconds
+        
+    Returns:
+        CompletedProcess object with result
+    """
+    
+    return subprocess.run(command, shell=True, capture_output=True, text=True, check=check_retcode, timeout=timeout)
+
 # Architecture detection
 TARGET_ARCH, TARGET_VARIANT = {
     'x86_64': ('amd64', None), 'amd64': ('amd64', None),
@@ -559,7 +573,7 @@ def test_create_cgroup_comprehensive(test_memory_comprehensive):
 
 
 
-def test_namespace_isolation():
+def test_namespace_isolation(run_in_cgroup_chroot_namespaced):
     """
     Test that namespaces provide proper isolation by checking:
     1. Different hostname (UTS namespace)
