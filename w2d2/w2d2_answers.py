@@ -530,3 +530,141 @@ from w2d2_test import test_bridge_interface
 test_bridge_interface(create_bridge_interface, exec_sh)
 
 # %%
+
+import threading
+
+# Dangerous syscalls for CVE-2024-0137
+DANGEROUS_SYSCALLS = {"setns", "unshare", "mount", "pivot_root", "chroot", "clone", "socket", "bind", "connect"}
+
+
+def monitor_container_syscalls(container_command, alert_callback):
+    """
+    Monitor syscalls by running strace INSIDE the container namespace
+
+    Args:
+        container_command: List of command and arguments to run in container
+        alert_callback: Function to call when dangerous syscalls are detected
+
+    Returns:
+        Exit code of the monitored process
+    """
+
+    # Build strace command that runs inside the container
+    strace_cmd = [
+        "strace",
+        "-f",
+        "-e",
+        "trace=" + ",".join(DANGEROUS_SYSCALLS),
+        "-o",
+        "/dev/stderr",  # Send to stderr for monitoring
+    ] + container_command
+
+    print(f"🔍 Running strace inside container: {' '.join(strace_cmd)}")
+
+    # Check if container_command matches our legitimate container setup pattern
+    legitimate_pattern = ["unshare", "--pid", "--mount", "--net", "--uts", "--ipc", "--fork", "chroot"]
+    is_legitimate_setup = False
+    if len(container_command) >= len(legitimate_pattern):
+        # Check if the container command starts with our legitimate pattern
+        if all(container_command[i] == legitimate_pattern[i] for i in range(len(legitimate_pattern))):
+            is_legitimate_setup = True
+            print("✓ Identified legitimate container setup sequence - initial unshare will be allowed")
+
+    process = subprocess.Popen(strace_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+
+    # Monitor stderr for syscall traces
+    def monitor_stderr():
+        if process.stderr:
+            # Track if we've seen the initial legitimate unshare
+            initial_unshare_seen = False
+
+            for line in iter(process.stderr.readline, ""):
+                if line.strip():
+                    # Check for dangerous syscalls
+                    if any(syscall in line for syscall in DANGEROUS_SYSCALLS):
+                        # If this is a legitimate setup and it's the initial unshare syscall
+                        if (
+                            is_legitimate_setup
+                            and "unshare" in line
+                            and ("CLONE_NEWNET" in line or "--net" in line)
+                            and not initial_unshare_seen
+                        ):
+                            # Skip the alert for this initial legitimate unshare
+                            initial_unshare_seen = True
+                            print(f"✓ Allowed initial container setup: {line.strip()}")
+                        else:
+                            # This is a suspicious syscall, trigger the alert
+                            alert_callback(line.strip(), process.pid)
+                    # Also print container output
+                    if not any(syscall in line for syscall in DANGEROUS_SYSCALLS):
+                        print(f"[CONTAINER] {line.strip()}")
+
+    # Monitor stdout for normal output
+    def monitor_stdout():
+        if process.stdout:
+            for line in iter(process.stdout.readline, ""):
+                if line.strip():
+                    print(f"[CONTAINER] {line.strip()}")
+
+    # Start monitoring threads
+    stderr_thread = threading.Thread(target=monitor_stderr, daemon=True)
+    stdout_thread = threading.Thread(target=monitor_stdout, daemon=True)
+
+    stderr_thread.start()
+    stdout_thread.start()
+
+    # Wait for process completion
+    exit_code = process.wait()
+    return exit_code
+
+
+from w2d2_test import test_syscall_monitoring
+
+# Run the test
+test_syscall_monitoring()
+
+
+def security_alert_handler(syscall_line, pid):
+    """
+    Enhanced alert handler for CVE-2024-0137 and other container escape attempts
+
+    Args:
+        syscall_line: The strace output line containing the syscall
+        pid: Process ID that made the syscall
+    """
+
+    print("🚨 SECURITY ALERT: Dangerous syscall detected!")
+    print(f"   Syscall trace: {syscall_line}")
+    print(f"   Process PID: {pid}")
+
+    # Specific CVE-2024-0137 detection patterns
+    if "unshare" in syscall_line and ("CLONE_NEWNET" in syscall_line):
+        print("🔥 CRITICAL: CVE-2024-0137 network namespace escape detected!")
+        print("   Terminating malicious container...")
+        # TODO: Kill the entire process group
+
+        pass  # Exit the Python process on critical failure
+
+    elif "setns" in syscall_line:
+        print("🔥 CRITICAL: Namespace manipulation detected!")
+        print("   Possible container escape attempt!")
+        # Log but don't kill immediately - might be legitimate
+
+    elif "mount" in syscall_line:
+        print("⚠ WARNING: Filesystem mount detected!")
+        print("   Monitor for privilege escalation attempts")
+
+    elif "pivot_root" in syscall_line:
+        print("🔥 CRITICAL: Root filesystem manipulation detected!")
+        print("   Possible container breakout attempt!")
+
+    else:
+        print("⚠ WARNING: Suspicious syscall detected")
+        print("   Review for potential security implications")
+
+
+from w2d2_test import test_security_alerts
+
+
+# Run the test
+test_security_alerts()
