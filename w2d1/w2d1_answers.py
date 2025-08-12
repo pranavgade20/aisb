@@ -40,10 +40,12 @@ def exploit_basic_overflow() -> str:
     Returns:
         The exploit string that will grant access
     """
+
+    return "aaaaaaaaa1212121212121212aaaaaaaa\n"
     exploit_str = bytes([1]*17)
     exploit_str += b'\n'
     print(f"we returned: {exploit_str}")
-    return exploit_str
+    return exploit_str.decode("utf-8")
 
 
     # TODO: Create an exploit string that:
@@ -53,5 +55,24 @@ def exploit_basic_overflow() -> str:
 from w2d1_re_test import test_basic_overflow
 
 
-test_basic_overflow(exploit_basic_overflow)
+test_basic_overflow(exploit_basic_overflow, compile_vulnerable_binary)
 # %%
+
+
+def find_password_in_binary() -> str:
+    """
+    Find the hardcoded password in the first.c binary.
+
+    Hint: Try running: strings first | grep -E '^[a-z0-9]{6,}$'
+    Or look for the strcmp() call in the decompiled code.
+
+    Returns:
+        The password found in the binary
+    """
+    # TODO: Find the hardcoded password
+    # Try: `strings first | grep -v printf`
+    pass
+from w2d1_re_test import test_password_extraction
+
+
+test_password_extraction(find_password_in_binary)
