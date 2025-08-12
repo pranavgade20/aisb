@@ -19,34 +19,47 @@ unsigned long simple_hash(const char *str) {
     return hash;
 }
 
+// The goals is to overwrite the return address with the address of admin_access
 void verify_user(char *password) {
-    char buffer[32];
+    char buffer[32]; // 32 byte buffer
     unsigned long expected_hash = 6385045028UL;
 
-    strcpy(buffer, password);
+    // this function copies the password into the buffer
+    // if the password length is longer than 32 bytes it will overflow the buffer
+    strcpy(buffer, password); 
 
-//    printf("\n[Debug] Hex dump of 128 binytes starting at buffer[-32]:\n");
-//    printf("Address: %p\n", &buffer);
-//
-//    unsigned char *ptr = (unsigned char *)&buffer[-32];
-//    for (int i = 0; i < 128; i++) {
-//        if (i % 16 == 0) {
-//            printf("\n%04x: ", i);
-//        }
-//        printf("%02x ", ptr[i]);
-//        if (i % 16 == 15) {
-//            printf(" |");
-//            for (int j = i - 15; j <= i; j++) {
-//                if (ptr[j] >= 32 && ptr[j] <= 126) {
-//                    printf("%c", ptr[j]);
-//                } else {
-//                    printf(".");
-//                }
-//            }
-//            printf("|");
-//        }
-//    }
-//    printf("\n\n");
+    /*
+    By providing a password that is longer than 32 bytes, an attacker
+    can overwrite the memory beyond the buffer, including the return address
+    stored in the stack.
+
+    1. Find the memory address of admin_access
+    2. Create a payload that fills the 32-byte buffer
+    3. Replace the return address with the address of admin_access
+    */
+
+    printf("\n[Debug] Hex dump of 128 binytes starting at buffer[-32]:\n");
+    printf("Address: %p\n", &buffer);
+
+    unsigned char *ptr = (unsigned char *)&buffer[-32];
+    for (int i = 0; i < 128; i++) {
+        if (i % 16 == 0) {
+            printf("\n%04x: ", i);
+        }
+        printf("%02x ", ptr[i]);
+        if (i % 16 == 15) {
+            printf(" |");
+            for (int j = i - 15; j <= i; j++) {
+                if (ptr[j] >= 32 && ptr[j] <= 126) {
+                    printf("%c", ptr[j]);
+                } else {
+                    printf(".");
+                }
+            }
+            printf("|");
+        }
+    }
+    printf("\n\n");
 
     // Check password hash
     unsigned long input_hash = simple_hash(buffer);
