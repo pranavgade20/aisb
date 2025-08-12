@@ -291,3 +291,40 @@ from w2d2_test import test_run_chroot
 test_run_chroot(run_chroot)
 
 # %%
+import signal
+import time
+
+
+def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
+    """
+    Create a cgroup with specified limits
+
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (stretch)
+
+    Returns:
+        Path to the created cgroup
+    """
+    # TODO: Implement basic cgroup creation
+    # 1. Create a new cgroup directory with path /sys/fs/cgroup/{cgroup_name} - you will write files in this directory to configure the cgroup
+    try:
+        subprocess.run(["sudo", "mkdir", f"/sys/fs/cgroup/{cgroup_name}"])
+        # 2. Enable controllers (+cpu +memory +pids) in parent cgroup
+        subprocess.run(
+            ["echo", "+cpu", "+memory", "+pids", ">>", f"/sys/fs/cgroup/{cgroup_name}/cgroup.subtree_control"]
+        )
+        # 3. Set memory limit if specified - write the memory limit to {cgroup_path}/memory.max, which will tell the kernel how much memory the cgroup can use
+        if memory_limit:
+            subprocess.run(["echo", memory_limit, ">>", f"/sys/fs/cgroup/{cgroup_name}/memory.max"])
+        # 4. Return the cgroup path
+        return f"/sys/fs/cgroup/{cgroup_name}"
+    # 5. Handle errors and return None on failure
+    except Exception:
+        return None
+
+
+from w2d2_test import test_create_cgroup
+
+test_create_cgroup(create_cgroup)
