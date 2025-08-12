@@ -107,8 +107,6 @@ from w2d2_test import test_parse_image_reference
 test_parse_image_reference(parse_image_reference)
 
 # %%
-
-
 def get_auth_token(registry: str, image: str) -> Dict[str, str]:
     """
     Get authentication headers for Docker registry access.
@@ -129,12 +127,14 @@ def get_auth_token(registry: str, image: str) -> Dict[str, str]:
     # 6. Add Authorization header with Bearer token
     # 7. Return headers dictionary
 
-    url = f"https://auth.docker.io/token?service=registry-1.docker.io&scope=repository:{image}:pull"
-    response = requests.get(url).json()
-    token = response["token"]
-
     headers = {}
-    headers["Authorization"] = f"Bearer {token}"
+    if registry == 'registry-1.docker.io':
+        # Get auth token for Docker Hub
+        token_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:{image}:pull"
+        token_resp = requests.get(token_url)
+        token_resp.raise_for_status()
+        token = token_resp.json()['token']
+        headers['Authorization'] = f'Bearer {token}'
 
     return headers
 
@@ -191,3 +191,87 @@ def get_target_manifest(
 from w2d2_test import test_get_target_manifest
 
 test_get_target_manifest(get_target_manifest, get_auth_token)
+
+# %%
+
+def get_manifest_layers(registry: str, image: str, manifest_digest: str, headers: Dict[str, str]) -> List[Dict[str, Any]]:
+    """
+    Get the layer information from a manifest.
+    
+    Args:
+        registry: Registry hostname
+        image: Image name
+        manifest_digest: Manifest digest
+        headers: Authentication headers
+        
+    Returns:
+        List of layer dictionaries with 'digest' and 'size' keys
+    """
+    # TODO: Implement manifest processing
+    # 1. Build manifest URL using digest
+    # 2. Add Accept header for v2 manifest format
+    # 3. Make HTTP request
+    # 4. Parse JSON and extract layers
+    # 5. Return list of layer dictionaries
+    url = f'https://{registry}/v2/{image}/manifests/{manifest_digest}'
+
+    accept_header = 'application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.manifest.v1+json'
+
+    headers['Accept'] = accept_header
+
+    response = requests.get(url, headers=headers)
+    response = response.json()
+
+    if 'layers' not in response:
+        return []
+    else:
+        layers = response['layers']
+
+    return layers
+
+from w2d2_test import test_get_manifest_layers
+
+test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifest)
+
+# %%
+
+def download_and_extract_layers(registry: str, image: str, layers: List[Dict[str, Any]], 
+                               headers: Dict[str, str], output_dir: str) -> None:
+    """
+    Download and extract all layers to the output directory.
+    
+    Args:
+        registry: Registry hostname
+        image: Image name
+        layers: List of layer dictionaries from manifest
+        headers: Authentication headers
+        output_dir: Directory to extract layers to
+    """
+    # TODO: Implement layer download and extraction
+    # 1. Create output directory
+    # 2. For each layer:
+    #    a. Build blob URL using digest
+    #    b. Download blob with streaming
+    #    c. Extract as gzipped tar to output_dir
+    # 3. Print progress information
+    if output_dir not in os.listdir():
+        os.mkdir(output_dir)
+
+    for layer in layers:
+        digest = layer['digest']
+        url = f'https://{registry}/v2/{image}/blobs/{digest}'
+
+        response = requests.get(url, headers=headers)
+
+        bytes_blob = BytesIO(response.content)
+        tar_file = tarfile.open(fileobj=bytes_blob, mode='r:gz')
+        tar_file.extractall(output_dir)
+
+
+
+from w2d2_test import test_download_and_extract_layers
+
+test_download_and_extract_layers(download_and_extract_layers, get_auth_token, 
+                                get_target_manifest, get_manifest_layers)
+
+# %%
