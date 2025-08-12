@@ -188,4 +188,44 @@ from w2d2_test import test_get_target_manifest
 
 test_get_target_manifest(get_target_manifest, get_auth_token)
 
+
 # %%
+def get_manifest_layers(
+    registry: str, image: str, manifest_digest: str, headers: Dict[str, str]
+) -> List[Dict[str, Any]]:
+    """
+    Get the layer information from a manifest.
+
+    Args:
+        registry: Registry hostname
+        image: Image name
+        manifest_digest: Manifest digest
+        headers: Authentication headers
+
+    Returns:
+        List of layer dictionaries with 'digest' and 'size' keys
+    """
+    # TODO: Implement manifest processing
+    # 1. Build manifest URL using digest
+    url = f"https://{registry}/v2/{image}/manifests/{manifest_digest}"
+    # 2. Add Accept header for v2 manifest format
+    headers_copy = headers.copy()
+    headers_copy["Accept"] = (
+        "application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.manifest.v1+json"
+    )
+    # 3. Make HTTP request
+    try:
+        response = requests.get(url, headers=headers_copy)
+        response.raise_for_status()
+        # 4. Parse JSON and extract layers
+        responsejson = response.json()
+        # 5. Return list of layer dictionaries
+        layers = responsejson.get("layers", [])
+        return layers  # Placeholder return
+    except Exception:
+        return []
+
+
+from w2d2_test import test_get_manifest_layers
+
+test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifest)
