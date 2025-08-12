@@ -128,3 +128,42 @@ from w2d2_test import test_get_auth_token
 test_get_auth_token(get_auth_token)
 
 # %%
+def get_target_manifest(registry: str, image: str, tag: str, headers: Dict[str, str], 
+                       target_arch: str, target_variant: Optional[str] = None) -> str:
+    """
+    Get the manifest digest for the target architecture.
+    
+    Args:
+        registry: Registry hostname
+        image: Image name
+        tag: Image tag
+        headers: Authentication headers
+        target_arch: Target architecture (e.g., "amd64", "arm64")
+        target_variant: Optional architecture variant (e.g., "v8")
+        
+    Returns:
+        Manifest digest for the target architecture
+        
+    Raises:
+        ValueError: If target architecture is not found
+    """
+    # 1. Build manifest list URL
+    url = f'https://{registry}/v2/{image}/manifests/{tag}'
+    # 2. Make HTTP request with headers
+    response = requests.get(url).json()
+    # 3. Parse JSON response
+    manifests = response['manifests']
+    for m in manifests:
+        platform = m['platform']
+        digest = m['digest']
+    # 4. Find manifest matching target_arch and target_variant
+        if platform.get('architecture') == target_arch and platform.get('variant') == target_variant:
+            return digest
+
+    # 5. Return the digest, or raise ValueError if not found
+    raise ValueError('Digest not found')
+            
+from w2d2_test import test_get_target_manifest
+
+test_get_target_manifest(get_target_manifest, get_auth_token)
+# %%
