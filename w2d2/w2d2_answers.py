@@ -307,7 +307,7 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     Returns:
         Path to the created cgroup
     """
-    # TODO: Implement basic cgroup creation
+    # Implement basic cgroup creation
     # 1. Create a new cgroup directory with path /sys/fs/cgroup/{cgroup_name} - you will write files in this directory to configure the cgroup
     try:
         subprocess.run(["sudo", "mkdir", f"/sys/fs/cgroup/{cgroup_name}"])
@@ -328,3 +328,34 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
 from w2d2_test import test_create_cgroup
 
 test_create_cgroup(create_cgroup)
+
+# %%
+
+
+def add_process_to_cgroup(cgroup_name, pid=None):
+    """
+    Add a process to a cgroup
+
+    Args:
+        cgroup_name: Name of the cgroup
+        pid: Process ID (default: current process)
+    """
+    try:
+        # Implement process assignment to cgroup
+        # 1. Use current process PID if none specified
+        if pid is None:
+            pid = os.getpid()
+        # 2. Write PID to cgroup.procs file
+        subprocess.run(["echo", f"{pid}", ">>", f"/sys/fs/cgroup/{cgroup_name}/cgroup.procs"])
+        # 3. Handle errors and return success status
+        return True
+    except Exception:
+        subprocess.run(["echo", "ERROR in setting pids"])
+        return False
+
+
+from w2d2_test import test_add_process_to_cgroup
+
+test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
+
+# %%
