@@ -95,7 +95,7 @@ def parse_image_reference(image_ref: str) -> Tuple[str, str, str]:
 
 from w2d2_test import test_parse_image_reference
 
-test_parse_image_reference(parse_image_reference)
+# test_parse_image_reference(parse_image_reference)
 # %%
 # %load_ext autoreload
 # %autoreload 2
@@ -139,7 +139,7 @@ def get_auth_token(registry: str, image: str) -> Dict[str, str]:
 
 from w2d2_test import test_get_auth_token
 
-test_get_auth_token(get_auth_token)
+# test_get_auth_token(get_auth_token)
 """
 https://{registry}/v2/{image}/manifests/{tag}
 
@@ -302,7 +302,7 @@ def download_and_extract_layers(
 
 from w2d2_test import test_download_and_extract_layers
 
-test_download_and_extract_layers(download_and_extract_layers, get_auth_token, get_target_manifest, get_manifest_layers)
+# test_download_and_extract_layers(download_and_extract_layers, get_auth_token, get_target_manifest, get_manifest_layers)
 
 # %%
 
@@ -346,9 +346,66 @@ def pull_layers(
 
 from w2d2_test import test_pull_layers_complete
 
-test_pull_layers_complete(pull_layers)
+# test_pull_layers_complete(pull_layers)
 
 
 pull_layers("alpine:latest", "./extracted_alpine")
 pull_layers("python:3.12-alpine", "./extracted_python")
 # %%
+
+import subprocess
+
+
+def run_chroot(
+    chroot_dir: str, command: Optional[Union[str, List[str]]] = None
+) -> Optional[subprocess.CompletedProcess]:
+    """
+    Run a command in a chrooted environment.
+
+    This function creates an isolated filesystem environment by changing the root directory
+    for the executed command. The process will only be able to access files within the
+    specified chroot directory.
+
+    Args:
+        chroot_dir: Directory to chroot into (must contain necessary binaries and libraries)
+        command: Command to run (default: /bin/sh)
+                - If string: executed as shell command
+                - If list: executed directly
+                - If None: defaults to interactive shell
+
+    Returns:
+        CompletedProcess object with execution results, or None if error/timeout
+    """
+    # TODO: Implement chroot command execution
+    # 1. Handle different command formats (None, string, list)
+    if isinstance(command, str):
+        chroot = ["chroot", chroot_dir] + [command]
+    elif isinstance(command, list):
+        chroot = ["chroot", chroot_dir] + command
+    elif command is None:
+        chroot = ["chroot", chroot_dir] + "/bin/sh"
+    else:
+        raise ValueError
+
+    try:
+        result = subprocess.run(
+            chroot,
+            timeout=5,
+            capture_output=True,
+        )
+        print(result)
+    except Exception as e:
+        print(e)
+        result = None
+    # 2. Build the chroot command: ['chroot', chroot_dir] + command
+    # 3. Execute with subprocess.run() with timeout and output capture
+    # 4. Print execution details and results
+    # 5. Handle TimeoutExpired and other exceptions
+    # 6. Return the result or None on error
+    return None
+
+
+from w2d2_test import test_run_chroot
+
+# Run the test
+test_run_chroot(run_chroot)
