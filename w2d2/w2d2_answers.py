@@ -456,7 +456,6 @@ def run_chroot(
     full_command = ["chroot", chroot_dir] + handled_command
 
     proc = subprocess.run(full_command, capture_output=True, text=True, timeout=30)
-    pass
     # if proc.returncode != 0:
     # raise RuntimeError("Command failed")
 
@@ -601,8 +600,49 @@ def create_cgroup_comprehensive(cgroup_name, memory_limit=None, cpu_limit=None):
         memory_limit: Memory limit (e.g., '100M', '1000000')
         cpu_limit: CPU limit (not implemented yet)
     """
-    pass
+    # cgroup_dir = Path(create_cgroup_comprehensive_part1(cgroup_name, memory_limit, cpu_limit))
+    # (cgroup_dir / "memory.oom.group").write_text("1")
+    # #pid = os.getpid()
+    # add_process_to_cgroup(cgroup_name)
+    # Path(f"/proc/self/oom_score_adj").write_text("1000")
+    # return cgroup_dir
+
+    print(f"Setting up comprehensive cgroup Part 2: {cgroup_name}")
+    
+    # Start with Part 1 - Core Memory Management
+    cgroup_path = create_cgroup_comprehensive_part1(cgroup_name, memory_limit, cpu_limit)
+    if not cgroup_path:
+        print("✗ Part 1 setup failed, cannot continue with Part 2")
+        return None
+    
+    print(f"✓ Part 1 complete, continuing with Part 2 - Advanced OOM and Process Management")
+    
+    # Set OOM killer to be more aggressive for this cgroup
+    oom_group_path = f"{cgroup_path}/memory.oom.group"
+    with open(oom_group_path, "w") as f:
+        f.write("1")
+    print("✓ Enabled OOM group killing (kills entire process group on OOM)")
+    
+    # Add current process to cgroup and set up OOM score adjustment
+    if add_process_to_cgroup(cgroup_name):
+        print(f"✓ Added current process to cgroup")
+    else:
+        print(f"⚠ Warning: Could not add process to cgroup")
+    
+    # Set oom_score_adj to make this process more likely to be killed
+    with open("/proc/self/oom_score_adj", "w") as f:
+        f.write("1000")
+    
+    print("✓ Set OOM score adjustment to 1000 (highest priority for killing)")
+    
+    print(f"✓ Part 2 - Advanced OOM and process management complete")
+    print(f"✓ Full comprehensive cgroup setup finished for: {cgroup_name}")
+    return cgroup_path
+
+
 from w2d2_test import test_memory_comprehensive
 from w2d2_test import test_create_cgroup_comprehensive
 
-test_create_cgroup_comprehensive(test_memory_comprehensive)
+test_create_cgroup_comprehensive(test_memory_comprehensive, create_cgroup_comprehensive)
+
+# %%

@@ -448,7 +448,7 @@ def test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1):
 
 
 
-def test_memory_comprehensive(cgroup_name="demo2", memory_limit="100M"):
+def test_memory_comprehensive(cgroup_name="demo2", memory_limit="100M", create_cgroup_comprehensive=None):
     """
     Comprehensive memory test that properly sets up cgroups with all necessary settings
     including oom_score_adj to ensure the memory limit is enforced
@@ -457,6 +457,7 @@ def test_memory_comprehensive(cgroup_name="demo2", memory_limit="100M"):
     print("(This should properly enforce the cgroup memory limit)")
     
     # Create cgroup with comprehensive settings
+    assert create_cgroup_comprehensive is not None
     cgroup_path = create_cgroup_comprehensive(cgroup_name, memory_limit=memory_limit)
     if not cgroup_path:
         print("✗ Failed to create cgroup")
@@ -520,7 +521,7 @@ EOF
 
 
 
-def test_create_cgroup_comprehensive(test_memory_comprehensive):
+def test_create_cgroup_comprehensive(test_memory_comprehensive, create_cgroup_comprehensive):
     print("Testing complete comprehensive cgroup creation with memory test...")
     print("Forking process to run memory test...")
 
@@ -531,7 +532,7 @@ def test_create_cgroup_comprehensive(test_memory_comprehensive):
         # Child process - run the memory test here
         try:
             print("Child process starting memory test...")
-            test_memory_comprehensive(cgroup_name="demo2", memory_limit="50M")
+            test_memory_comprehensive(cgroup_name="demo2", memory_limit="50M", create_cgroup_comprehensive=create_cgroup_comprehensive)
         except Exception as e:
             print(f"Child process error: {e}")
             sys.exit(1)
