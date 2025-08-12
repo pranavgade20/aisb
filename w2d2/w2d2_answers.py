@@ -376,7 +376,7 @@ def run_chroot(
     if command is None:
         handled_command = ["/bin/sh"]
     elif isinstance(command, str):
-        handled_command = ["/bin/sh", command]
+        handled_command = ["/bin/sh", '-c', command]
     elif isinstance(command, list):
         handled_command = command
 
@@ -386,6 +386,8 @@ def run_chroot(
         full_command,
         timeout=10,
         capture_output=True,
+        text=True,
+        timeout=30
     )
     pass
     # if proc.returncode != 0:
@@ -394,6 +396,7 @@ def run_chroot(
     return proc
 
 
+# %%
 from w2d2_test import test_run_chroot
 
 # Run the test

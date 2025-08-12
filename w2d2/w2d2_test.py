@@ -224,6 +224,8 @@ def test_run_chroot(run_chroot):
     """Test the chroot command execution function."""
     print("Testing chroot command execution...")
     
+    print(f"Detected architecture: {TARGET_ARCH} {TARGET_VARIANT if TARGET_VARIANT else ''}")
+
     # Test 1: Basic command execution in Alpine Linux environment
     print("\n1. Testing basic command execution:")
     result = run_chroot("./extracted_alpine", "echo 'Hello from chroot!'")
