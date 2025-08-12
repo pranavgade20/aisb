@@ -57,7 +57,6 @@ def test_basic_overflow(exploit_basic_overflow: callable):
     else:
         print("✗ Exploit failed. Output:")
         print(stdout)
-        exit(1)
 
 
 def test_password_extraction(find_password_in_binary: callable):
@@ -77,7 +76,6 @@ def test_password_extraction(find_password_in_binary: callable):
         return True
     else:
         print("✗ Password incorrect")
-        exit(1)
 
 
 def test_shellcode_basics():

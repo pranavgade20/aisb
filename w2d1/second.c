@@ -25,28 +25,28 @@ void verify_user(char *password) {
 
     strcpy(buffer, password);
 
-//    printf("\n[Debug] Hex dump of 128 binytes starting at buffer[-32]:\n");
-//    printf("Address: %p\n", &buffer);
-//
-//    unsigned char *ptr = (unsigned char *)&buffer[-32];
-//    for (int i = 0; i < 128; i++) {
-//        if (i % 16 == 0) {
-//            printf("\n%04x: ", i);
-//        }
-//        printf("%02x ", ptr[i]);
-//        if (i % 16 == 15) {
-//            printf(" |");
-//            for (int j = i - 15; j <= i; j++) {
-//                if (ptr[j] >= 32 && ptr[j] <= 126) {
-//                    printf("%c", ptr[j]);
-//                } else {
-//                    printf(".");
-//                }
-//            }
-//            printf("|");
-//        }
-//    }
-//    printf("\n\n");
+   printf("\n[Debug] Hex dump of 128 binytes starting at buffer[-32]:\n");
+   printf("Address: %p\n", &buffer);
+
+   unsigned char *ptr = (unsigned char *)&buffer[-32];
+   for (int i = 0; i < 128; i++) {
+       if (i % 16 == 0) {
+           printf("\n%04x: ", i);
+       }
+       printf("%02x ", ptr[i]);
+       if (i % 16 == 15) {
+           printf(" |");
+           for (int j = i - 15; j <= i; j++) {
+               if (ptr[j] >= 32 && ptr[j] <= 126) {
+                   printf("%c", ptr[j]);
+               } else {
+                   printf(".");
+               }
+           }
+           printf("|");
+       }
+   }
+   printf("\n\n");
 
     // Check password hash
     unsigned long input_hash = simple_hash(buffer);
