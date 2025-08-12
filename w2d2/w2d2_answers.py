@@ -256,6 +256,11 @@ def download_and_extract_layers(
     print(f"\n✓ Extracted {len(layers)} layers to {output_dir}")
 
 
+from w2d2_test import test_download_and_extract_layers
+
+# test_download_and_extract_layers(download_and_extract_layers, get_auth_token, get_target_manifest, get_manifest_layers)
+
+
 # %%
 def pull_layers(
     image_ref: str, output_dir: str, target_arch: str = TARGET_ARCH, target_variant: Optional[str] = TARGET_VARIANT
@@ -294,6 +299,11 @@ def pull_layers(
     print(f"  Architecture: {target_arch}{f' variant {target_variant}' if target_variant else ''}")
 
 
+from w2d2_test import test_pull_layers_complete
+
+# test_pull_layers_complete(pull_layers)
+
+
 # %%
 
 import subprocess
@@ -320,26 +330,15 @@ Returns:
 def run_chroot(
     chroot_dir: str, command: Optional[Union[str, List[str]]] = None
 ) -> Optional[subprocess.CompletedProcess]:
-    # TODO: Implement chroot command execution
-    # 1. Handle different command formats (None, string, list)
-    # deal with strings and lists
-    if command:
-        if isinstance(command, list):  # a list
-            # 2. Build the chroot command: ['chroot', chroot_dir] + command
-            chroot_command = ["chroot", chroot_dir] + command
-        else:  # a string
-            # 2. Build the chroot command: ['chroot', chroot_dir] + command
-            chroot_command = ["chroot", chroot_dir] + [command]
+    if command is None:
+        command = ["/bin/sh"]
+    elif isinstance(command, str):
+        command = ["/bin/sh", "-c", command]
 
-    # deal with None
-    else:
-        # 2. Build the chroot command: ['chroot', chroot_dir] + command
-        chroot_command = ["chroot", chroot_dir]
+    print(f"Running chroot {chroot_dir} with command: {' '.join(command)}")
 
-    # 3. Execute with subprocess.run() with timeout and output capture
-    result = subprocess.run(chroot_command, capture_output=True, text=True, timeout=30)
-
-    # 4. Print execution details and results
+    result = subprocess.run(["chroot", chroot_dir] + command, capture_output=True, text=True, timeout=30)
+    print(f"Exit code: {result.returncode}")
     if result.stdout:
         print(f"stdout:\n{result.stdout}")
     if result.stderr:
@@ -350,7 +349,7 @@ def run_chroot(
 from w2d2_test import test_run_chroot
 
 # Run the test
-test_run_chroot(run_chroot)
+# test_run_chroot(run_chroot)
 
 # %%
 import signal
@@ -432,3 +431,32 @@ from w2d2_test import test_add_process_to_cgroup
 
 test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
 # %%
+
+"""
+Run a command in both a cgroup and chroot environment
+
+Args:
+    cgroup_name: Name of the cgroup to create/use
+    chroot_dir: Directory to chroot into
+    command: Command to run
+    memory_limit: Memory limit for the cgroup
+"""
+
+
+def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    # TODO: Implement combined cgroup-chroot execution
+    # 1. Create cgroup with memory limit
+    create_cgroup(cgroup_name, memory_limit=memory_limit)
+    # 2. Handle command format (None, string, list)
+    # 3. Create shell script that:
+    #    - Adds process to cgroup
+    add_process_to_cgroup(cgroup_name)
+    #    - Executes chroot with command
+    run_chroot(chroot_dir, command)
+    # 4. Run with timeout and error handling
+
+
+from w2d2_test import test_memory_simple
+from w2d2_test import test_run_in_cgroup_chroot
+
+test_run_in_cgroup_chroot(run_in_cgroup_chroot)
