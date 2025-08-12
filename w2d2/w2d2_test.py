@@ -1,6 +1,15 @@
 # Allow imports from parent directory
 import sys
 import os
+import platform
+
+# Architecture detection
+TARGET_ARCH, TARGET_VARIANT = {
+    'x86_64': ('amd64', None), 'amd64': ('amd64', None),
+    'arm64': ('arm64', 'v8'), 'aarch64': ('arm64', 'v8'),
+    'armv7l': ('arm', 'v7'), 'armv6l': ('arm', 'v6')
+}.get(platform.machine().lower(), ('amd64', None))
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 import requests
