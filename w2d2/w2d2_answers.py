@@ -1,4 +1,8 @@
 # %%
+%load_ext autoreload
+%autoreload 2
+
+# %%
 import json
 import os
 import platform
@@ -521,13 +525,14 @@ def add_process_to_cgroup(cgroup_name, pid=None):
     # 1. Use current process PID if none specified
     pid = pid or os.getpid()
     # 2. Write PID to cgroup.procs file
-    cgroup_dir = Path("/sys/fs/group") / cgroup_name
+    cgroup_dir = Path("/sys/fs/cgroup") / cgroup_name
     if not cgroup_dir.exists():
         return 1
 
     procs_file = cgroup_dir / "cgroup.procs"
     with procs_file.open("a") as f:
         f.write(f"{pid}\n")
+    return 0
 
 
 from w2d2_test import test_add_process_to_cgroup
@@ -652,22 +657,37 @@ def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memor
         print("Received signal from parent")
 
         # Execute with namespace isolation
-        os.unshare(
-        )
+        flags = (
+            # pid
+            os.CLONE_NEWPID | 
+            # mount
+            os.CLONE_NEWNS | 
+            # network
+            os.CLONE_NEWNET | 
+            # hostname
+            os.CLONE_NEWUTS | 
+            # ipc
+            os.CLONE_NEWIPC)
+        os.unshare(flags)
+        code = run_chroot(chroot_dir, command)
 
     else:
         # in parent
         child_pid = pid
 
-        print("Parent is doing stuff")
-        time.sleep(2)
-        print("Parent finished sleeping")
-
-        print("Parent sending kill signal")
+        code = add_process_to_cgroup(cgroup_name, child_pid)
+        if code != 0:
+            print(f"code: {code}")
+            raise RuntimeError
+        # signal to child
         os.kill(child_pid, signal.SIGUSR1)
-        print("Parent has sent signal")
-
-        os.waitpid(child_pid, 0)
+        exit_status = os.waitpid(child_pid, 0)
+        return os.WEXITSTATUS(exit_status)
 
     # Think about why we did .fork() and the complicated signalling, as opposed to just running the commands sequentially.
     pass
+
+from w2d2_test import test_namespace_isolation
+
+test_namespace_isolation(run_in_cgroup_chroot_namespaced) 
+# %%
