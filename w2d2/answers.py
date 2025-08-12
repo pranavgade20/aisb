@@ -90,3 +90,41 @@ from w2d2_test import test_parse_image_reference
 test_parse_image_reference(parse_image_reference)
 
 # %%
+
+def get_auth_token(registry: str, image: str) -> Dict[str, str]:
+    """
+    Get authentication headers for Docker registry access.
+    
+    Args:
+        registry: Registry hostname (e.g., "registry-1.docker.io")
+        image: Image name (e.g., "library/hello-world")
+        
+    Returns:
+        Dictionary of headers to include in registry requests
+    """
+    headers = {}
+    base_url = 'https://auth.docker.io/token'
+    # 1. Initialize empty headers dictionary
+    params = ['service=registry.docker.io']
+    # 2. Check if registry is Docker Hub (registry-1.docker.io)
+    if registry == 'registry-1.docker.io':
+    # 3. For Docker Hub, construct token URL with service and scope parameters
+        scope = f'repository:{image}:pull'
+        params.append(f'scope={scope}')
+    # 4. Make HTTP request to auth.docker.io/token
+        url = f'{base_url}?{'&'.join(params)}'
+        response = requests.get(url)
+        # 5. Parse JSON response to extract token
+        token = response.json()['token']
+        # 6. Add Authorization header with Bearer token
+        headers['Authorization'] = f'Bearer {token}'
+        # 7. Return headers dictionary
+        return headers  # Placeholder return
+    
+    return {}
+
+from w2d2_test import test_get_auth_token
+
+test_get_auth_token(get_auth_token)
+
+# %%
