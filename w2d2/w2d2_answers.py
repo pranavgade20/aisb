@@ -271,37 +271,117 @@ test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifes
 # %%
 
 
+# def download_and_extract_layers(
+#     registry: str, image: str, layers: List[Dict[str, Any]], headers: Dict[str, str], output_dir: str
+# ) -> None:
+#     """
+#     Download and extract all layers to the output directory.
+
+#     Args:
+#         registry: Registry hostname
+#         image: Image name
+#         layers: List of layer dictionaries from manifest
+#         headers: Authentication headers
+#         output_dir: Directory to extract layers to
+#     """
+#     # TODO: Implement layer download and extraction
+#     # 1. Create output directory
+#     # 2. For each layer:
+#     #    a. Build blob URL using digest
+#     #    b. Download blob with streaming
+#     #    c. Extract as gzipped tar to output_dir
+#     # 3. Print progress information
+#     if not os.path.exists(output_dir):
+#         os.makedirs(output_dir)
+#     for l in layers:
+#         digest = l["digest"]
+#         url = f"https://{registry}/v2/{image}/blobs/{digest}"
+#         resp = requests.get(url, headers=headers, stream=True)
+#         resp.raise_for_status()
+
+#         with tarfile.open(fileobj=BytesIO(resp.content), mode="r:gz") as tar:
+#             tar.extractall(output_dir)
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import List, Dict, Any
+import os
+import tarfile
+import requests
+from io import BytesIO
+
+def download_and_extract_single_layer(
+    registry: str, 
+    image: str, 
+    layer: Dict[str, Any], 
+    headers: Dict[str, str], 
+    output_dir: str,
+    layer_index: int,
+    total_layers: int
+) -> str:
+    """Download and extract a single layer."""
+    digest = layer["digest"]
+    url = f"https://{registry}/v2/{image}/blobs/{digest}"
+    
+    print(f"Downloading layer {layer_index + 1}/{total_layers}: {digest[:12]}...")
+    
+    resp = requests.get(url, headers=headers, stream=True)
+    resp.raise_for_status()
+    
+    # Extract the layer
+    with tarfile.open(fileobj=BytesIO(resp.content), mode="r:gz") as tar:
+        tar.extractall(output_dir)
+    
+    return f"Layer {layer_index + 1}/{total_layers} ({digest[:12]}) extracted"
+
 def download_and_extract_layers(
-    registry: str, image: str, layers: List[Dict[str, Any]], headers: Dict[str, str], output_dir: str
+    registry: str, 
+    image: str, 
+    layers: List[Dict[str, Any]], 
+    headers: Dict[str, str], 
+    output_dir: str,
+    max_workers: int = 4
 ) -> None:
     """
-    Download and extract all layers to the output directory.
-
+    Download and extract all layers to the output directory using parallel processing.
+    
     Args:
         registry: Registry hostname
         image: Image name
         layers: List of layer dictionaries from manifest
         headers: Authentication headers
         output_dir: Directory to extract layers to
+        max_workers: Maximum number of parallel downloads (default: 4)
     """
-    # TODO: Implement layer download and extraction
-    # 1. Create output directory
-    # 2. For each layer:
-    #    a. Build blob URL using digest
-    #    b. Download blob with streaming
-    #    c. Extract as gzipped tar to output_dir
-    # 3. Print progress information
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    for l in layers:
-        digest = l["digest"]
-        url = f"https://{registry}/v2/{image}/blobs/{digest}"
-        resp = requests.get(url, headers=headers, stream=True)
-        resp.raise_for_status()
-
-        with tarfile.open(fileobj=BytesIO(resp.content), mode="r:gz") as tar:
-            tar.extractall(output_dir)
-
+    # Create output directory
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Use ThreadPoolExecutor for parallel downloads
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all download tasks
+        future_to_layer = {
+            executor.submit(
+                download_and_extract_single_layer,
+                registry,
+                image,
+                layer,
+                headers,
+                output_dir,
+                i,
+                len(layers)
+            ): (i, layer)
+            for i, layer in enumerate(layers)
+        }
+        
+        # Process completed downloads
+        for future in as_completed(future_to_layer):
+            layer_index, layer = future_to_layer[future]
+            try:
+                result = future.result()
+                print(result)
+            except Exception as e:
+                digest = layer["digest"][:12]
+                print(f"Error downloading layer {layer_index + 1} ({digest}): {e}")
+                raise
 
 from w2d2_test import test_download_and_extract_layers
 
@@ -376,18 +456,13 @@ def run_chroot(
     if command is None:
         handled_command = ["/bin/sh"]
     elif isinstance(command, str):
-        handled_command = ["/bin/sh", '-c', command]
+        handled_command = ["/bin/sh", "-c", command]
     elif isinstance(command, list):
         handled_command = command
 
     full_command = ["chroot", chroot_dir] + handled_command
 
-    proc = subprocess.run(
-        full_command,
-        capture_output=True,
-        text=True,
-        timeout=30
-    )
+    proc = subprocess.run(full_command, capture_output=True, text=True, timeout=30)
     pass
     # if proc.returncode != 0:
     # raise RuntimeError("Command failed")
@@ -406,10 +481,11 @@ import signal
 import time
 from pathlib import Path
 
+
 def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     """
     Create a cgroup with specified limits
-    
+
     Args:
         cgroup_name: Name of the cgroup (e.g., 'demo')
         memory_limit: Memory limit (e.g., '100M', '1000000')
@@ -426,14 +502,67 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     # 5. Handle errors and return None on failure
     cgroup_dir = Path(f"/sys/fs/cgroup/{cgroup_name}")
     cgroup_dir.mkdir(exist_ok=True)
-    (cgroup_dir/"cgroup.subtree_control").write_text("+cpu +memory +pids")
+    (cgroup_dir / "cgroup.subtree_control").write_text("+cpu +memory +pids")
     if memory_limit is not None:
-        (cgroup_dir/"memory.max").write_text(memory_limit)
+        (cgroup_dir / "memory.max").write_text(memory_limit)
     if cpu_limit is not None:
-        (cgroup_dir/"cpu.max").write_text(cpu_limit)
+        (cgroup_dir / "cpu.max").write_text(cpu_limit)
     return str(cgroup_dir)
+
+
 # %%
 from w2d2_test import test_create_cgroup
 
 test_create_cgroup(create_cgroup)
 # %%
+
+
+def add_process_to_cgroup(cgroup_name, pid=None):
+    """
+    Add a process to a cgroup
+
+    Args:
+        cgroup_name: Name of the cgroup
+        pid: Process ID (default: current process)
+    """
+    # TODO: Implement process assignment to cgroup
+    # 1. Use current process PID if none specified
+    pid = pid or os.getpid()
+    # 2. Write PID to cgroup.procs file
+    cgroup_dir = Path("/sys/fs/group") / cgroup_name
+    if not cgroup_dir.exists():
+        return 1
+
+    procs_file = cgroup_dir / "cgroup.procs"
+    with procs_file.open("a") as f:
+        f.write(f"{pid}\n")
+
+
+from w2d2_test import test_add_process_to_cgroup
+
+test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
+
+# %%
+
+
+def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    """
+    Run a command in both a cgroup and chroot environment
+
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into
+        command: Command to run
+        memory_limit: Memory limit for the cgroup
+    """
+    create_cgroup(
+        cgroup_name=cgroup_name,
+        memory_limit=memory_limit,
+    )
+    add_process_to_cgroup(cgroup_name)
+    run_chroot(chroot_dir, command)
+
+
+from w2d2_test import test_memory_simple, test_run_in_cgroup_chroot
+
+test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup)

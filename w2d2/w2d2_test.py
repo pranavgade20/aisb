@@ -341,7 +341,7 @@ def test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup):
 
 
 
-def test_memory_simple(cgroup_name="demo", memory_limit="100M"):
+def test_memory_simple(cgroup_name="demo", memory_limit="100M", create_cgroup = None):
     """
     Simple memory test that matches the user's manual example exactly
     """
@@ -349,6 +349,7 @@ def test_memory_simple(cgroup_name="demo", memory_limit="100M"):
     print("(This should show allocations and then get killed)")
     
     # Create cgroup
+    assert create_cgroup is not None
     create_cgroup(cgroup_name, memory_limit=memory_limit)
     
     # Use a here document to avoid quote nesting issues completely
@@ -405,7 +406,7 @@ EOF
 
 
 
-def test_run_in_cgroup_chroot(run_in_cgroup_chroot):
+def test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup):
     """Test the combined cgroup-chroot execution function."""
     print("Testing combined cgroup-chroot execution...")
     
@@ -416,7 +417,7 @@ def test_run_in_cgroup_chroot(run_in_cgroup_chroot):
     else:
         print("⚠ Basic combined execution failed")
 
-    test_memory_simple(cgroup_name="demo_comprehensive", memory_limit="50M")
+    test_memory_simple(cgroup_name="demo_comprehensive", memory_limit="50M", create_cgroup=create_cgroup)
     
     print("✓ Combined cgroup-chroot tests completed!\n" + "=" * 60)
 
