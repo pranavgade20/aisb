@@ -229,3 +229,65 @@ def get_manifest_layers(
 from w2d2_test import test_get_manifest_layers
 
 test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifest)
+
+# %%
+
+
+import subprocess
+
+
+def run_chroot(
+    chroot_dir: str, command: Optional[Union[str, List[str]]] = None
+) -> Optional[subprocess.CompletedProcess]:
+    """
+    Run a command in a chrooted environment.
+
+    This function creates an isolated filesystem environment by changing the root directory
+    for the executed command. The process will only be able to access files within the
+    specified chroot directory.
+
+    Args:
+        chroot_dir: Directory to chroot into (must contain necessary binaries and libraries)
+        command: Command to run (default: /bin/sh)
+                - If string: executed as shell command
+                - If list: executed directly
+                - If None: defaults to interactive shell
+
+    Returns:
+        CompletedProcess object with execution results, or None if error/timeout
+    """
+    # Implement chroot command execution
+    # 1. Handle different command formats (None, string, list)
+    shell_command = ["chroot", chroot_dir]
+    if type(command) == str:
+        # 2. Build the chroot command: ['chroot', chroot_dir] + command
+        shell_command.append(command)
+    elif type(command) == List:  # noqa: E721
+        for cmd in command:
+            shell_command.append(cmd)
+    else:
+        # type None
+        pass
+    try:
+        # 3. Execute with subprocess.run() with timeout and output capture
+        result = subprocess.run(shell_command, capture_output=True, timeout=15)
+        # 4. Print execution details and results
+        subprocess.run(["echo", result])
+    # 5. Handle TimeoutExpired and other exceptions
+    except TimeoutError:
+        subprocess.run(["echo", "Timed out!"])
+        result = None
+    except Exception:
+        subprocess.run(["echo", f"ERROR! {Exception}"])
+        result = None
+
+    # 6. Return the result or None on error
+    return result
+
+
+from w2d2_test import test_run_chroot
+
+# Run the test
+test_run_chroot(run_chroot)
+
+# %%
