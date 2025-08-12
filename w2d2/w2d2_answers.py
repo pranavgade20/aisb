@@ -128,26 +128,15 @@ def get_auth_token(registry: str, image: str) -> Dict[str, str]:
     Returns:
         Dictionary of headers to include in registry requests
     """
-    if "SOLUTION":
-        headers = {}
-        if registry == "registry-1.docker.io":
-            # Get auth token for Docker Hub
-            token_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:{image}:pull"
-            token_resp = requests.get(token_url)
-            token_resp.raise_for_status()
-            token = token_resp.json()["token"]
-            headers["Authorization"] = f"Bearer {token}"
-        return headers
-    else:
-        # TODO: Authentication implementation
-        # 1. Initialize empty headers dictionary
-        # 2. Check if registry is Docker Hub (registry-1.docker.io)
-        # 3. For Docker Hub, construct token URL with service and scope parameters
-        # 4. Make HTTP request to auth.docker.io/token
-        # 5. Parse JSON response to extract token
-        # 6. Add Authorization header with Bearer token
-        # 7. Return headers dictionary
-        return {}  # Placeholder return
+    headers = {}
+    if registry == "registry-1.docker.io":
+        # Get auth token for Docker Hub
+        token_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:{image}:pull"
+        token_resp = requests.get(token_url)
+        token_resp.raise_for_status()
+        token = token_resp.json()["token"]
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 # %%
@@ -201,31 +190,166 @@ from w2d2_test import test_get_target_manifest
 test_get_target_manifest(get_target_manifest, get_auth_token)
 
 
+"""
+Get the layer information from a manifest.
+
+Args:
+    registry: Registry hostname
+    image: Image name
+    manifest_digest: Manifest digest
+    headers: Authentication headers
+
+Returns:
+    List of layer dictionaries with 'digest' and 'size' keys
+"""
+
+
 # %%
 def get_manifest_layers(
     registry: str, image: str, manifest_digest: str, headers: Dict[str, str]
 ) -> List[Dict[str, Any]]:
-    """
-    Get the layer information from a manifest.
-
-    Args:
-        registry: Registry hostname
-        image: Image name
-        manifest_digest: Manifest digest
-        headers: Authentication headers
-
-    Returns:
-        List of layer dictionaries with 'digest' and 'size' keys
-    """
     # TODO: Implement manifest processing
     # 1. Build manifest URL using digest
+    url = f"https://{registry}/v2/{image}/manifests/{manifest_digest}"
     # 2. Add Accept header for v2 manifest format
+    headers["Accept"] = (
+        "application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.manifest.v1+json"
+    )
     # 3. Make HTTP request
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
     # 4. Parse JSON and extract layers
+    layers = response.json()["layers"]
     # 5. Return list of layer dictionaries
-    return []  # Placeholder return
+    return layers  # Placeholder return
 
 
 from w2d2_test import test_get_manifest_layers
 
 test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifest)
+
+# %%
+
+
+def download_and_extract_layers(
+    registry: str, image: str, layers: List[Dict[str, Any]], headers: Dict[str, str], output_dir: str
+) -> None:
+    # Create output directory
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Download and extract layers in order
+    for i, layer in enumerate(layers):
+        digest = layer["digest"]
+        size = layer.get("size", 0)
+        print(f"\nProcessing layer {i + 1}/{len(layers)}: {digest} ({size} bytes)")
+
+        # Download layer blob
+        blob_url = f"https://{registry}/v2/{image}/blobs/{digest}"
+        blob_resp = requests.get(blob_url, headers=headers, stream=True)
+        blob_resp.raise_for_status()
+
+        # Extract layer (layers are gzipped tarballs)
+        print(f"  Extracting to {output_dir}...")
+        with tarfile.open(fileobj=BytesIO(blob_resp.content), mode="r:gz") as tar:
+            tar.extractall(output_dir)
+
+    print(f"\n✓ Extracted {len(layers)} layers to {output_dir}")
+
+
+# %%
+def pull_layers(
+    image_ref: str, output_dir: str, target_arch: str = TARGET_ARCH, target_variant: Optional[str] = TARGET_VARIANT
+) -> None:
+    """
+    Pull and extract Docker image layers for a specific architecture.
+
+    Args:
+        image_ref: Docker image reference (various formats supported)
+        output_dir: Directory to extract layers to
+        target_arch: Target architecture (default: auto-detected)
+        target_variant: Target architecture variant (default: auto-detected)
+    """
+
+    # Step 1: Parse image reference
+    registry, image, tag = parse_image_reference(image_ref)
+
+    print(f"Registry: {registry}")
+    print(f"Image: {image}")
+    print(f"Tag: {tag}")
+    print(f"Target architecture: {target_arch}{f' variant {target_variant}' if target_variant else ''}")
+
+    # Step 2: Get authentication
+    headers = get_auth_token(registry, image)
+
+    # Step 3: Get target manifest
+    manifest_digest = get_target_manifest(registry, image, tag, headers, target_arch, target_variant)
+
+    # Step 4: Get layers from manifest
+    layers = get_manifest_layers(registry, image, manifest_digest, headers)
+
+    # Step 5: Download and extract layers
+    download_and_extract_layers(registry, image, layers, headers, output_dir)
+
+    print(f"✓ Successfully extracted {image_ref} to {output_dir}")
+    print(f"  Architecture: {target_arch}{f' variant {target_variant}' if target_variant else ''}")
+
+
+# %%
+
+import subprocess
+
+"""
+Run a command in a chrooted environment.
+
+This function creates an isolated filesystem environment by changing the root directory
+for the executed command. The process will only be able to access files within the
+specified chroot directory.
+
+Args:
+    chroot_dir: Directory to chroot into (must contain necessary binaries and libraries)
+    command: Command to run (default: /bin/sh)
+            - If string: executed as shell command
+            - If list: executed directly
+            - If None: defaults to interactive shell
+
+Returns:
+    CompletedProcess object with execution results, or None if error/timeout
+"""
+
+
+def run_chroot(
+    chroot_dir: str, command: Optional[Union[str, List[str]]] = None
+) -> Optional[subprocess.CompletedProcess]:
+    # TODO: Implement chroot command execution
+    # 1. Handle different command formats (None, string, list)
+    # deal with strings and lists
+    if command:
+        if isinstance(command, list):  # a list
+            # 2. Build the chroot command: ['chroot', chroot_dir] + command
+            chroot_command = ["chroot", chroot_dir] + command
+        else:  # a string
+            # 2. Build the chroot command: ['chroot', chroot_dir] + command
+            chroot_command = ["chroot", chroot_dir] + [command]
+
+    # deal with None
+    else:
+        # 2. Build the chroot command: ['chroot', chroot_dir] + command
+        chroot_command = ["chroot", chroot_dir]
+
+    # 3. Execute with subprocess.run() with timeout and output capture
+    result = subprocess.run(chroot_command, capture_output=True, text=True, timeout=30)
+
+    # 4. Print execution details and results
+    if result.stdout:
+        print(f"stdout:\n{result.stdout}")
+    if result.stderr:
+        print(f"stderr:\n{result.stderr}")
+    return result
+
+
+from w2d2_test import test_run_chroot
+
+# Run the test
+test_run_chroot(run_chroot)
+
+# %%
