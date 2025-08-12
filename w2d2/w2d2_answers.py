@@ -591,10 +591,10 @@ test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
 # def create_cgroup_comprehensive(cgroup_name, memory_limit=None, cpu_limit=None):
 #     """
 #     Create a cgroup with comprehensive settings - Part 2: Advanced OOM and Process Management
-    
+
 #     This builds on Part 1 by adding advanced Out-of-Memory handling, process assignment,
 #     and comprehensive monitoring capabilities for production-ready container isolation.
-    
+
 #     Args:
 #         cgroup_name: Name of the cgroup (e.g., 'demo')
 #         memory_limit: Memory limit (e.g., '100M', '1000000')
@@ -614,3 +614,60 @@ test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
 # test_create_cgroup_comprehensive(test_memory_comprehensive, create_cgroup_comprehensive)
 
 # %%
+
+
+def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    """
+    Run a command in cgroup, chroot, and namespace isolation
+
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into (must contain basic filesystem structure)
+        command: Command to run (defaults to /bin/sh if None)
+        memory_limit: Memory limit for the cgroup (e.g., "100M")
+
+    Returns:
+        Exit code of the command, or None if error occurred
+    """
+    # Create cgroup with memory limit
+    create_cgroup(cgroup_name, memory_limit=memory_limit)
+
+    # Prepare command - default to shell if none provided
+    if command is None:
+        command = ["/bin/sh"]
+    elif isinstance(command, str):
+        command = ["/bin/sh", "-c", command]
+
+    print(f"Running `{command}` in cgroup {cgroup_name} with chroot {chroot_dir} and namespaces")
+
+    # Step 1: Fork a child process
+    pid = os.fork()
+
+    if pid == 0:
+        # in child
+        def child_handler(signal, frame):
+            print("Child has received signal")
+        signal.signal(signal.SIGUSR1, child_handler)
+        signal.pause()
+        print("Received signal from parent")
+
+        # Execute with namespace isolation
+        os.unshare(
+        )
+
+    else:
+        # in parent
+        child_pid = pid
+
+        print("Parent is doing stuff")
+        time.sleep(2)
+        print("Parent finished sleeping")
+
+        print("Parent sending kill signal")
+        os.kill(child_pid, signal.SIGUSR1)
+        print("Parent has sent signal")
+
+        os.waitpid(child_pid, 0)
+
+    # Think about why we did .fork() and the complicated signalling, as opposed to just running the commands sequentially.
+    pass
