@@ -8,6 +8,7 @@ import platform
 from io import BytesIO
 from typing import Optional, List, Union, Tuple, Dict, Any
 import subprocess
+import asyncio
 
 
 def exec_sh(command: str, timeout: Optional[int | None] = 30, check_retcode=True) -> subprocess.CompletedProcess:
@@ -425,5 +426,107 @@ def create_cgroup_comprehensive_part1(cgroup_name, memory, cpu):
 from w2d2_test import test_create_cgroup_comprehensive_part1
 
 test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
+
+# %%
+
+
+def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    """
+    Run a command in cgroup, chroot, and namespace isolation
+
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into (must contain basic filesystem structure)
+        command: Command to run (defaults to /bin/sh if None)
+        memory_limit: Memory limit for the cgroup (e.g., "100M")
+
+    Returns:
+        Exit code of the command, or None if error occurred
+    """
+    # Create cgroup with memory limit
+    create_cgroup(cgroup_name, memory_limit=memory_limit)
+
+    # Prepare command - default to shell if none provided
+    if command is None:
+        command = ["/bin/sh"]
+    elif isinstance(command, str):
+        command = ["/bin/sh", "-c", command]
+
+    print(f"Running `{command}` in cgroup {cgroup_name} with chroot {chroot_dir} and namespaces")
+    # TODO: Implement namespace isolation following these steps:
+
+    # Step 1: Fork a child process
+    # (Creates a copy of our program - parent and child run separately)
+    # Learn more: https://linuxhint.com/fork-system-call-linux/ and https://www.w3schools.com/python/ref_os_fork.asp
+    # documentation: https://docs.python.org/3/library/os.html#os.fork
+    p = os.fork()
+    if p == 0:
+        print("We are in the child process.")
+
+        # Step 2: In child process:
+        #   - Set up signal handler for SIGUSR1 (like a doorbell to wake up the child)
+
+        signal.signal(signal.SIGUSR1, handler=signal.SIG_DFL)
+        #     See: https://docs.python.org/3/library/signal.html
+        #   - Wait for parent to finish setup and send a signal
+        signal.pause()
+
+    else:
+        pass
+    #   - After receiving signal, use unshare command to create isolated environments:
+    #     See: https://man7.org/linux/man-pages/man1/unshare.1.html
+
+    # Step 3: In parent process:
+    #   - Add child PID to cgroup (to limit resources like memory/CPU)
+    #   - Send SIGUSR1 signal to child (tells it "you're ready to start")
+    #   - Wait for child to finish running
+    #   - Get the exit code to report success/failure
+
+    # Think about why we did .fork() and the complicated signalling, as opposed to just running the commands sequentially.
+    pass
+
+
+# %%
+
+import uuid
+
+
+def create_bridge_interface():
+    """
+    Create and configure bridge0 interface with IP address
+    """
+    # Check if bridge already exists
+    bridge_check = exec_sh("ip link show bridge0", check_retcode=False)
+    if bridge_check.returncode == 0:
+        print("✓ Bridge0 already exists, checking configuration...")
+        # Check if it has the right IP
+        ip_check = exec_sh("ip addr show bridge0")
+        if "10.0.0.1/24" in ip_check.stdout:
+            print("✓ Bridge0 already configured with correct IP")
+            return True
+        else:
+            print("⚠ Bridge0 exists but needs reconfiguration")
+
+    # Remove existing bridge if it exists
+    exec_sh("ip link del bridge0", check_retcode=False)
+
+    # Create and configure bridge
+    exec_sh("""
+        ip link add bridge0 type bridge
+        ip addr add 10.0.0.1/24 dev bridge0
+        ip link set bridge0 up
+    """)
+
+    print("✓ Created bridge0")
+    print("✓ Added IP 10.0.0.1/24 to bridge0")
+    print("✓ Bridge0 is up")
+
+    return True
+
+
+from w2d2_test import test_bridge_interface
+
+# Run the test
+test_bridge_interface(create_bridge_interface, exec_sh)
 
 # %%

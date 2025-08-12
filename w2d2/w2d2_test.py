@@ -577,11 +577,11 @@ def test_namespace_isolation():
     return True
 
 
-def test_bridge_interface():
+def test_bridge_interface(create_bridge_interface_fn, exec_sh):
     """Test bridge interface creation"""
     print("Testing bridge interface creation...")
 
-    result = create_bridge_interface()
+    result = create_bridge_interface_fn()
     if result:
         print("✓ Bridge interface creation successful!")
 
