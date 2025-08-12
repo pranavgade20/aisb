@@ -348,7 +348,7 @@ def run_chroot(
     # 6. Return the result or None on error
 
     if isinstance(command, str):
-        chroot_command = ['sudo', 'chroot', chroot_dir, '/bin/sh', '-c', command]
+        chroot_command = ["sudo", "chroot", chroot_dir, "/bin/sh", "-c", command]
     elif isinstance(command, list):
         chroot_command = ["sudo", "chroot", chroot_dir] + command
     elif command is None:
@@ -372,11 +372,13 @@ test_run_chroot(run_chroot)
 # %%
 import signal
 import time
+from pathlib import Path
+
 
 def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     """
     Create a cgroup with specified limits
-    
+
     Args:
         cgroup_name: Name of the cgroup (e.g., 'demo')
         memory_limit: Memory limit (e.g., '100M', '1000000')
@@ -391,43 +393,23 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     # 3. Set memory limit if specified - write the memory limit to {cgroup_path}/memory.max, which will tell the kernel how much memory the cgroup can use
     # 4. Return the cgroup path
     # 5. Handle errors and return None on failure
-    # path = f'/sys/fs/cgVroup/{cgroup_name}'
-    # subprocess.run(['sudo', 'chmod', '+w', '/sys/fs/cgroup/'])
-    # os.mkdir(path)
-    
-    # # subprocess.run(['sudo', 'mkdir', path])
+    path = f"/sys/fs/cgroup/{cgroup_name}"
+    subprocess.run(["sudo", "chmod", "+w", "/sys/fs/cgroup/"])
+    os.makedirs(path, exist_ok=True)
 
-    # with open(path+'/cgroup.subtree_control', 'w') as f:
-    #     f.write('+cpu +memory +pids')
-
-    # if memory_limit is not None:
-    #     with open(path+'/memory.max', 'w') as f:
-    #         f.write(memory_limit)
-
-    # if cpu_limit is not None:
-    #     with open(path+'/cpu.max', 'w') as f:
-    #         f.write(cpu_limit)
-
-    # return path
-
-    cgroup_path = f"/sys/fs/cgroup/{cgroup_name}"
-        
-    # Create cgroup directory
-    os.makedirs(cgroup_path, exist_ok=True)
-    print(f"Created cgroup directory: {cgroup_path}")
-        
-    # Enable controllers in parent cgroup
-    with open("/sys/fs/cgroup/cgroup.subtree_control", "w") as f:
+    with open(path + "/cgroup.subtree_control", "w") as f:
         f.write("+cpu +memory +pids")
-    print("Enabled cgroup controllers")
-        
-    # Set memory limit if specified
+
     if memory_limit:
-        memory_max_path = f"{cgroup_path}/memory.max"
-        with open(memory_max_path, "w") as f:
-            f.write(str(memory_limit))
-        print(f"Set memory limit to {memory_limit}")
-    return cgroup_path
+        with open(path + "/memory.max", "w") as f:
+            f.write(memory_limit)
+
+    if cpu_limit:
+        with open(path + "/cpu.max", "w") as f:
+            f.write(cpu_limit)
+
+    return path
+
 
 from w2d2_test import test_create_cgroup
 
