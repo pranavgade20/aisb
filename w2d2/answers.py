@@ -150,7 +150,7 @@ def get_target_manifest(registry: str, image: str, tag: str, headers: Dict[str, 
     # 1. Build manifest list URL
     url = f'https://{registry}/v2/{image}/manifests/{tag}'
     # 2. Make HTTP request with headers
-    response = requests.get(url).json()
+    response = requests.get(url, headers=headers).json()
     # 3. Parse JSON response
     manifests = response['manifests']
     for m in manifests:
