@@ -138,3 +138,158 @@ def get_auth_token(registry: str, image: str) -> Dict[str, str]:
 from w2d2_test import test_get_auth_token
 
 test_get_auth_token(get_auth_token)
+"""
+https://{registry}/v2/{image}/manifests/{tag}
+
+{
+  "manifests": [
+    {
+      "platform": {"architecture": "amd64"},
+      "digest": "sha256:abc123..."
+    },
+    {
+      "platform": {"architecture": "arm64", "variant": "v8"},
+      "digest": "sha256:def456..."
+    }
+  ]
+}
+
+"""
+
+
+def get_target_manifest(registry: str, image: str, tag: str, headers: Dict[str, str], 
+                       target_arch: str, target_variant: Optional[str] = None) -> str:
+    """
+    Get the manifest digest for the target architecture.
+    
+    Args:
+        registry: Registry hostname
+        image: Image name
+        tag: Image tag
+        headers: Authentication headers
+        target_arch: Target architecture (e.g., "amd64", "arm64")
+        target_variant: Optional architecture variant (e.g., "v8")
+        
+    Returns:
+        Manifest digest for the target architecture
+        
+    Raises:
+        ValueError: If target architecture is not found
+    """
+    # TODO: Implement manifest discovery
+    # 1. Build manifest list URL
+    # 2. Make HTTP request with headers
+    # 3. Parse JSON response
+    # 4. Find manifest matching target_arch and target_variant
+    # 5. Return the digest, or raise ValueError if not found
+    
+    manifest_list_url = f"https://{registry}/v2/{image}/manifests/{tag}"
+    print(f"Fetching manifest list from: {manifest_list_url}")
+    
+    resp = requests.get(manifest_list_url, headers=headers)
+    resp.raise_for_status()
+    manifest_list = resp.json()
+    
+    # Find the manifest for our target architecture
+    target_manifest = None
+    for manifest in manifest_list.get('manifests', []):
+        platform = manifest.get('platform', {})
+        if platform.get('architecture') == target_arch:
+            # Check variant if specified
+            if target_variant:
+                if platform.get('variant') == target_variant:
+                    target_manifest = manifest
+                    break
+            else:
+                # No variant specified, take the first match
+                target_manifest = manifest
+                break
+
+    if not target_manifest:
+        available_archs = []
+        for manifest in manifest_list.get('manifests', []):
+            platform = manifest.get('platform', {})
+            arch_str = platform.get('architecture', 'unknown')
+            if platform.get('variant'):
+                arch_str += f" {platform.get('variant')}"
+            available_archs.append(arch_str)
+        
+        raise ValueError(f"No manifest found for architecture {target_arch}"
+                        f"{f' variant {target_variant}' if target_variant else ''}. "
+                        f"Available: {', '.join(available_archs)}")
+
+    manifest_digest = target_manifest['digest']
+    print(f"Found manifest for {target_arch}: {manifest_digest}")
+    return manifest_digest
+
+
+def get_manifest_layers(registry: str, image: str, manifest_digest: str, headers: Dict[str, str]) -> List[Dict[str, Any]]:
+    """
+    Get the layer information from a manifest.
+    
+    Args:
+        registry: Registry hostname
+        image: Image name
+        manifest_digest: Manifest digest
+        headers: Authentication headers
+        
+    Returns:
+        List of layer dictionaries with 'digest' and 'size' keys
+    """
+    # TODO: Implement manifest processing
+    # 1. Build manifest URL using digest
+    # 2. Add Accept header for v2 manifest format
+    # 3. Make HTTP request
+    # 4. Parse JSON and extract layers
+    # 5. Return list of layer dictionaries
+    manifest_url = f"https://{registry}/v2/{image}/manifests/{manifest_digest}"
+    headers_copy = headers.copy()
+    headers_copy['Accept'] = 'application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.manifest.v1+json'
+    
+    print(f"Fetching manifest from: {manifest_url}")
+    resp = requests.get(manifest_url, headers=headers_copy)
+    resp.raise_for_status()
+    manifest = resp.json()
+    
+    print(f"Manifest type: {manifest.get('mediaType', 'unknown')}")
+    layers = manifest.get('layers', [])
+    print(f"Number of layers: {len(layers)}")
+    
+    return layers # Placeholder return
+
+# %%
+
+def download_and_extract_layers(registry: str, image: str, layers: List[Dict[str, Any]], 
+                               headers: Dict[str, str], output_dir: str) -> None:
+    """
+    Download and extract all layers to the output directory.
+    
+    Args:
+        registry: Registry hostname
+        image: Image name
+        layers: List of layer dictionaries from manifest
+        headers: Authentication headers
+        output_dir: Directory to extract layers to
+    """
+    # TODO: Implement layer download and extraction
+    # 1. Create output directory
+    output_dict = {}
+    # 2. For each layer:
+    #    a. Build blob URL using digest
+    #    b. Download blob with streaming
+    #    c. Extract as gzipped tar to output_dir
+    print(len(layers))
+    for layer in layers:
+        x = layer
+        pass
+        get_target_manifest(registry=registry,image=image)
+        pass
+        
+    # 3. Print progress information
+    pass
+from w2d2_test import test_download_and_extract_layers
+
+test_download_and_extract_layers(download_and_extract_layers, get_auth_token, 
+                                get_target_manifest, get_manifest_layers)
+
+# %%
