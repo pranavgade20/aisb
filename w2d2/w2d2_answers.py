@@ -314,3 +314,123 @@ test_pull_layers_complete(pull_layers)
 # %%
 pull_layers("alpine:latest", "./extracted_alpine")
 pull_layers("python:3.12-alpine", "./extracted_python")
+
+# %%
+import subprocess
+
+
+def run_chroot(
+    chroot_dir: str, command: Optional[Union[str, List[str]]] = None
+) -> Optional[subprocess.CompletedProcess]:
+    """
+    Run a command in a chrooted environment.
+
+    This function creates an isolated filesystem environment by changing the root directory
+    for the executed command. The process will only be able to access files within the
+    specified chroot directory.
+
+    Args:
+        chroot_dir: Directory to chroot into (must contain necessary binaries and libraries)
+        command: Command to run (default: /bin/sh)
+                - If string: executed as shell command
+                - If list: executed directly
+                - If None: defaults to interactive shell
+
+    Returns:
+        CompletedProcess object with execution results, or None if error/timeout
+    """
+    # TODO: Implement chroot command execution
+    # 1. Handle different command formats (None, string, list)
+    # 2. Build the chroot command: ['chroot', chroot_dir] + command
+    # 3. Execute with subprocess.run() with timeout and output capture
+    # 4. Print execution details and results
+    # 5. Handle TimeoutExpired and other exceptions
+    # 6. Return the result or None on error
+
+    if isinstance(command, str):
+        chroot_command = ['sudo', 'chroot', chroot_dir, '/bin/sh', '-c', command]
+    elif isinstance(command, list):
+        chroot_command = ["sudo", "chroot", chroot_dir] + command
+    elif command is None:
+        chroot_command = ["sudo", "chroot", chroot_dir, "/bin/sh"]
+
+    print(chroot_command)
+    try:
+        out = subprocess.run(chroot_command, timeout=2, capture_output=True, text=True)
+    except TimeoutError as e:
+        print(e)
+        return None
+
+    return out
+
+
+from w2d2_test import test_run_chroot
+
+# Run the test
+test_run_chroot(run_chroot)
+
+# %%
+import signal
+import time
+
+def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
+    """
+    Create a cgroup with specified limits
+    
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (stretch)
+
+    Returns:
+        Path to the created cgroup
+    """
+    # TODO: Implement basic cgroup creation
+    # 1. Create a new cgroup directory with path /sys/fs/cgroup/{cgroup_name} - you will write files in this directory to configure the cgroup
+    # 2. Enable controllers (+cpu +memory +pids) in parent cgroup
+    # 3. Set memory limit if specified - write the memory limit to {cgroup_path}/memory.max, which will tell the kernel how much memory the cgroup can use
+    # 4. Return the cgroup path
+    # 5. Handle errors and return None on failure
+    # path = f'/sys/fs/cgVroup/{cgroup_name}'
+    # subprocess.run(['sudo', 'chmod', '+w', '/sys/fs/cgroup/'])
+    # os.mkdir(path)
+    
+    # # subprocess.run(['sudo', 'mkdir', path])
+
+    # with open(path+'/cgroup.subtree_control', 'w') as f:
+    #     f.write('+cpu +memory +pids')
+
+    # if memory_limit is not None:
+    #     with open(path+'/memory.max', 'w') as f:
+    #         f.write(memory_limit)
+
+    # if cpu_limit is not None:
+    #     with open(path+'/cpu.max', 'w') as f:
+    #         f.write(cpu_limit)
+
+    # return path
+
+    cgroup_path = f"/sys/fs/cgroup/{cgroup_name}"
+        
+    # Create cgroup directory
+    os.makedirs(cgroup_path, exist_ok=True)
+    print(f"Created cgroup directory: {cgroup_path}")
+        
+    # Enable controllers in parent cgroup
+    with open("/sys/fs/cgroup/cgroup.subtree_control", "w") as f:
+        f.write("+cpu +memory +pids")
+    print("Enabled cgroup controllers")
+        
+    # Set memory limit if specified
+    if memory_limit:
+        memory_max_path = f"{cgroup_path}/memory.max"
+        with open(memory_max_path, "w") as f:
+            f.write(str(memory_limit))
+        print(f"Set memory limit to {memory_limit}")
+    return cgroup_path
+
+from w2d2_test import test_create_cgroup
+
+test_create_cgroup(create_cgroup)
+
+# %%
