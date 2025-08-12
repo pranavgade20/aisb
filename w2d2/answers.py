@@ -423,3 +423,30 @@ from w2d2_test import test_run_in_cgroup_chroot
 test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup=create_cgroup)
 
 # %%
+def create_cgroup_comprehensive_part1(cgroup_name, memory, cpu):
+    """
+    Create a cgroup with comprehensive settings - Part 1: Basic setup
+    
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (not implemented yet)
+    """
+    # 1. Call create_cgroup() with the correct parameters to create the cgroup
+    cgroup_path = create_cgroup(cgroup_name, memory_limit=memory, cpu_limit=cpu)
+    # 2. Disable swap - search for "swap.max" in https://docs.kernel.org/admin-guide/cgroup-v2.html
+    swap_path = f'{cgroup_path}/memory.swap.max'
+    with open(swap_path, 'w') as f:
+        ok = f.write('0')
+    # 3. Return cgroup path or None if critical steps fail
+    if ok:
+        return cgroup_path
+
+    return None
+
+
+from w2d2_test import test_create_cgroup_comprehensive_part1
+
+test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
+
+# %%
