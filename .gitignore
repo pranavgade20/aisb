@@ -109,6 +109,6 @@ cython_debug/
 db.sqlite3
 aisb_ssh
 
-w2d2/extracted_alpine/*
-w2d2/extracted_python/*
-w2d2/img/*
+extracted_alpine/*
+extracted_python/*
+img/*
