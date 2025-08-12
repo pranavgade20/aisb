@@ -367,3 +367,24 @@ from w2d2_test import test_create_cgroup
 test_create_cgroup(create_cgroup)
 
 # %%
+def add_process_to_cgroup(cgroup_name, pid=None):
+    """
+    Add a process to a cgroup
+    
+    Args:
+        cgroup_name: Name of the cgroup
+        pid: Process ID (default: current process)
+    """
+    # 1. Use current process PID if none specified
+    if pid == None:
+        pid = os.getpid()
+    # 2. Write PID to cgroup.procs file
+    with open(f'/sys/fs/cgroup/{cgroup_name}/cgroup.procs', 'w') as f:
+        ok = f.write(f"{pid}")
+    # 3. Handle errors and return success status
+    return ok
+
+from w2d2_test import test_add_process_to_cgroup
+test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
+
+# %%
