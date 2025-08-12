@@ -2397,8 +2397,8 @@ def create_bridge_interface():
             else:
                 print("⚠ Bridge0 exists but needs reconfiguration")
 
-        # Remove existing bridge if it exists
-        exec_sh("ip link del bridge0", check_retcode=False)
+                # Remove existing bridge if it exists
+                exec_sh("ip link del bridge0", check_retcode=False)
 
         # Create and configure bridge
         exec_sh("""

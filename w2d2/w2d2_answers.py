@@ -460,36 +460,6 @@ def parse_image_reference(image_ref: str) -> Tuple[str, str, str]:
 """
 
 
-def test_parse_image_reference(parse_image_reference):
-    """Test the image reference parsing function."""
-    print("Testing image reference parsing...")
-
-    # Test 1: Docker Hub shorthand
-    registry, image, tag = parse_image_reference("hello-world:latest")
-    assert registry == "mirror.gcr.io", f"Expected registry-1.docker.io, got {registry}"
-    assert image == "library/hello-world", f"Expected library/hello-world, got {image}"
-    assert tag == "latest", f"Expected latest, got {tag}"
-    print("✓ Docker Hub shorthand parsing works")
-
-    # Test 2: Custom registry
-    registry, image, tag = parse_image_reference("gcr.io/google-containers/pause:3.2")
-    assert registry == "gcr.io", f"Expected gcr.io, got {registry}"
-    assert image == "google-containers/pause", f"Expected google-containers/pause, got {image}"
-    assert tag == "3.2", f"Expected 3.2, got {tag}"
-    print("✓ Custom registry parsing works")
-
-    # Test 3: No tag specified (should default to latest)
-    registry, image, tag = parse_image_reference("alpine")
-    assert registry == "mirror.gcr.io", f"Expected registry-1.docker.io, got {registry}"
-    assert image == "library/alpine", f"Expected library/alpine, got {image}"
-    assert tag == "latest", f"Expected latest, got {tag}"
-    print("✓ Default tag handling works")
-
-    print("✓ Image reference parsing tests passed!\n" + "=" * 60)
-
-
-test_parse_image_reference(parse_image_reference)
-
 # %%
 """
 ### Exercise 1.2: Docker Registry Authentication (Optional)
@@ -589,26 +559,6 @@ def get_auth_token(registry: str, image: str) -> Dict[str, str]:
         # 7. Return headers dictionary
         return {}  # Placeholder return
 
-
-def test_get_auth_token(get_auth_token):
-    """Test the authentication token retrieval."""
-    print("Testing authentication token retrieval...")
-
-    # Test 1: Docker Hub authentication
-    headers = get_auth_token("registry-1.docker.io", "library/hello-world")
-    assert "Authorization" in headers, "Authorization header missing"
-    assert headers["Authorization"].startswith("Bearer "), "Token should be Bearer type"
-    print("✓ Docker Hub token retrieval works")
-
-    # Test 2: Other registries (should return empty headers)
-    headers = get_auth_token("gcr.io", "google-containers/pause")
-    assert isinstance(headers, dict), "Should return dictionary"
-    print("✓ Other registry handling works")
-
-    print("✓ Authentication tests passed!\n" + "=" * 60)
-
-
-test_get_auth_token(get_auth_token)
 
 """
 <details>
@@ -787,42 +737,6 @@ def get_target_manifest(
 </details>
 """
 
-
-def test_get_target_manifest(get_target_manifest, get_auth_token):
-    """Test the manifest discovery function."""
-    print("Testing manifest discovery...")
-
-    # Test with a known multi-arch image
-    registry = "mirror.gcr.io"
-    image = "library/hello-world"
-    tag = "latest"
-    headers = get_auth_token(registry, image)
-
-    # Test 1: Find amd64 manifest
-    digest = get_target_manifest(registry, image, tag, headers, "amd64")
-    assert digest.startswith("sha256:"), f"Digest should start with sha256:, got {digest}"
-    print("✓ AMD64 manifest discovery works")
-
-    # Test 2: Find arm64 manifest
-    digest = get_target_manifest(registry, image, tag, headers, "arm64", "v8")
-    assert digest.startswith("sha256:"), f"Digest should start with sha256:, got {digest}"
-    print("✓ ARM64 manifest discovery works")
-
-    # Test 3: Invalid architecture should raise ValueError
-    try:
-        get_target_manifest(registry, image, tag, headers, "invalid-arch")
-        assert False, "Should have raised ValueError for invalid architecture"
-    except ValueError:
-        print("✓ Invalid architecture handling works")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        sys.exit(1)
-
-    print("✓ Manifest discovery tests passed!\n" + "=" * 60)
-
-
-test_get_target_manifest(get_target_manifest, get_auth_token)
-
 # %%
 """
 ### Exercise 1.4: Manifest Processing
@@ -941,40 +855,6 @@ def get_manifest_layers(
         return []  # Placeholder return
 
 
-def test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifest):
-    """Test the manifest processing function."""
-    print("Testing manifest processing...")
-
-    # Use a known image
-    registry = "mirror.gcr.io"
-    image = "library/hello-world"
-    tag = "latest"
-    headers = get_auth_token(registry, image)
-
-    # Get manifest digest
-    manifest_digest = get_target_manifest(registry, image, tag, headers, "amd64")
-
-    # Get layers
-    layers = get_manifest_layers(registry, image, manifest_digest, headers)
-
-    assert isinstance(layers, list), "Layers should be a list"
-    assert len(layers) > 0, "Should have at least one layer"
-
-    # Check layer structure
-    for layer in layers:
-        assert "digest" in layer, "Layer should have digest"
-        assert "size" in layer, "Layer should have size"
-        assert layer["digest"].startswith("sha256:"), "Digest should start with sha256:"
-        assert isinstance(layer["size"], int), "Size should be integer"
-
-    print(f"✓ Found {len(layers)} layers")
-    print("✓ Manifest processing works")
-
-    print("✓ Manifest processing tests passed!\n" + "=" * 60)
-
-
-test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifest)
-
 # %%
 """
 ### Exercise 1.5: Layer Download and Extraction
@@ -1081,48 +961,6 @@ def download_and_extract_layers(
         pass
 
 
-def test_download_and_extract_layers(
-    download_and_extract_layers, get_auth_token, get_target_manifest, get_manifest_layers
-):
-    """Test the layer download and extraction function."""
-    print("Testing layer download and extraction...")
-
-    # Use a small image for testing
-    registry = "mirror.gcr.io"
-    image = "library/hello-world"
-    tag = "latest"
-    output_dir = "./test_extracted"
-
-    # Get authentication
-    headers = get_auth_token(registry, image)
-
-    # Get manifest
-    manifest_digest = get_target_manifest(registry, image, tag, headers, TARGET_ARCH, TARGET_VARIANT)
-
-    # Get layers
-    layers = get_manifest_layers(registry, image, manifest_digest, headers)
-
-    # Download and extract
-    download_and_extract_layers(registry, image, layers, headers, output_dir)
-
-    # Verify extraction
-    assert os.path.exists(output_dir), "Output directory should exist"
-    extracted_files = os.listdir(output_dir)
-    assert len(extracted_files) > 0, "Should have extracted some files"
-
-    print(f"✓ Successfully extracted to {output_dir}")
-    print(f"✓ Found {len(extracted_files)} items in output directory")
-
-    # Cleanup
-    import shutil
-
-    shutil.rmtree(output_dir, ignore_errors=True)
-
-    print("✓ Layer download and extraction tests passed!\n" + "=" * 60)
-
-
-test_download_and_extract_layers(download_and_extract_layers, get_auth_token, get_target_manifest, get_manifest_layers)
-
 # %%
 """
 ### Exercise 1.6: Complete Implementation
@@ -1195,38 +1033,6 @@ def pull_layers(
         # 5. download_and_extract_layers()
         pass
 
-
-def test_pull_layers_complete(pull_layers):
-    """Test the complete pull_layers function."""
-    print("Testing complete pull_layers function...")
-
-    # Test with a small image
-    test_cases = [
-        ("hello-world:latest", "./extracted_hello_world"),
-        ("alpine:latest", "./extracted_alpine"),
-        ("python:3.12-alpine", "./extracted_python"),
-    ]
-
-    for image_ref, output_dir in test_cases:
-        print(f"\nTesting {image_ref}...")
-        pull_layers(image_ref, output_dir)
-
-        # Verify extraction
-        assert os.path.exists(output_dir), f"Output directory {output_dir} should exist"
-        extracted_files = os.listdir(output_dir)
-        assert len(extracted_files) > 0, f"Should have extracted files to {output_dir}"
-
-        print(f"✓ Successfully extracted {image_ref}")
-
-        # Cleanup
-        import shutil
-
-        shutil.rmtree(output_dir, ignore_errors=True)
-
-    print("✓ Complete pull_layers tests passed!\n" + "=" * 60)
-
-
-test_pull_layers_complete(pull_layers)
 
 # %%
 pull_layers("alpine:latest", "./extracted_alpine")
@@ -1325,66 +1131,6 @@ def run_chroot(
         pass
 
 
-def test_run_chroot(run_chroot):
-    """Test the chroot command execution function."""
-    print("Testing chroot command execution...")
-
-    # Test 1: Basic command execution in Alpine Linux environment
-    print("\n1. Testing basic command execution:")
-    result = run_chroot("./extracted_alpine", "echo 'Hello from chroot!'")
-    if result:
-        assert result.returncode == 0, "Echo command should succeed"
-        assert "Hello from chroot!" in result.stdout, "Output should contain expected text"
-        print("✓ Basic command execution works")
-    else:
-        print("⚠ Basic command test failed - may need Alpine environment")
-
-    # Test 2: Testing with Python environment
-    print("\n2. Testing Python version check:")
-    result = run_chroot("./extracted_python", "python --version")
-    if result:
-        assert result.returncode == 0, "Python version command should succeed"
-        assert "Python" in result.stdout or "Python" in result.stderr, "Should show Python version"
-        print("✓ Python environment test works")
-    else:
-        print("⚠ Python test failed - may need Python environment")
-
-    # Test 3: Testing file system isolation
-    print("\n3. Testing filesystem isolation:")
-    result = run_chroot("./extracted_alpine", "ls /")
-    if result:
-        assert result.returncode == 0, "Directory listing should succeed"
-        # Should not see host filesystem
-        assert "Users" not in result.stdout, "Should not see host directories"
-        print("✓ Filesystem isolation verified")
-    else:
-        print("⚠ Filesystem isolation test failed")
-
-    # Test 4: Testing command list format
-    print("\n4. Testing command list format:")
-    result = run_chroot("./extracted_alpine", ["echo", "List command works"])
-    if result:
-        assert result.returncode == 0, "List command should succeed"
-        assert "List command works" in result.stdout, "Output should contain expected text"
-        print("✓ Command list format works")
-    else:
-        print("⚠ Command list test failed")
-
-    # Test 5: Testing error handling
-    print("\n5. Testing error handling:")
-    result = run_chroot("./extracted_alpine", "nonexistent_command")
-    if result:
-        assert result.returncode != 0, "Non-existent command should fail"
-        print("✓ Error handling works")
-    else:
-        print("⚠ Error handling test failed")
-
-    print("\n✓ Chroot tests completed!\n" + "=" * 60)
-
-
-# Run the test
-test_run_chroot(run_chroot)
-
 # %%
 """
 ## Container Resource Management: Cgroups
@@ -1482,37 +1228,6 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
 </details>
 """
 
-
-def test_create_cgroup(create_cgroup):
-    """Test the basic cgroup creation function."""
-    print("Testing basic cgroup creation...")
-
-    # Test 1: Create cgroup without limits
-    cgroup_path = create_cgroup("test_basic")
-    if cgroup_path:
-        assert os.path.exists(cgroup_path), "Cgroup directory should exist"
-        print("✓ Basic cgroup creation works")
-    else:
-        print("⚠ Basic cgroup creation failed - may need root privileges")
-
-    # Test 2: Create cgroup with memory limit
-    cgroup_path = create_cgroup("test_memory", memory_limit="50M")
-    if cgroup_path:
-        memory_max_path = f"{cgroup_path}/memory.max"
-        if os.path.exists(memory_max_path):
-            with open(memory_max_path, "r") as f:
-                limit = f.read().strip()
-            print(f"✓ Memory limit set to: {limit}")
-        else:
-            print("⚠ Memory limit file not found")
-    else:
-        print("⚠ Memory limit test failed")
-
-    print("✓ Basic cgroup creation tests completed!\n" + "=" * 60)
-
-
-test_create_cgroup(create_cgroup)
-
 # %%
 """
 ### Exercise 3.2: Process Assignment
@@ -1567,39 +1282,6 @@ def add_process_to_cgroup(cgroup_name, pid=None):
         # 3. Handle errors and return success status
         pass
 
-
-def test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup):
-    """Test the process assignment function."""
-    print("Testing process assignment to cgroup...")
-
-    # Create a test cgroup first
-    cgroup_path = create_cgroup("test_process")
-    if not cgroup_path:
-        print("⚠ Cannot test process assignment - cgroup creation failed")
-        return
-
-    # Test: Add current process to cgroup
-    success = add_process_to_cgroup("test_process")
-    if success:
-        # Verify the process was added
-        cgroup_procs_path = f"{cgroup_path}/cgroup.procs"
-        if os.path.exists(cgroup_procs_path):
-            with open(cgroup_procs_path, "r") as f:
-                procs = f.read().strip().split("\n")
-            current_pid = str(os.getpid())
-            if current_pid in procs:
-                print("✓ Process assignment works")
-            else:
-                print("⚠ Process not found in cgroup.procs")
-        else:
-            print("⚠ cgroup.procs file not found")
-    else:
-        print("⚠ Process assignment failed")
-
-    print("✓ Process assignment tests completed!\n" + "=" * 60)
-
-
-test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
 
 # %%
 """
@@ -1660,86 +1342,6 @@ def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="10
         pass
 
 
-def test_memory_simple(cgroup_name="demo", memory_limit="100M"):
-    """
-    Simple memory test that matches the user's manual example exactly
-    """
-    print(f"Testing memory allocation with {memory_limit} limit:")
-    print("(This should show allocations and then get killed)")
-
-    # Create cgroup
-    create_cgroup(cgroup_name, memory_limit=memory_limit)
-
-    # Use a here document to avoid quote nesting issues completely
-    script = """
-    chroot extracted_python/ /bin/sh << 'EOF'
-python3 -c "
-
-import os
-import time
-
-print('Starting memory allocation test...')
-print('Process PID:', os.getpid())
-
-import random
-data = []
-sum = 0
-for i in range(99):
-    # Use random data to prevent optimization
-    random_number = random.random()
-    data.append(str(random_number) * 10 * 1024 * 1024)  # 10MB chunks
-    sum += random_number
-    print('Allocated ' + str(sum * 10) + 'MB', flush=True)
-
-print('Test completed - this should not be reached if limits work!')
-"
-EOF
-    """
-
-    # Use Popen to get real-time output and better control
-    process = subprocess.Popen(
-        ["sh", "-c", script], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
-    )
-
-    # Stream output in real-time
-    if process.stdout:
-        for line in iter(process.stdout.readline, ""):
-            print(line.strip())
-
-    process.wait(timeout=60)
-
-    # Check how the process ended
-    if process.returncode == 0:
-        print("\n⚠ Process completed normally - memory limit may not be working")
-    elif process.returncode == -signal.SIGKILL or process.returncode == 137:
-        print("\n✓ Process was KILLED (likely by OOM killer) - memory limit working!")
-        print("   Return code 137 = 128 + 9 (SIGKILL)")
-    elif process.returncode < 0:
-        print(f"\n✓ Process was killed by signal {-process.returncode}")
-    else:
-        print(f"\n? Process exited with code {process.returncode}")
-
-    return process.returncode
-
-
-def test_run_in_cgroup_chroot(run_in_cgroup_chroot):
-    """Test the combined cgroup-chroot execution function."""
-    print("Testing combined cgroup-chroot execution...")
-
-    # Test basic command execution
-    result = run_in_cgroup_chroot("test_combined", "./extracted_alpine", "echo 'Hello from container!'")
-    if result:
-        print(f"✓ Basic combined execution completed with exit code: {result.returncode}")
-    else:
-        print("⚠ Basic combined execution failed")
-
-    test_memory_simple(cgroup_name="demo_comprehensive", memory_limit="50M")
-
-    print("✓ Combined cgroup-chroot tests completed!\n" + "=" * 60)
-
-
-test_run_in_cgroup_chroot(run_in_cgroup_chroot)
-
 # %%
 """
 ### Exercise 3.4: Comprehensive Cgroup Setup - Part 1
@@ -1788,31 +1390,6 @@ def create_cgroup_comprehensive_part1(cgroup_name, memory, cpu):
         # 3. Return cgroup path or None if critical steps fail
         pass
 
-
-def test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1):
-    """Test the comprehensive cgroup creation function - Part 1."""
-    print("Testing comprehensive cgroup creation - Part 1...")
-
-    # Test comprehensive cgroup with memory limit
-    cgroup_path = create_cgroup_comprehensive_part1("test_comprehensive_p1", "100M", None)
-    if cgroup_path:
-        assert os.path.exists(cgroup_path), "Cgroup directory should exist"
-
-        # Check if memory limit was set
-        memory_max_path = f"{cgroup_path}/memory.max"
-        if os.path.exists(memory_max_path):
-            with open(memory_max_path, "r") as f:
-                limit = f.read().strip()
-            print(f"✓ Comprehensive cgroup created with memory limit: {limit}")
-        else:
-            print("⚠ Memory limit file not accessible")
-    else:
-        print("⚠ Comprehensive cgroup creation failed")
-
-    print("✓ Comprehensive cgroup creation Part 1 tests completed!\n" + "=" * 60)
-
-
-test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
 
 # %%
 """
@@ -1883,118 +1460,7 @@ def create_cgroup_comprehensive(cgroup_name, memory_limit=None, cpu_limit=None):
         pass
 
 
-def test_memory_comprehensive(cgroup_name="demo2", memory_limit="100M"):
-    """
-    Comprehensive memory test that properly sets up cgroups with all necessary settings
-    including oom_score_adj to ensure the memory limit is enforced
-    """
-    print(f"Testing memory allocation with {memory_limit} limit (comprehensive setup):")
-    print("(This should properly enforce the cgroup memory limit)")
-
-    # Create cgroup with comprehensive settings
-    cgroup_path = create_cgroup_comprehensive(cgroup_name, memory_limit=memory_limit)
-    if not cgroup_path:
-        print("✗ Failed to create cgroup")
-        return None
-
-    # Create the test script with proper oom_score_adj setting
-    script = """
-    # Run the memory test in chroot
-    chroot extracted_python/ /bin/sh << 'EOF'
-python3 -c "
-import os
-import time
-
-print('Starting memory allocation test...')
-print('Process PID:', os.getpid())
-
-data = []
-for i in range(200):  # Allocate up to 2GB if not killed
-    data.append('x' * 10 * 1024 * 1024)  # 10MB chunks
-    print('Allocated ' + str((i+1) * 10) + 'MB', flush=True)
-    
-    # Add a small delay to make killing more predictable
-    time.sleep(0.5)
-
-print('Test completed - this should not be reached if limits work!')
-"
-EOF
-    """
-
-    # Use Popen to get real-time output
-    process = subprocess.Popen(
-        ["sh", "-c", script], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True
-    )
-
-    # Stream output in real-time
-    print("Streaming output...")
-    if process.stdout:
-        while True:
-            output = process.stdout.readline()
-            if output == "" and process.poll() is not None:
-                break
-            if output:
-                print(output.strip())
-
-    process.wait(timeout=60)
-
-    # Check how the process ended
-    if process.returncode == 0:
-        print("\n⚠ Process completed normally - cgroup memory limit NOT working")
-    elif process.returncode == -signal.SIGKILL or process.returncode == 137:
-        print("\n✓ Process was KILLED - cgroup memory limit working!")
-        print("   Return code 137 = 128 + 9 (SIGKILL)")
-    elif process.returncode < 0:
-        print(f"\n✓ Process was killed by signal {-process.returncode}")
-    else:
-        print(f"\n? Process exited with code {process.returncode}")
-
-    return process.returncode
-
-
-def test_create_cgroup_comprehensive(test_memory_comprehensive):
-    print("Testing complete comprehensive cgroup creation with memory test...")
-    print("Forking process to run memory test...")
-
-    # Fork the process
-    pid = os.fork()
-
-    if pid == 0:
-        # Child process - run the memory test here
-        try:
-            print("Child process starting memory test...")
-            test_memory_comprehensive(cgroup_name="demo2", memory_limit="50M")
-        except Exception as e:
-            print(f"Child process error: {e}")
-            sys.exit(1)
-        finally:
-            # Child must exit explicitly to avoid continuing parent code
-            os._exit(0)
-
-    else:
-        # Parent process - wait for child and report results
-        print(f"✓ Forked child process with PID: {pid}")
-
-        # Wait for child process to complete
-        _, status = os.waitpid(pid, 0)
-
-        # Check how the child process ended
-        if os.WIFEXITED(status):
-            exit_code = os.WEXITSTATUS(status)
-            print(f"Child exited with code: {exit_code}")
-        elif os.WIFSIGNALED(status):
-            signal_num = os.WTERMSIG(status)
-            if signal_num == 9:  # SIGKILL
-                print("✓ Child was KILLED by OOM - cgroup memory limit working!")
-            else:
-                print(f"✓ Child was killed by signal {signal_num}")
-
-        print("✓ Parent process continues running!")
-
-    print("✓ Complete comprehensive cgroup creation tests completed!\n" + "=" * 60)
-
-
-test_create_cgroup_comprehensive(test_memory_comprehensive)
+# test_create_cgroup_comprehensive(test_memory_comprehensive)
 # %%
 """
 ### Summary: Understanding Cgroups
@@ -2107,5 +1573,132 @@ def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memor
 # %%
 from w2d2_test import test_namespace_isolation
 
-test_namespace_isolation()
+# test_namespace_isolation(run_in_cgroup_chroot_namespaced)
+# %%
+
+import uuid
+
+"""
+Create and configure bridge0 interface with IP address
+"""
+
+
+def create_bridge_interface():
+    try:
+        # Check if running as root
+        if os.geteuid() != 0:
+            print("⚠ Warning: Bridge interface creation requires root privileges")
+            print("Critical failure - bridge interface creation requires root privileges")
+            sys.exit(1)  # Exit the Python process on critical failure
+
+        #   - Check if bridge0 already exists
+        result = subprocess.run(["ip", "link", "show", "bridge0"], capture_output=True, text=True)
+
+        #   - Remove existing bridge if present
+        if result.returncode == 0:
+            # check if bridge has the correct IP
+            ip_check_result = subprocess.run(["ip", "addr", "show", "bridge0"], capture_output=True, text=True)
+
+            if "10.0.0.1/24" in ip_check_result.stdout:
+                return True
+            else:
+                # remove existing
+                subprocess.run(["ip", "link", "del", "bridge0"], capture_output=True, text=True)
+
+        # Create bridge0 interface
+        subprocess.run(["ip", "link", "add", "bridge0", "type", "bridge"], check=True)
+
+        # Configure bridge0 with IP 10.0.0.1/24
+        subprocess.run(["ip", "addr", "add", "10.0.0.1/24", "dev", "bridge0"], check=True)
+
+        #   - Bring bridge0 up
+        subprocess.run(["ip", "link", "set", "bridge0", "up"], check=True)
+
+        return True
+    except Exception:
+        return False
+
+
+from w2d2_test import test_bridge_interface
+
+# Run the test
+test_bridge_interface(create_bridge_interface)
+
+
+# %%
+
+
+import threading
+
+# Dangerous syscalls for CVE-2024-0137
+DANGEROUS_SYSCALLS = {"setns", "unshare", "mount", "pivot_root", "chroot", "clone", "socket", "bind", "connect"}
+
+
+def monitor_container_syscalls(container_command, alert_callback):
+    """
+    Monitor syscalls by running strace INSIDE the container namespace
+
+    Args:
+        container_command: List of command and arguments to run in container
+        alert_callback: Function to call when dangerous syscalls are detected
+
+    Returns:
+        Exit code of the monitored process
+    """
+
+    try:
+        # TODO: Implement syscall monitoring
+        # Create strace command with dangerous syscalls filter
+        strace_cmd = [
+            "strace",
+            "-f",
+            "-e",
+            "trace=" + ",".join(DANGEROUS_SYSCALLS),
+            "-o",
+            "/dev/stderr",
+        ] + container_command
+
+        print(f"🔍 Running strace inside container: {' '.join(strace_cmd)}")
+
+        process = subprocess.Popen(strace_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+
+        # Monitor stderr for syscall traces
+        def monitor_stderr():
+            if process.stderr:
+                for line in iter(process.stderr.readline, ""):
+                    if line.strip():
+                        # Check for dangerous syscalls
+                        if any(syscall in line for syscall in DANGEROUS_SYSCALLS):
+                            alert_callback(line.strip(), process.pid)
+                        # Also print container output
+                        if not any(syscall in line for syscall in DANGEROUS_SYSCALLS):
+                            print(f"[CONTAINER] {line.strip()}")
+
+        # Monitor stdout for normal output
+        def monitor_stdout():
+            if process.stdout:
+                for line in iter(process.stdout.readline, ""):
+                    if line.strip():
+                        print(f"[CONTAINER] {line.strip()}")
+
+        # Start monitoring threads
+        stderr_thread = threading.Thread(target=monitor_stderr, daemon=True)
+        stdout_thread = threading.Thread(target=monitor_stdout, daemon=True)
+
+        stderr_thread.start()
+        stdout_thread.start()
+
+        # Wait for process completion
+        exit_code = process.wait()
+        return exit_code
+
+    except Exception as e:
+        print(f"⚠ Container monitoring error: {e}")
+        return -1
+
+
+from w2d2_test import test_syscall_monitoring
+
+# Run the test
+test_syscall_monitoring(monitor_container_syscalls)
 # %%
