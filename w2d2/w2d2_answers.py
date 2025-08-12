@@ -397,8 +397,11 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     subprocess.run(["sudo", "chmod", "+w", "/sys/fs/cgroup/"])
     os.makedirs(path, exist_ok=True)
 
-    with open(path + "/cgroup.subtree_control", "w") as f:
-        f.write("+cpu +memory +pids")
+    # In cgroup v2, enabling controllers is done on the parent cgroup's
+    # subtree_control, not on the leaf where we place processes. Writing
+    # to the leaf's subtree_control makes it a distribution point and
+    # prevents adding processes to it (EBUSY). We therefore avoid writing
+    # subtree_control here.
 
     if memory_limit:
         with open(path + "/memory.max", "w") as f:
@@ -416,3 +419,58 @@ from w2d2_test import test_create_cgroup
 test_create_cgroup(create_cgroup)
 
 # %%
+
+
+def add_process_to_cgroup(cgroup_name, pid=None):
+    """
+    Add a process to a cgroup
+
+    Args:
+        cgroup_name: Name of the cgroup
+        pid: Process ID (default: current process)
+    """
+    # TODO: Implement process assignment to cgroup
+    # 1. Use current process PID if none specified
+    # 2. Write PID to cgroup.procs file
+    # 3. Handle errors and return success status
+    if pid is None:
+        pid = os.getpid()
+        
+    cgroup_procs_path = f"/sys/fs/cgroup/{cgroup_name}/cgroup.procs"
+        
+    with open(cgroup_procs_path, "w") as f:
+        f.write(str(pid))
+    print(f"Added process {pid} to cgroup {cgroup_name}")
+    return True
+
+
+from w2d2_test import test_add_process_to_cgroup
+
+test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
+
+# %%
+def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    """
+    Run a command in both a cgroup and chroot environment
+    
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into
+        command: Command to run
+        memory_limit: Memory limit for the cgroup
+    """
+    # TODO: Implement combined cgroup-chroot execution
+    # 1. Create cgroup with memory limit
+    # 2. Handle command format (None, string, list)
+    # 3. Create shell script that:
+    #    - Adds process to cgroup
+    #    - Executes chroot with command
+    # 4. Run with timeout and error handling
+    cgroup = create_cgroup(cgroup_name, memory_limit=memory_limit)
+
+    
+
+from w2d2_test import test_memory_simple
+from w2d2_test import test_run_in_cgroup_chroot
+
+test_run_in_cgroup_chroot(run_in_cgroup_chroot)
