@@ -99,3 +99,5 @@ from w2d1_re_test import test_password_extraction
 
 test_password_extraction(find_password_in_binary)
 
+#%%
+# ./second "$(python -c "import sys; sys.stdout.buffer.write(b'A'*72 + b'\x00\x40\x06\x74\n')")"  
