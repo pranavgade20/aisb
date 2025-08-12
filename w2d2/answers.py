@@ -761,7 +761,6 @@ def run_chroot(chroot_dir: str, command: Optional[Union[str, List[str]]] = None)
     if command is None:
         appended_commands = ['/bin/sh']
     elif isinstance(command, str):
-        print(command)
         appended_commands = ['/bin/sh', "-c", command]
     else:
         appended_commands = command
