@@ -1,4 +1,5 @@
 #%%
+from subprocess import TimeoutExpired
 
 import requests
 import tarfile
@@ -9,6 +10,8 @@ import platform
 from io import BytesIO
 from typing import Optional, List, Union, Tuple, Dict, Any
 import subprocess
+
+from decorator import append
 
 from w2d2.w2d2_test import test_pull_layers_complete
 
@@ -655,32 +658,32 @@ def download_and_extract_layers(registry: str, image: str, layers: List[Dict[str
         # 3. Print progress information
         pass
 
-# %%
-"""
-### Exercise 1.6: Complete Implementation
-
-Combine all the exercises into a complete `pull_layers` function that can extract any Docker image.
-
-This function orchestrates all the previous functions to provide a complete Docker image extraction tool.
-
-<details>
-<summary>Vocabulary: Container Image Pipeline</summary>
-
-- **Image Reference**: Complete specification of image including registry, name, and tag
-- **Registry API**: RESTful HTTP API for accessing container images and metadata
-
-</details>
-
-#### Exercise - implement pull_layers
-
-> **Difficulty**: 🔴🔴⚪⚪⚪  
-> **Importance**: 🔵🔵🔵🔵🔵
-> 
-> You should spend up to ~10 minutes on this exercise.
-
-Implement the complete `pull_layers` function using all the sub-functions you've created.
-"""
-
+# # %%
+# """
+# ### Exercise 1.6: Complete Implementation
+#
+# Combine all the exercises into a complete `pull_layers` function that can extract any Docker image.
+#
+# This function orchestrates all the previous functions to provide a complete Docker image extraction tool.
+#
+# <details>
+# <summary>Vocabulary: Container Image Pipeline</summary>
+#
+# - **Image Reference**: Complete specification of image including registry, name, and tag
+# - **Registry API**: RESTful HTTP API for accessing container images and metadata
+#
+# </details>
+#
+# #### Exercise - implement pull_layers
+#
+# > **Difficulty**: 🔴🔴⚪⚪⚪
+# > **Importance**: 🔵🔵🔵🔵🔵
+# >
+# > You should spend up to ~10 minutes on this exercise.
+#
+# Implement the complete `pull_layers` function using all the sub-functions you've created.
+# """
+#
 def pull_layers(image_ref: str, output_dir: str, target_arch: str = TARGET_ARCH,
                 target_variant: Optional[str] = TARGET_VARIANT) -> None:
     """
@@ -724,9 +727,65 @@ def pull_layers(image_ref: str, output_dir: str, target_arch: str = TARGET_ARCH,
         # 4. get_manifest_layers()
         # 5. download_and_extract_layers()
         pass
+#
+#
+# test_pull_layers_complete(pull_layers)
+#
+import subprocess
+#
+def run_chroot(chroot_dir: str, command: Optional[Union[str, List[str]]] = None) -> Optional[subprocess.CompletedProcess]:
+    """
+    Run a command in a chrooted environment.
+
+    This function creates an isolated filesystem environment by changing the root directory
+    for the executed command. The process will only be able to access files within the
+    specified chroot directory.
+
+    Args:
+        chroot_dir: Directory to chroot into (must contain necessary binaries and libraries)
+        command: Command to run (default: /bin/sh)
+                - If string: executed as shell command
+                - If list: executed directly
+                - If None: defaults to interactive shell
+
+    Returns:
+        CompletedProcess object with execution results, or None if error/timeout
+    """
+    # TODO: Implement chroot command execution
+    # 1. Handle different command formats (None, string, list)
+    # 2. Build the chroot command: ['chroot', chroot_dir] + command
+    # 3. Execute with subprocess.run() with timeout and output capture
+    # 4. Print execution details and results
+    # 5. Handle TimeoutExpired and other exceptions
+    # 6. Return the result or None on error
+    if command is None:
+        appended_commands = ['/bin/sh']
+    elif isinstance(command, str):
+        print(command)
+        appended_commands = ['/bin/sh', "-c", command]
+    else:
+        appended_commands = command
+
+    chroot_command = ['chroot', chroot_dir] + appended_commands
+
+    try:
+        results = subprocess.run(chroot_command, capture_output=True, text=True, timeout=30)
+    except TimeoutExpired:
+        print("timeout expired")
+        return None
+    except Exception as e:
+        print(f"failed: {e}")
+        return None
+
+    print(results.stderr)
+
+    return results
 
 
-test_pull_layers_complete(pull_layers)
+from w2d2_test import test_run_chroot
+
+# Run the test
+test_run_chroot(run_chroot)
 
 # %%
 # pull_layers("alpine:latest", "./extracted_alpine")

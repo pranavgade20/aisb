@@ -214,8 +214,8 @@ def test_pull_layers_complete(pull_layers):
         print(f"✓ Successfully extracted {image_ref}")
         
         # Cleanup
-        import shutil
-        shutil.rmtree(output_dir, ignore_errors=True)
+        # import shutil
+        # shutil.rmtree(output_dir, ignore_errors=True)
             
     print("✓ Complete pull_layers tests passed!\n" + "=" * 60)
 
