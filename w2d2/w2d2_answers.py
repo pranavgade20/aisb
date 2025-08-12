@@ -353,3 +353,82 @@ from w2d2_test import test_run_chroot
 test_run_chroot(run_chroot)
 
 # %%
+import signal
+import time
+
+
+def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
+    """
+    Create a cgroup with specified limits
+
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (stretch)
+
+    Returns:
+        Path to the created cgroup
+    """
+    # TODO: Implement basic cgroup creation
+    # 1. Create a new cgroup directory with path /sys/fs/cgroup/{cgroup_name} - you will write files in this directory to configure the cgroup
+    # 2. Enable controllers (+cpu +memory +pids) in parent cgroup
+    # 3. Set memory limit if specified - write the memory limit to {cgroup_path}/memory.max, which will tell the kernel how much memory the cgroup can use
+    # 4. Return the cgroup path
+    # 5. Handle errors and return None on failure
+
+    try:
+        output_dir = f"/sys/fs/cgroup/{cgroup_name}"
+        os.makedirs(output_dir, exist_ok=True)
+
+        with open("/sys/fs/cgroup/cgroup.subtree_control", "w") as file:
+            file.write("+cpu +memory +pids")
+
+        if memory_limit:
+            with open(f"{output_dir}/memory.max", "w") as file:
+                file.write(str(memory_limit))
+
+        return output_dir
+
+    except Exception as e:
+        print(e)
+        return None
+
+
+from w2d2_test import test_create_cgroup
+
+test_create_cgroup(create_cgroup)
+
+
+# %%
+def add_process_to_cgroup(cgroup_name, pid=None):
+    """
+    Add a process to a cgroup
+
+    Args:
+        cgroup_name: Name of the cgroup
+        pid: Process ID (default: current process)
+    """
+    # TODO: Implement process assignment to cgroup
+    # 1. Use current process PID if none specified
+    # 2. Write PID to cgroup.procs file
+    # 3. Handle errors and return success status
+    try:
+        output_dir = f"/sys/fs/cgroup/{cgroup_name}"
+
+        if pid:
+            with open(f"{output_dir}/cgroup.procs", "w") as file:
+                file.write(str(pid))
+        else:
+            with open(f"{output_dir}/cgroup.procs", "w") as file:
+                file.write(str(os.getpid()))
+        return True
+
+    except Exception as e:
+        print(e)
+        return False
+
+
+from w2d2_test import test_add_process_to_cgroup
+
+test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
+# %%
