@@ -108,3 +108,7 @@ cython_debug/
 *_reference.py
 db.sqlite3
 aisb_ssh
+
+w2d2/extracted_alpine/*
+w2d2/extracted_python/*
+w2d2/img/*
