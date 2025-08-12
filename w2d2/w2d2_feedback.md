@@ -1,0 +1,1 @@
+In 4.1 (create c_group and namespace), the solution code will have the parent continue the child process regardless of if the add_process_to_c_group is successful. This is a pretty majority security flaw, it should kill the child process upon failure.
