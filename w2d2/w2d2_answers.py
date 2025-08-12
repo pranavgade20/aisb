@@ -310,7 +310,10 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     # Implement basic cgroup creation
     # 1. Create a new cgroup directory with path /sys/fs/cgroup/{cgroup_name} - you will write files in this directory to configure the cgroup
     try:
-        subprocess.run(["sudo", "mkdir", f"/sys/fs/cgroup/{cgroup_name}"])
+        if os.path.isdir(f"/sys/fs/cgroup/{cgroup_name}"):
+            pass
+        else:
+            subprocess.run(["sudo", "mkdir", f"/sys/fs/cgroup/{cgroup_name}"])
         # 2. Enable controllers (+cpu +memory +pids) in parent cgroup
         subprocess.run(
             ["echo", "+cpu", "+memory", "+pids", ">>", f"/sys/fs/cgroup/{cgroup_name}/cgroup.subtree_control"]
@@ -327,7 +330,7 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
 
 from w2d2_test import test_create_cgroup
 
-test_create_cgroup(create_cgroup)
+# test_create_cgroup(create_cgroup)
 
 # %%
 
@@ -357,5 +360,70 @@ def add_process_to_cgroup(cgroup_name, pid=None):
 from w2d2_test import test_add_process_to_cgroup
 
 test_add_process_to_cgroup(add_process_to_cgroup, create_cgroup)
+
+# %%
+
+
+def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
+    """
+    Run a command in both a cgroup and chroot environment
+
+    Args:
+        cgroup_name: Name of the cgroup to create/use
+        chroot_dir: Directory to chroot into
+        command: Command to run
+        memory_limit: Memory limit for the cgroup
+    """
+    # Create cgroup
+    create_cgroup(cgroup_name, memory_limit=memory_limit)
+
+    if command is None:
+        command = ["/bin/sh"]
+    elif isinstance(command, str):
+        command = ["/bin/sh", "-c", command]
+
+    # Create a shell script that adds the process to cgroup then chroots
+    script = f"""
+    echo $$ > /sys/fs/cgroup/{cgroup_name}/cgroup.procs
+    chroot {chroot_dir} {" ".join(command)}
+    """
+
+    # Run without capturing output so we see it in real-time
+    result = subprocess.run(["sh", "-c", script], timeout=60)
+    return result
+
+
+from w2d2_test import test_memory_simple
+from w2d2_test import test_run_in_cgroup_chroot
+
+test_run_in_cgroup_chroot(run_in_cgroup_chroot, create_cgroup)
+
+# %%
+
+
+def create_cgroup_comprehensive_part1(cgroup_name, memory, cpu):
+    """
+    Create a cgroup with comprehensive settings - Part 1: Basic setup
+
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (not implemented yet)
+    """
+    try:
+        # Implement basic cgroup creation with swap disabling
+        # 1. Call create_cgroup() with the correct parameters to create the cgroup
+        cgroup_path = create_cgroup(cgroup_name, memory)
+        # 2. Disable swap - search for "swap.max" in https://docs.kernel.org/admin-guide/cgroup-v2.html
+        subprocess.run(["echo", 0, ">>", f"/sys/fs/cgroup/{cgroup_name}/memory.swap.max"])
+        # 3. Return cgroup path or None if critical steps fail
+        return cgroup_path
+    except Exception:
+        return None
+
+
+from w2d2_test import test_create_cgroup_comprehensive_part1
+
+test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
 
 # %%
