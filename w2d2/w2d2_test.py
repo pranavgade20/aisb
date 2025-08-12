@@ -30,7 +30,7 @@ def test_parse_image_reference(parse_image_reference):
     
     # Test 1: Docker Hub shorthand
     registry, image, tag = parse_image_reference("hello-world:latest")
-    assert registry == "mirror.gcr.io", f"Expected registry-1.docker.io, got {registry}"
+    assert registry == "registry-1.docker.io", f"Expected registry-1.docker.io, got {registry}"
     assert image == "library/hello-world", f"Expected library/hello-world, got {image}"
     assert tag == "latest", f"Expected latest, got {tag}"
     print("✓ Docker Hub shorthand parsing works")
@@ -44,7 +44,7 @@ def test_parse_image_reference(parse_image_reference):
     
     # Test 3: No tag specified (should default to latest)
     registry, image, tag = parse_image_reference("alpine")
-    assert registry == "mirror.gcr.io", f"Expected registry-1.docker.io, got {registry}"
+    assert registry == "registry-1.docker.io", f"Expected registry-1.docker.io, got {registry}"
     assert image == "library/alpine", f"Expected library/alpine, got {image}"
     assert tag == "latest", f"Expected latest, got {tag}"
     print("✓ Default tag handling works")
@@ -78,7 +78,7 @@ def test_get_target_manifest(get_target_manifest, get_auth_token):
     print("Testing manifest discovery...")
     
     # Test with a known multi-arch image
-    registry = "mirror.gcr.io"
+    registry = "registry-1.docker.io"
     image = "library/hello-world"
     tag = "latest"
     headers = get_auth_token(registry, image)
@@ -112,7 +112,7 @@ def test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_man
     print("Testing manifest processing...")
     
     # Use a known image
-    registry = "mirror.gcr.io"
+    registry = "registry-1.docker.io"
     image = "library/hello-world"
     tag = "latest"
     headers = get_auth_token(registry, image)
@@ -148,7 +148,7 @@ def test_download_and_extract_layers(download_and_extract_layers, get_auth_token
     print("Testing layer download and extraction...")
     
     # Use a small image for testing
-    registry = "mirror.gcr.io"
+    registry = "registry-1.docker.io"
     image = "library/hello-world"
     tag = "latest"
     output_dir = "./test_extracted"
