@@ -30,7 +30,7 @@ def test_parse_image_reference(parse_image_reference):
     
     # Test 1: Docker Hub shorthand
     registry, image, tag = parse_image_reference("hello-world:latest")
-    assert registry == "mirror.gcr.io", f"Expected registry-1.docker.io, got {registry}"
+    assert registry == "mirror.gcr.io", f"Expected mirror.gcr.io, got {registry}"
     assert image == "library/hello-world", f"Expected library/hello-world, got {image}"
     assert tag == "latest", f"Expected latest, got {tag}"
     print("✓ Docker Hub shorthand parsing works")
@@ -44,7 +44,7 @@ def test_parse_image_reference(parse_image_reference):
     
     # Test 3: No tag specified (should default to latest)
     registry, image, tag = parse_image_reference("alpine")
-    assert registry == "mirror.gcr.io", f"Expected registry-1.docker.io, got {registry}"
+    assert registry == "mirror.gcr.io", f"Expected mirror.gcr.io, got {registry}"
     assert image == "library/alpine", f"Expected library/alpine, got {image}"
     assert tag == "latest", f"Expected latest, got {tag}"
     print("✓ Default tag handling works")
