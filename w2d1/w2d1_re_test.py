@@ -9,7 +9,81 @@ import subprocess
 import sys
 from typing import Callable, Optional, Tuple
 
-from w2d1.w2d1_re_solution import check_binary_protections, compile_vulnerable_binary, create_shellcode_exploit, exec_sh
+
+def check_binary_protections(binary_path: str) -> dict:
+    """
+    Check which security protections are enabled on a binary.
+
+    Args:
+        binary_path: Path to the binary to check
+
+    Returns:
+        Dictionary of protection_name: enabled (bool)
+    """
+    if "SOLUTION":
+        protections = {"NX": False, "PIE": False, "Stack Canary": False, "FORTIFY": False, "RELRO": False}
+
+        # Check with checksec or manually
+        # For simplicity, we'll check readelf output
+
+        # Check NX bit
+        cmd = f"readelf -l {binary_path} | grep GNU_STACK"
+        result = exec_sh(cmd)
+        if result.stdout and "RW" in result.stdout and "RWE" not in result.stdout:
+            protections["NX"] = True
+
+        # Check PIE
+        cmd = f"readelf -h {binary_path} | grep 'Type:'"
+        result = exec_sh(cmd)
+        if result.stdout and "DYN" in result.stdout:
+            protections["PIE"] = True
+
+        # Check for stack canary
+        cmd = f"objdump -d {binary_path} | grep -E '__stack_chk_fail|%(fs:0x28)|%(gs:0x14)'"
+        result = exec_sh(cmd)
+        if result.stdout:
+            protections["Stack Canary"] = True
+
+        # Check FORTIFY_SOURCE
+        cmd = f"strings {binary_path} | grep -E '_chk@|__fortify'"
+        result = exec_sh(cmd)
+        if result.stdout:
+            protections["FORTIFY"] = True
+
+        # Check RELRO
+        cmd = f"readelf -d {binary_path} | grep BIND_NOW"
+        result = exec_sh(cmd)
+        if result.stdout:
+            protections["RELRO"] = True
+
+        return protections
+    else:
+        # TODO: Implement protection checking
+        # Use readelf, objdump, or checksec to identify protections
+        pass
+
+
+def exec_sh(command: str, timeout: Optional[int] = 30, check_retcode: bool = True) -> subprocess.CompletedProcess:
+    """Execute a shell command and return the result."""
+    return subprocess.run(command, shell=True, capture_output=True, text=True, check=False, timeout=timeout)
+
+
+def compile_vulnerable_binary(source_file: str, output_file: str, extra_flags: str = "") -> bool:
+    """Compile a C program with security features disabled for educational purposes."""
+    flags = "-fno-stack-protector -z execstack -no-pie -g"
+    cmd = f"gcc {flags} {extra_flags} -o {output_file} {source_file}"
+    result = exec_sh(cmd)
+    return result.returncode == 0
+
+
+def hex_dump(data: bytes, start_address: int = 0) -> str:
+    """Create a hex dump of binary data."""
+    lines = []
+    for i in range(0, len(data), 16):
+        hex_part = " ".join(f"{b:02x}" for b in data[i : i + 16])
+        ascii_part = "".join(chr(b) if 32 <= b <= 126 else "." for b in data[i : i + 16])
+        lines.append(f"{start_address + i:08x}: {hex_part:<48} |{ascii_part}|")
+    return "\n".join(lines)
 
 
 def test_basic_overflow(exploit_basic_overflow: Callable):
