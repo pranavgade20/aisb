@@ -24,6 +24,15 @@ import random
 from pathlib import Path
 
 
+
+# Architecture detection
+TARGET_ARCH, TARGET_VARIANT = {
+    'x86_64': ('amd64', None), 'amd64': ('amd64', None),
+    'arm64': ('arm64', 'v8'), 'aarch64': ('arm64', 'v8'),
+    'armv7l': ('arm', 'v7'), 'armv6l': ('arm', 'v6')
+}.get(platform.machine().lower(), ('amd64', None))
+
+
 def test_parse_image_reference(parse_image_reference):
     """Test the image reference parsing function."""
     print("Testing image reference parsing...")
