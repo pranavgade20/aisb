@@ -1,0 +1,9 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+RUN pip install requests
+
+COPY src/developer_simulator.py .
+
+CMD ["python", "developer_simulator.py"] 

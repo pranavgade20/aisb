@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  pypi.local:
+    build:
+      context: .
+      dockerfile: Dockerfile.pypi
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./packages:/packages
+    networks:
+      - exercise_workshop
+
+networks:
+  exercise_workshop:
+    external: true

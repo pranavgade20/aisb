@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game - Apple vs Snakes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+        .game-section {
+            flex: 2;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .game-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #gameCanvas {
+            border: 2px solid #333;
+            display: block;
+            margin: 0 auto;
+            background: #f8f8f8;
+        }
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn-danger {
+            background: #f44336;
+        }
+        .btn-danger:hover {
+            background: #da190b;
+        }
+        .btn-secondary {
+            background: #2196F3;
+        }
+        .btn-secondary:hover {
+            background: #0b7dda;
+        }
+        .score {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+            color: #333;
+        }
+        .leaderboard {
+            margin-top: 20px;
+        }
+        .leaderboard h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .leaderboard-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .leaderboard-item:first-child {
+            background: #ffd700;
+            font-weight: bold;
+        }
+        .leaderboard-item:nth-child(2) {
+            background: #c0c0c0;
+        }
+        .leaderboard-item:nth-child(3) {
+            background: #cd7f32;
+        }
+        .player-name-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .player-name-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        .paused-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 165, 0, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            display: none;
+            z-index: 10;
+        }
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .instructions h4 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-section">
+            <h1 class="game-title">🍎 Apple vs Snakes Game 🐍</h1>
+            
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <ul>
+                    <li>You are the <strong>🍎 Apple</strong> (red pixel)</li>
+                    <li>Move around using arrow keys or WASD</li>
+                    <li>Eat <strong>🐍 Snakes</strong> (green pixels) to grow your apple tree</li>
+                    <li>Don't hit the walls or you'll fail!</li>
+                    <li>Each snake eaten increases your score by 1</li>
+                    <li><strong>⏸️ Pause:</strong> Press SPACEBAR or click "Pause Game" to stop and save your state</li>
+                    <li><strong>📥 Save State:</strong> Download your current game state anytime</li>
+                    <li><strong>📤 Load State:</strong> Upload a saved state to continue playing</li>
+                </ul>
+            </div>
+
+            <div class="player-name-section">
+                <input type="text" id="playerName" class="player-name-input" 
+                       placeholder="Enter your name" value="{{ player_name }}">
+                <button class="btn btn-secondary" onclick="setPlayerName()">Set Name</button>
+            </div>
+
+            <div class="score">
+                Score: <span id="score">1</span>
+            </div>
+
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+            <div class="controls">
+                <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
+                <button class="btn btn-secondary" id="pauseBtn" onclick="pauseGame()" style="display: none;">Pause Game</button>
+                <button class="btn btn-secondary" id="continueBtn" onclick="console.log('Continue button clicked!'); continueGame();" style="display: none;">Continue Game</button>
+                <button class="btn btn-secondary" onclick="downloadState()">Download State</button>
+                <button class="btn btn-secondary" onclick="uploadState()">Upload State</button>
+                <input type="file" id="stateFile" accept=".pkl" style="display: none;" onchange="handleFileUpload()">
+                <button class="btn btn-danger" onclick="resetGame()">Reset Game</button>
+            </div>
+
+            <div class="game-over" id="gameOver">
+                <h2>Game Over!</h2>
+                <p>Your final score: <span id="finalScore">0</span></p>
+                <button class="btn" onclick="startGame()">Play Again</button>
+            </div>
+
+            <div class="paused-indicator" id="pausedIndicator">
+                ⏸️ GAME PAUSED
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3>🏆 Leaderboard</h3>
+            <div id="leaderboard" class="leaderboard">
+                {% for entry in leaderboard %}
+                <div class="leaderboard-item">
+                    <span>{{ entry.player_name }}</span>
+                    <span>{{ entry.apple_size }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h4>Current Top Score: 1,000,000</h4>
+                <p style="font-size: 12px; color: #666;">
+                    Can you beat the current champion and become #1?
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20;
+        const gridWidth = canvas.width / gridSize;
+        const gridHeight = canvas.height / gridSize;
+
+        let gameState = {
+            apple_pos: [10, 10],
+            apple_size: 1,
+            snakes: [],
+            player_name: '{{ player_name }}'
+        };
+
+        let gameRunning = false;
+        let gamePaused = false;
+        let direction = [0, 0];
+        let gameLoop;
+
+        // Initialize game
+        async function initGame() {
+            try {
+                const response = await fetch('/api/game_state');
+                const data = await response.json();
+                gameState = data;
+                updateScore();
+            } catch (error) {
+                console.error('Failed to load game state:', error);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = gameState.apple_size;
+        }
+
+        function drawGame() {
+            // Clear canvas
+            ctx.fillStyle = '#f8f8f8';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid
+            ctx.strokeStyle = '#ddd';
+            for (let x = 0; x <= canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Draw apple
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(
+                gameState.apple_pos[0] * gridSize,
+                gameState.apple_pos[1] * gridSize,
+                gridSize, gridSize
+            );
+
+            // Draw snakes
+            ctx.fillStyle = '#00ff00';
+            gameState.snakes.forEach(snake => {
+                ctx.fillRect(
+                    snake[0] * gridSize,
+                    snake[1] * gridSize,
+                    gridSize, gridSize
+                );
+            });
+        }
+
+        function moveApple() {
+            if (!gameRunning || gamePaused) return;
+            
+            // Don't move if no direction is set (waiting for user input)
+            if (direction[0] === 0 && direction[1] === 0) return;
+
+            const newPos = [
+                gameState.apple_pos[0] + direction[0],
+                gameState.apple_pos[1] + direction[1]
+            ];
+            
+            console.log('Moving apple from', gameState.apple_pos, 'to', newPos, 'direction:', direction);
+
+            // Check wall collision
+            if (newPos[0] < 0 || newPos[0] >= gridWidth || 
+                newPos[1] < 0 || newPos[1] >= gridHeight) {
+                gameOver();
+                return;
+            }
+
+            gameState.apple_pos = newPos;
+
+            // Check if apple ate a snake
+            const snakeIndex = gameState.snakes.findIndex(snake => 
+                snake[0] === newPos[0] && snake[1] === newPos[1]
+            );
+
+            if (snakeIndex !== -1) {
+                // Eat snake
+                gameState.snakes.splice(snakeIndex, 1);
+                gameState.apple_size += 1;
+                updateScore();
+                
+                // Add new snake
+                const newSnake = [
+                    Math.floor(Math.random() * gridWidth),
+                    Math.floor(Math.random() * gridHeight)
+                ];
+                gameState.snakes.push(newSnake);
+            }
+
+            // Update server
+            updateGameState();
+        }
+
+        async function updateGameState() {
+            try {
+                await fetch('/api/update_game', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        apple_pos: gameState.apple_pos,
+                        apple_size: gameState.apple_size,
+                        snakes: gameState.snakes,
+                        game_over: false
+                    })
+                });
+            } catch (error) {
+                console.error('Failed to update game state:', error);
+            }
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            gamePaused = false;
+            clearInterval(gameLoop);
+            
+            // Reset button visibility
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('continueBtn').style.display = 'none';
+            document.getElementById('pausedIndicator').style.display = 'none';
+            
+            document.getElementById('finalScore').textContent = gameState.apple_size;
+            document.getElementById('gameOver').style.display = 'block';
+
+            // Send game over to server
+            fetch('/api/update_game', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    game_over: true
+                })
+            }).then(() => {
+                updateLeaderboard();
+            });
+        }
+
+        function startGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            gameRunning = true;
+            gamePaused = false;
+            direction = [0, 0];
+            
+            // Update button visibility
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('continueBtn').style.display = 'none';
+            document.getElementById('pausedIndicator').style.display = 'none';
+            
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(() => {
+                moveApple();
+                drawGame();
+            }, 200);
+        }
+
+        function pauseGame() {
+            gamePaused = true;
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('continueBtn').style.display = 'inline-block';
+            document.getElementById('pausedIndicator').style.display = 'block';
+        }
+
+        function continueGame() {
+            console.log('=== CONTINUE GAME CALLED ===');
+            console.log('Before continue - gameRunning:', gameRunning, 'gamePaused:', gamePaused, 'gameLoop:', gameLoop);
+            
+            gamePaused = false;
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('continueBtn').style.display = 'none';
+            document.getElementById('pausedIndicator').style.display = 'none';
+            
+            console.log('After setting gamePaused = false');
+            
+            // Start game loop if it's not already running
+            if (!gameLoop) {
+                console.log('Starting new game loop');
+                gameLoop = setInterval(() => {
+                    console.log('Game loop tick - gameRunning:', gameRunning, 'gamePaused:', gamePaused);
+                    moveApple();
+                    drawGame();
+                }, 200);
+            } else {
+                console.log('Game loop already running');
+            }
+            
+            console.log('After continue - gameRunning:', gameRunning, 'gamePaused:', gamePaused, 'gameLoop:', gameLoop);
+        }
+
+        function resetGame() {
+            gameRunning = false;
+            gamePaused = false;
+            clearInterval(gameLoop);
+            
+            // Reset button visibility
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('continueBtn').style.display = 'none';
+            document.getElementById('pausedIndicator').style.display = 'none';
+            
+            initGame().then(() => {
+                drawGame();
+                updateScore();
+            });
+        }
+
+        async function downloadState() {
+            try {
+                const response = await fetch('/api/download_state');
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `game_state_${gameState.player_name}_${Date.now()}.pkl`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Failed to download state:', error);
+                alert('Failed to download game state');
+            }
+        }
+
+        function uploadState() {
+            document.getElementById('stateFile').click();
+        }
+
+        async function handleFileUpload() {
+            const file = document.getElementById('stateFile').files[0];
+            if (!file) return;
+
+            console.log('Uploading file:', file.name);
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/upload_state', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                console.log('Upload response:', result);
+                
+                if (result.success) {
+                    console.log('Success! Loading game state...');
+                    gameState = result.game_state;
+                    console.log('Loaded game state:', gameState);
+                    
+                    updateScore();
+                    drawGame();
+                    
+                    // Set game to paused state when loading a new state
+                    gameRunning = true;
+                    gamePaused = true;
+                    if (gameLoop) {
+                        clearInterval(gameLoop);
+                        gameLoop = null;
+                    }
+                    direction = [0, 0]; // Reset direction
+                    
+                    console.log('Game state after upload - gameRunning:', gameRunning, 'gamePaused:', gamePaused, 'direction:', direction);
+                    
+                    // Update button visibility for paused state
+                    document.getElementById('startBtn').style.display = 'none';
+                    document.getElementById('pauseBtn').style.display = 'none';
+                    document.getElementById('continueBtn').style.display = 'inline-block';
+                    document.getElementById('pausedIndicator').style.display = 'block';
+                    
+                    console.log('Buttons updated, showing continue button');
+                    alert('Game state loaded successfully! Press "Continue Game" to resume playing.');
+                } else {
+                    console.error('Upload failed:', result.error);
+                    alert('Failed to load game state: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Failed to upload state:', error);
+                alert('Failed to upload game state');
+            }
+        }
+
+        async function setPlayerName() {
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('Please enter a player name');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/set_player_name', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ player_name: playerName })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    gameState.player_name = playerName;
+                    alert('Player name updated!');
+                } else {
+                    alert('Failed to update player name: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Failed to set player name:', error);
+                alert('Failed to update player name');
+            }
+        }
+
+        async function updateLeaderboard() {
+            try {
+                const response = await fetch('/api/leaderboard');
+                const leaderboard = await response.json();
+                
+                const leaderboardDiv = document.getElementById('leaderboard');
+                leaderboardDiv.innerHTML = '';
+                
+                leaderboard.forEach(entry => {
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item';
+                    item.innerHTML = `
+                        <span>${entry.player_name}</span>
+                        <span>${entry.apple_size}</span>
+                    `;
+                    leaderboardDiv.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Failed to update leaderboard:', error);
+            }
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            // Handle pause/resume with spacebar
+            if (e.key === ' ' && gameRunning) {
+                e.preventDefault(); // Prevent page scroll
+                if (gamePaused) {
+                    continueGame();
+                } else {
+                    pauseGame();
+                }
+                return;
+            }
+
+            if (!gameRunning || gamePaused) return;
+
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    if (direction[1] !== 1) {
+                        direction = [0, -1];
+                        console.log('Direction set to UP:', direction);
+                    }
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    if (direction[1] !== -1) {
+                        direction = [0, 1];
+                        console.log('Direction set to DOWN:', direction);
+                    }
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    if (direction[0] !== 1) {
+                        direction = [-1, 0];
+                        console.log('Direction set to LEFT:', direction);
+                    }
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    if (direction[0] !== -1) {
+                        direction = [1, 0];
+                        console.log('Direction set to RIGHT:', direction);
+                    }
+                    break;
+            }
+        });
+
+        // Initialize game on load
+        window.addEventListener('load', () => {
+            initGame().then(() => {
+                drawGame();
+                updateScore();
+            });
+        });
+    </script>
+</body>
+</html>

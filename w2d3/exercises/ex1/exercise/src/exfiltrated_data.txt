@@ -1,0 +1,12 @@
+{
+  "HOSTNAME": "acfa31773457",
+  "HOME": "/root",
+  "GPG_KEY": "E3FF2839C048B25C084DEBE9B26995E310250568",
+  "PYTHON_SHA256": "61a42919e13d539f7673cf11d1c404380e28e540510860b9d242196e165709c9",
+  "PATH": "/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+  "LANG": "C.UTF-8",
+  "PYTHON_VERSION": "3.9.23",
+  "PWD": "/app",
+  "WERKZEUG_SERVER_FD": "5",
+  "WERKZEUG_RUN_MAIN": "true"
+}

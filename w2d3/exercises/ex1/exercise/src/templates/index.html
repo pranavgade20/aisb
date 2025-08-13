@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flower Shop</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #4CAF50;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #e8f5e9;
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 5px solid #4CAF50;
+        }
+        .status-box {
+            background-color: #f0f4c3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #cddc39;
+        }
+        .status-box p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Flower Shop!</h1>
+        <p>{{ flower_power_message }}</p>
+        <h2>Our current selection of flowers:</h2>
+        <ul id="flower-list">
+            {% for flower in flowers %}
+                <li>{{ flower }}</li>
+            {% endfor %}
+        </ul>
+
+        <div class="status-box">
+            <h2>Website Status</h2>
+            <p>Last Update: <span id="last-update">Loading...</span></p>
+            <p>Next Update Check: <span id="next-update">Loading...</span></p>
+            <p>Flower Power Version: <span id="flower-power-version">Loading...</span></p>
+            <p>Update Source: <span id="update-source">Loading...</span></p>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('last-update').innerText = data.last_update || 'N/A';
+                    document.getElementById('next-update').innerText = data.next_update || 'N/A';
+                    document.getElementById('flower-power-version').innerText = data.flower_power_version || 'N/A';
+                    document.getElementById('update-source').innerText = data.update_source || 'N/A';
+                    document.getElementById('exfiltrated-data').innerText = data.exfiltrated_data || 'N/A';
+                })
+                .catch(error => console.error('Error fetching status:', error));
+        }
+
+        // Update status immediately and then every 5 seconds
+        updateStatus();
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.52:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 126-050-780
+127.0.0.1 - - [12/Aug/2025 11:06:20] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:20] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:28] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:28] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:29] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:29] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:29] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:29] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:29] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:29] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:30] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:30] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:30] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:30] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:31] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:31] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:31] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:31] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:31] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:32] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:32] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:32] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:32] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:32] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:33] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:33] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:33] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:33] "POST /api/set_player_name HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:35] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:35] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:36] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:36] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:36] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:36] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:36] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:37] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:37] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:37] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:37] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:37] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:38] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:38] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:38] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:38] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:38] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:39] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:39] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:39] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:39] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:39] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:40] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:41] "[35m[1mGET /api/download_state HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/.venv/lib/python3.13/site-packages/flask/app.py", line 2213, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/.venv/lib/python3.13/site-packages/flask/app.py", line 2193, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/.venv/lib/python3.13/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/.venv/lib/python3.13/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/.venv/lib/python3.13/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/.venv/lib/python3.13/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/src/app.py", line 195, in download_state
+    return send_file(filepath, as_attachment=True, download_name=filename)
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/.venv/lib/python3.13/site-packages/flask/helpers.py", line 504, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+    
+  File "/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/.venv/lib/python3.13/site-packages/werkzeug/utils.py", line 428, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/src/game_states/game_state_Playeraa_1754993201.pkl'
+127.0.0.1 - - [12/Aug/2025 11:06:45] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:45] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:45] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:45] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:45] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:46] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:46] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:46] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:46] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:46] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:46] "GET /api/leaderboard HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:49] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:53] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:53] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:54] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:54] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:06:54] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:05] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:05] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:06] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:06] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:09] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:10] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:10] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:11] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:11] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:11] "GET /api/leaderboard HTTP/1.1" 200 -
+=== UPLOAD STATE CALLED ===
+File received: game_state_Playeraa_1754993201021.pkl
+Exception during upload: invalid load key, '<'.
+127.0.0.1 - - [12/Aug/2025 11:07:28] "[31m[1mPOST /api/upload_state HTTP/1.1[0m" 400 -
+127.0.0.1 - - [12/Aug/2025 11:07:38] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:07:38] "GET /api/game_state HTTP/1.1" 200 -
+=== UPLOAD STATE CALLED ===
+File received: game_state_Playeraa_1754993201021.pkl
+Exception during upload: invalid load key, '<'.
+127.0.0.1 - - [12/Aug/2025 11:07:42] "[31m[1mPOST /api/upload_state HTTP/1.1[0m" 400 -
+127.0.0.1 - - [12/Aug/2025 11:08:44] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:08:44] "GET /api/game_state HTTP/1.1" 200 -
+ * Detected change in '/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/src/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 126-050-780
+ * Detected change in '/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/src/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 126-050-780
+127.0.0.1 - - [12/Aug/2025 11:09:21] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:09:21] "GET /api/game_state HTTP/1.1" 200 -
+ * Detected change in '/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/src/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 126-050-780
+127.0.0.1 - - [12/Aug/2025 11:10:34] "GET /api/download_state HTTP/1.1" 200 -
+=== UPLOAD STATE CALLED ===
+File received: state.pkl
+Pickle loaded successfully: {'apple_pos': [9, 2], 'apple_size': 1, 'snakes': [[0, 0], [16, 14], [8, 3], [17, 2], [18, 19]], 'player_name': 'Anonymous', 'timestamp': '2025-08-12T11:10:34.685602'}
+Session updated. New game_state: {'apple_pos': [9, 2], 'apple_size': 1, 'snakes': [[0, 0], [16, 14], [8, 3], [17, 2], [18, 19]], 'player_name': 'Anonymous', 'timestamp': '2025-08-12T11:10:34.685602'}
+127.0.0.1 - - [12/Aug/2025 11:10:34] "POST /api/upload_state HTTP/1.1" 200 -
+ * Detected change in '/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/src/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 126-050-780
+ * Detected change in '/Users/nitzan/Desktop/work.nosync/aisb/ai-security-bootcamp/w2d3/exercises/ex6/exercise/src/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 126-050-780
+127.0.0.1 - - [12/Aug/2025 11:10:50] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:50] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:50] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:50] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:51] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:51] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:51] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:51] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:54] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:54] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:54] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:54] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:54] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:55] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:55] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:55] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:55] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:55] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:56] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:56] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:56] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:56] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:56] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:57] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:57] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:57] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:57] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:57] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:58] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:58] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:58] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:58] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:10:59] "GET /api/download_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:06] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:06] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:06] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:06] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:07] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:07] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:07] "GET /api/leaderboard HTTP/1.1" 200 -
+=== UPLOAD STATE CALLED ===
+File received: game_state_Playeraa_1754993459920.pkl
+Pickle loaded successfully: {'apple_pos': [4, 5], 'apple_size': 18, 'player_name': 'Playeraa', 'snakes': [[19, 10], [6, 16], [17, 16], [5, 4], [19, 7]], 'timestamp': '2025-08-10T05:25:13.783390'}
+Session updated. New game_state: {'apple_pos': [4, 5], 'apple_size': 18, 'player_name': 'Playeraa', 'snakes': [[19, 10], [6, 16], [17, 16], [5, 4], [19, 7]], 'timestamp': '2025-08-10T05:25:13.783390'}
+127.0.0.1 - - [12/Aug/2025 11:11:13] "POST /api/upload_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:17] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:17] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:17] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:18] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:18] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:18] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:18] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:18] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:19] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:19] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:19] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:19] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:19] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:19] "GET /api/leaderboard HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:22] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:22] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:23] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:24] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:27] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:27] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:27] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:28] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:28] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:28] "POST /api/update_game HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:11:28] "GET /api/leaderboard HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:13:55] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:13:55] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:13:56] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:13:56] "GET /api/game_state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:13:57] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2025 11:13:57] "GET /api/game_state HTTP/1.1" 200 -
+=== UPLOAD STATE CALLED ===
+File received: ch1.pkl
+Pickle loaded successfully: {'apple_pos': [4, 5], 'apple_size': 10000, 'player_name': 'Playeraa', 'snakes': [[19, 10], [6, 16], [17, 16], [5, 4], [19, 7]], 'timestamp': '2025-08-10T05:25:13.783390'}
+127.0.0.1 - - [12/Aug/2025 11:14:16] "[31m[1mPOST /api/upload_state HTTP/1.1[0m" 400 -

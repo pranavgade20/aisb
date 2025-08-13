@@ -1,0 +1,8 @@
+FROM python:3.9-slim
+
+RUN pip install pypiserver
+
+EXPOSE 8080
+COPY packages /packages
+
+CMD ["pypi-server", "run", "-p", "8080", "-a", ".", "-P", ".", "/packages"] 

@@ -1,0 +1,6 @@
+# This file aggregates both external and internal requirements.
+# External deps are installed at build time from PyPI.
+# Internal deps (like flower_power) are installed at runtime from the local PyPI server.
+
+-r external-requirements.txt
+-r internal-requirements.txt

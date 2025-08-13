@@ -1,0 +1,34 @@
+services:
+  pypi-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.pypi
+    ports:
+      - "8080:8080"
+    networks:
+      - workshop
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - workshop
+    depends_on:
+      - pypi-server
+
+  developer-simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile.developer
+    networks:
+      - workshop
+    depends_on:
+      - pypi-server
+      - web
+    command: [ "python", "developer_simulator.py" ]
+
+networks:
+  workshop:
