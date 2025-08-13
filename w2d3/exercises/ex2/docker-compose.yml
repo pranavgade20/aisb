@@ -1,0 +1,15 @@
+services:
+  pypi.local:
+    image: pypiserver/pypiserver:latest
+    hostname: pypi.local
+    container_name: pypi.local
+    networks:
+      - shared
+    ports:
+      - "80:8080"
+    command: -P . -a .
+
+networks:
+  shared:
+    name: exercise_workshop
+    external: true
