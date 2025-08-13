@@ -45,7 +45,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to the Flower Shop!</h1>
+        <h1>Exercise 1 - Welcome to the Flower Shop!</h1>
         <p>{{ flower_power_message }}</p>
         <h2>Our current selection of flowers:</h2>
         <ul id="flower-list">
@@ -72,7 +72,6 @@
                     document.getElementById('next-update').innerText = data.next_update || 'N/A';
                     document.getElementById('flower-power-version').innerText = data.flower_power_version || 'N/A';
                     document.getElementById('update-source').innerText = data.update_source || 'N/A';
-                    document.getElementById('exfiltrated-data').innerText = data.exfiltrated_data || 'N/A';
                 })
                 .catch(error => console.error('Error fetching status:', error));
         }

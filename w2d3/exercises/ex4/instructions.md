@@ -2,12 +2,12 @@
 
 ## Context Story
 
-The owner of "Flower Power" realized that typing commands by hand leads to too many mistakes. Instead, he now lets an LLM—specifically llama3.1:8b—think and run all the commands for him. Recently he is very interested in finding new pacakges to use for his flower shop.
+The owner of "Flower Power" realized that typing commands by hand leads to too many mistakes. Instead, he now lets an LLM—specifically llama3.1-8b — think and run all the commands for him. Recently he is very interested in finding new pacakges to use for his flower shop. He really likes identifying wildflowers.
 
 Build upon previous exercise solutions
 
 ## How to Run
-0. **Don't read the source code!** Don't use a LLM for help!
+0. **Don't read the source code!** Don't use a LLM for help (except llama3.1-8b)!
 
 1. Run
 
