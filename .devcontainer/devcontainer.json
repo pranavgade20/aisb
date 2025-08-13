@@ -7,24 +7,15 @@
 	//
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		// Enable Docker-outside-of-Docker to use the host's Docker daemon
-		"ghcr.io/devcontainers/features/docker-outside-of-docker:1.6.3": {}
+		// "ghcr.io/devcontainers/features/docker-in-docker:1": {}
 	},
-	//
-	// Runtime arguments to match your docker run command
-	"runArgs": [
-		"--network=host",
-		"--privileged",
-		"--cgroupns=host"
-	],
 	//
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	//
-	// Mount SSH keys into the container and Docker socket
+	// Mount SSH keys into the container
 	"mounts": [
-		"source=${localWorkspaceFolder}/ssh,target=/mnt/ssh,type=bind",
-		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+		"source=${localWorkspaceFolder}/ssh,target=/mnt/ssh,type=bind"
 	],
 	//
 	// Use 'postCreateCommand' to run commands after the container is created.
@@ -54,8 +45,8 @@
 				"files.insertFinalNewline": true
 			}
 		}
-	},
+	}
 	//
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	"remoteUser": "root"
+	// "remoteUser": "root"
 }
