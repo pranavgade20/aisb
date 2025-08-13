@@ -8,6 +8,15 @@ services:
     networks:
       - workshop
 
+  pypi.local:
+    build:
+      context: .
+      dockerfile: Dockerfile.pypilocal
+    ports:
+      - "8085:8080"
+    networks:
+      - workshop
+
   web:
     build:
       context: .
@@ -21,3 +30,5 @@ services:
 
 networks:
   workshop:
+
+
