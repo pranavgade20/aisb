@@ -1,6 +1,4 @@
-# %%
-%load_ext autoreload
-%autoreload 2
+
 
 # %%
 import json
@@ -13,6 +11,12 @@ from io import BytesIO
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
+
+# %%
+
+subprocess.run(["sudo", "rmdir", "/sys/fs/cgroup/test_process"])
+subprocess.run(["sudo", "rmdir", "/sys/fs/cgroup/test_namespaces"])
+subprocess.run(["sudo", "rmdir", "/sys/fs/cgroup/test_combined"])
 
 
 def exec_sh(command: str, timeout: Optional[int | None] = 30, check_retcode=True) -> subprocess.CompletedProcess:
@@ -422,8 +426,6 @@ test_pull_layers_complete(pull_layers)
 pull_layers("alpine:latest", "./extracted_alpine")
 pull_layers("python:3.12-alpine", "./extracted_python")
 
-# %%
-
 
 import subprocess
 
@@ -498,7 +500,7 @@ def create_cgroup(cgroup_name, memory_limit=None, cpu_limit=None):
     # 5. Handle errors and return None on failure
     cgroup_dir = Path(f"/sys/fs/cgroup/{cgroup_name}")
     cgroup_dir.mkdir(exist_ok=True)
-    (cgroup_dir / "cgroup.subtree_control").write_text("+cpu +memory +pids")
+    (cgroup_dir.parent / "cgroup.subtree_control").write_text("+cpu +memory +pids")
     if memory_limit is not None:
         (cgroup_dir / "memory.max").write_text(memory_limit)
     if cpu_limit is not None:
@@ -593,34 +595,32 @@ test_create_cgroup_comprehensive_part1(create_cgroup_comprehensive_part1)
 # %%
 
 
-# def create_cgroup_comprehensive(cgroup_name, memory_limit=None, cpu_limit=None):
-#     """
-#     Create a cgroup with comprehensive settings - Part 2: Advanced OOM and Process Management
+def create_cgroup_comprehensive(cgroup_name, memory_limit=None, cpu_limit=None):
+    """
+    Create a cgroup with comprehensive settings - Part 2: Advanced OOM and Process Management
 
-#     This builds on Part 1 by adding advanced Out-of-Memory handling, process assignment,
-#     and comprehensive monitoring capabilities for production-ready container isolation.
+    This builds on Part 1 by adding advanced Out-of-Memory handling, process assignment,
+    and comprehensive monitoring capabilities for production-ready container isolation.
 
-#     Args:
-#         cgroup_name: Name of the cgroup (e.g., 'demo')
-#         memory_limit: Memory limit (e.g., '100M', '1000000')
-#         cpu_limit: CPU limit (not implemented yet)
-#     """
-#     cgroup_dir = Path(create_cgroup_comprehensive_part1(cgroup_name, memory_limit, cpu_limit))
-#     (cgroup_dir / "memory.oom.group").write_text("1")
-#     #pid = os.getpid()
-#     add_process_to_cgroup(cgroup_name)
-#     Path(f"/proc/self/oom_score_adj").write_text("1000")
-#     return cgroup_dir
+    Args:
+        cgroup_name: Name of the cgroup (e.g., 'demo')
+        memory_limit: Memory limit (e.g., '100M', '1000000')
+        cpu_limit: CPU limit (not implemented yet)
+    """
+    cgroup_dir = Path(create_cgroup_comprehensive_part1(cgroup_name, memory_limit, cpu_limit))
+    (cgroup_dir / "memory.oom.group").write_text("1")
+    #pid = os.getpid()
+    add_process_to_cgroup(cgroup_name)
+    Path(f"/proc/self/oom_score_adj").write_text("1000")
+    return cgroup_dir
 
 
-# from w2d2_test import test_memory_comprehensive
-# from w2d2_test import test_create_cgroup_comprehensive
+from w2d2_test import test_memory_comprehensive
+from w2d2_test import test_create_cgroup_comprehensive
 
-# test_create_cgroup_comprehensive(test_memory_comprehensive, create_cgroup_comprehensive)
+test_create_cgroup_comprehensive(test_memory_comprehensive, create_cgroup_comprehensive)
 
 # %%
-
-
 def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memory_limit="100M"):
     """
     Run a command in cgroup, chroot, and namespace isolation
@@ -681,7 +681,7 @@ def run_in_cgroup_chroot_namespaced(cgroup_name, chroot_dir, command=None, memor
             raise RuntimeError
         # signal to child
         os.kill(child_pid, signal.SIGUSR1)
-        exit_status = os.waitpid(child_pid, 0)
+        pid, exit_status = os.waitpid(child_pid, 0)
         return os.WEXITSTATUS(exit_status)
 
     # Think about why we did .fork() and the complicated signalling, as opposed to just running the commands sequentially.

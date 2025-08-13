@@ -1513,10 +1513,14 @@ def add_process_to_cgroup(cgroup_name, pid=None):
         if pid is None:
             pid = os.getpid()
         
-        cgroup_procs_path = f"/sys/fs/cgroup/{cgroup_name}/cgroup.procs"
-        
-        with open(cgroup_procs_path, "w") as f:
-            f.write(str(pid))
+        try:
+            cgroup_procs_path = f"/sys/fs/cgroup/{cgroup_name}/cgroup.procs"
+            
+            with open(cgroup_procs_path, "w") as f:
+                f.write(str(pid))
+        except OSError:
+            print(f"path: {cgroup_procs_path}")
+            raise 
         print(f"Added process {pid} to cgroup {cgroup_name}")
         return True
     else:
