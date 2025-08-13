@@ -1,0 +1,8 @@
+FROM python:3.9-slim
+
+RUN pip install pypiserver['passlib']
+
+COPY packages /packages
+
+CMD ["python", "-m", "pypiserver", "run", "-P", ".", "-a", "." ,"-p", "8080", "/packages"]
+

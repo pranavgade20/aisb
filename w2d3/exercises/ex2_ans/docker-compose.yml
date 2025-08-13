@@ -1,0 +1,12 @@
+services:
+  pypi.local:
+    build:
+      context: .
+      dockerfile: Dockerfile.pypi
+    ports:
+      - "192.168.65.7:8080:8080"
+    networks:
+      - workshop
+
+networks:
+  workshop:
