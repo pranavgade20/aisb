@@ -113,7 +113,7 @@
                     <span> Submit your own card for use. Don't worry, this is completely secure! We will validate it on
                       our end.<br>This card can be for any price.</span>
                   </div>
-                  <form method="post" enctype="multipart/form-data">
+                  <form method="post" enctype="multipart/form-data">{% csrf_token %}
                     <input type="file" name="card_data">
                     <input type="hidden" name="card_supplied" id="card_supplied" value="True" />
                     <input type="test" name="card_fname" id="card_fname" placeholder="NameYourCard">
@@ -136,7 +136,7 @@
                     <span> Use a card by providing the pastebin URL containing your card data below.
                       <br>Just do it.</span>
                   </div>
-                  <form method="post">
+                  <form method="post">{% csrf_token %}
                     <input type="url" name="card_url" id="card_url" placeholder="https://pastebin.com/raw/abcdef"
                       class="form-control mb-2" required>
                     <input type="hidden" name="card_url_supplied" id="card_url_supplied" value="True" />
