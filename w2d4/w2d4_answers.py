@@ -182,3 +182,56 @@ from w2d4_test import test_exploit_csrf_vulnerability
 print("\nTesting CSRF vulnerability exploitation...")
 # test_exploit_csrf_vulnerability(exploit_csrf_vulnerability)
 # %%
+
+def fix_csrf_vulnerability():
+    """
+    Fix CSRF vulnerability by implementing comprehensive CSRF protection.
+    You can do it manually or edit the back end code.
+    
+    Args:
+        None
+        
+    Returns:
+        None
+    """
+    import os
+    import re
+    # TODO: Implement CSRF protection with tokens, middleware, and security settings
+    # - Add CSRF tokens to all necessary POST forms in templates
+    # - Enable CSRF middleware
+    # - Add possible decorators to vulnerable views
+    # - Configure secure cookie settings
+    os.chdir('w2d4')
+
+    with open('GiftcardSite/settings.py', 'r') as f:
+        x = f.read()
+        x = x.replace('Lax', 'Strict')
+        x = x.replace('MIDDLEWARE = [', 'MIDDLEWARE = [\n"django.middleware.csrf.CsrfViewMiddleware",')
+
+    with open('GiftcardSite/settings.py', 'w') as f:
+        f.write(x)
+        f.write('\nSESSION_COOKIE_SECURE = True')
+        f.write('\nCSRF_COOKIE_SECURE = True')
+
+    filenames = glob.glob("templates/**/*.html", recursive=True)
+
+    for file in filenames:
+        with open(file, 'r') as f:
+            x = f.read()
+            x = re.sub(r'(<form[^>]*>)', '\1{% csrf_token %}', x)
+
+        with open(file, 'w') as f:
+            f.write(x)
+
+    with open('LegacySite/views.py', 'r') as f:
+        x = f.read()
+        x = x.replace('\ndef ', '\n@csrf_protect\ndef ')
+
+    with open('LegacySite/views.py', 'w') as f:
+        f.write(x)
+
+from w2d4_test import test_fix_csrf_vulnerability
+print("\nTesting CSRF vulnerability fix...")
+test_fix_csrf_vulnerability(fix_csrf_vulnerability)
+
+# %%
