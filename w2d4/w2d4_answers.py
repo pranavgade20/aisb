@@ -73,10 +73,10 @@ def exploit_xss_vulnerability():
         return False
 
 
-from w2d4_test import test_exploit_xss_vulnerability
+# from w2d4_test import test_exploit_xss_vulnerability
 
-if __name__ == "__main__":
-    test_exploit_xss_vulnerability(exploit_xss_vulnerability)
+# if __name__ == "__main__":
+#     test_exploit_xss_vulnerability(exploit_xss_vulnerability)
 # %%
 # %%
 result = {
@@ -91,23 +91,23 @@ result = {
 # %%
 # url = "http://127.0.0.1:8000/gift/1"
 # headers = {
-    # "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:141.0) Gecko/20100101 Firefox/141.0",
-    # "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    # "Accept-Language": "en-US,en;q=0.5",
-    # "Accept-Encoding": "gzip, deflate, br, zstd",
-    # "Referer": "http://127.0.0.1:8000/gift/1",
-    # "Content-Type": "application/x-www-form-urlencoded",
-    # "Origin": "http://127.0.0.1:8000",
-    # "Connection": "keep-alive",
-    # "Cookie": "sessionid=zg8hd07t17ujbx4vqzdv4wzr8ci9rbvr",
-    # "Upgrade-Insecure-Requests": "1",
-    # "Sec-Fetch-Dest": "document",
-    # "Sec-Fetch-Mode": "navigate",
-    # "Sec-Fetch-Site": "same-origin",
-    # "Sec-Fetch-User": "?1",
-    # "DNT": "1",
-    # "Sec-GPC": "1",
-    # "Priority": "u=0, i",
+# "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:141.0) Gecko/20100101 Firefox/141.0",
+# "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+# "Accept-Language": "en-US,en;q=0.5",
+# "Accept-Encoding": "gzip, deflate, br, zstd",
+# "Referer": "http://127.0.0.1:8000/gift/1",
+# "Content-Type": "application/x-www-form-urlencoded",
+# "Origin": "http://127.0.0.1:8000",
+# "Connection": "keep-alive",
+# "Cookie": "sessionid=zg8hd07t17ujbx4vqzdv4wzr8ci9rbvr",
+# "Upgrade-Insecure-Requests": "1",
+# "Sec-Fetch-Dest": "document",
+# "Sec-Fetch-Mode": "navigate",
+# "Sec-Fetch-Site": "same-origin",
+# "Sec-Fetch-User": "?1",
+# "DNT": "1",
+# "Sec-GPC": "1",
+# "Priority": "u=0, i",
 # }
 # data_raw = "amount=1^&username=test%40test.com^&xss_payload=helloworld"
 # res = requests.post(url, data=data_raw, headers=headers)
@@ -117,32 +117,68 @@ result = {
 import os
 import glob
 
+
 def fix_xss_vulnerability():
     """
     Fix XSS vulnerability by finding discepencies.
     You can do it manually or edit the front end code.
-    
+
     Args:
         None
-        
+
     Returns:
         None
     """
     # TODO: Look for |safe filter in templates
     # - What does `|` mean in this case
-    # - You can do it manually or use re.search within the code 
-    filenames = glob.glob('templates/**/*.html', recursive=True)
+    # - You can do it manually or use re.search within the code
+    filenames = glob.glob("templates/**/*.html", recursive=True)
 
     for file in filenames:
-        with open(file, 'r') as f:
+        with open(file, "r") as f:
             x = f.read()
-            x = x.replace('|safe', '')
+            x = x.replace("|safe", "")
 
-        with open(file, 'w') as f:
+        with open(file, "w") as f:
             f.write(x)
+
 
 from w2d4_test import test_fix_xss_vulnerability
 
 print("\nTesting XSS vulnerability fix...")
-test_fix_xss_vulnerability(fix_xss_vulnerability)
+# test_fix_xss_vulnerability(fix_xss_vulnerability)
+# %%
+
+# existing html
+#
+
+
+# sessionid:"zg8hd07t17ujbx4vqzdv4wzr8ci9rbvr"
+
+
+def exploit_csrf_vulnerability():
+    """
+    Create malicious HTML that exploits CSRF vulnerability.
+
+    Args:
+        None
+
+    Returns:
+        str: HTML content that performs the CSRF attack
+    """
+    # TODO: Create malicious HTML that performs CSRF attack
+    # - Create an HTML page that appears legitimate
+    # - Include a hidden form targeting the gift card endpoint
+    # - Add JavaScript to automatically submit the form
+    # - Give user "test2" a gify card
+    with open("/workspaces/aisb/w2d4/data/csrf.html", "r") as f:
+        x = f.read()
+    return x
+
+
+from w2d4_test import test_exploit_csrf_vulnerability
+
+
+print("\nTesting CSRF vulnerability exploitation...")
+# test_exploit_csrf_vulnerability(exploit_csrf_vulnerability)
 # %%
