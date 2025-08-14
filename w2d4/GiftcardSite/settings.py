@@ -142,6 +142,6 @@ AUTHENTICATION_BACKENDS = ["LegacySite.models.OurBackend"]
 # Django 3.2 compat
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Strict"
 
 SESSION_COOKIE_HTTPONLY = False
