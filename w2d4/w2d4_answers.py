@@ -13,6 +13,7 @@ import time
 import shutil
 import stat
 import inspect
+import requests
 
 # Setup Django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "GiftcardSite.settings")
@@ -132,6 +133,20 @@ def exploit_csrf_vulnerability():
     # - Create an HTML page that appears legitimate
     # - Include a hidden form targeting the gift card endpoint
     # - Add JavaScript to automatically submit the form
+    gift_endpoint = "/gift/1"
+    url = f"http://127.0.0.1:8000{gift_endpoint}"
+    data = {
+        "username": "",
+        "amount": "",
+    }
+    try:
+        response = requests.post(url, json=data)
+        if response.status_code == 200:
+            print("Success")
+        else:
+            print("response failed")
+    except Exception as e:
+        print(e)
     # - Give user "test2" a gify card
     return "<html><body><h1>CSRF Vulnerability</h1></body></html>"
 
