@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: flower_power
+Version: 2.0.0
+Summary: A beautiful flower management package with bundled flower images
+Author: Flower Shop Team
+Author-email: flowers@example.com
+Dynamic: author
+Dynamic: author-email
+Dynamic: summary

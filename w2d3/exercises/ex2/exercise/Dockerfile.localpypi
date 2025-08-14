@@ -1,0 +1,17 @@
+
+FROM python:3.9-slim
+
+# Install pypiserver with passlib support
+RUN pip install pypiserver[passlib]
+
+# Create packages directory
+RUN mkdir -p /packages
+
+# Copy packages to the container
+COPY packages/ /packages/
+
+# Expose port 8080
+EXPOSE 8080
+
+# Run pypiserver
+CMD ["python", "-m", "pypiserver", "run", "-P", ".", "-a", ".", "-p", "8080", "/packages"]
