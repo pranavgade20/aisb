@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-synf&-ajkl!q5we)uad)n7(9ii@!=b_2+db73w=q*7r)jvpz!w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]  # Changed: Allow all hosts for development
 
 
 # Application definition
@@ -54,7 +54,7 @@ ROOT_URLCONF = "myproject.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],  # Changed: Added templates directory
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
