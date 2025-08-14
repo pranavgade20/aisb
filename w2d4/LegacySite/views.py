@@ -319,11 +319,3 @@ def use_card_view(request):
         context['card_list'] = user_cards
         return render(request, "use-card.html", context)
     return HttpResponse("Error 404: Internal Server Error")
-
-from w2d4_solution import fix_sql_injection_vulnerability, fix_ssrf_vulnerability
-
-# to test_exploit_ssrf_vulnerability() please comment the following lines
-use_card_view = fix_ssrf_vulnerability()
-
-# to test_exploit_sql_injection_vulnerability() please comment the following lines
-use_card_view = fix_sql_injection_vulnerability()
