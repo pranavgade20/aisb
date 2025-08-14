@@ -72,3 +72,26 @@ if __name__  == '__main__':
     test_exploit_xss_vulnerability(exploit_xss_vulnerability)
 
 # %%
+def fix_xss_vulnerability():
+    """
+    Fix XSS vulnerability by finding discepencies.
+    You can do it manually or edit the front end code.
+    
+    Args:
+        None
+        
+    Returns:
+        None
+    """
+    # TODO: Look for |safe filter in templates
+    # - What does `|` mean in this case
+    # - You can do it manually or use re.search within the code 
+    pass
+
+from w2d4_test import test_fix_xss_vulnerability
+
+if __name__ == '__main__':
+    print("\nTesting XSS vulnerability fix...")
+    test_fix_xss_vulnerability(fix_xss_vulnerability)
+
+# %%
