@@ -1,0 +1,63 @@
+<header class="site-navbar py-4 site-navbar-target" role="banner">
+
+  <div class="container">
+    <div class="d-flex align-items-center">
+      <div class="site-logo">
+        <a href="/index.html" class="d-block">
+          <img src="/images/logo.png" alt="Image" class="img-fluid">
+        </a>
+      </div>
+      <div class="mr-auto">
+        <nav class="site-navigation position-relative text-right" role="navigation">
+          <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+            <li class="active">
+              <a href="/index.html" class="nav-link text-left">Home</a>
+            </li>
+            <li class="has-children">
+              <a href="/index.html" class="nav-link text-left">Services</a>
+              <ul class="dropdown">
+                <li><a href="/gift.html">Gift a Card</a></li>
+                <li><a href="/buy.html">Buy a Card</a></li>
+                <li><a href="/use.html">Use a Card</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+
+      </div>
+      {% if user.is_authenticated %}
+      <div class="ml-auto">
+
+        <div class="social-wrap">
+          <a href="/logout.html" class="text-white">Sign Out</a>
+
+
+          <a href="#" class="d-inline-block d-lg-none site-menu-toggle js-menu-toggle text-black"><span
+              class="icon-menu h3 text-white" style="position: relative; top: 7px;"></span></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  {% else %}
+  <div class="ml-auto">
+
+    <div class="social-wrap">
+      {% if request.user.is_authenticated %}
+      <a href="/logout.html" class="text-white">Sign Out</a>
+      {% else %}
+      <a href="/login.html" class="text-white">Sign In</a> / <a href="/register.html" class="text-white">Register</a>
+      {% endif %}
+
+      <a href="#" class="d-inline-block d-lg-none site-menu-toggle js-menu-toggle text-black"><span
+          class="icon-menu h3 text-white" style="position: relative; top: 7px;"></span></a>
+    </div>
+  </div>
+
+  </div>
+  </div>
+
+
+  {% endif %}
+
+</header>

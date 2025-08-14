@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% include "title.html" %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <link href="https://fonts.googleapis.com/css?family=Muli:300,400,700,900" rel="stylesheet">
+  <link rel="stylesheet" href="fonts/icomoon/style.css">
+
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/owl.carousel.min.css">
+  <link rel="stylesheet" href="/css/owl.theme.default.min.css">
+  <link rel="stylesheet" href="/css/owl.theme.default.min.css">
+
+  <link rel="stylesheet" href="/css/jquery.fancybox.min.css">
+
+  <link rel="stylesheet" href="/css/bootstrap-datepicker.css">
+
+  <link rel="stylesheet" href="fonts/flaticon/font/flaticon.css">
+
+  <link rel="stylesheet" href="/css/aos.css">
+  <link href="/css/jquery.mb.YTPlayer.min.css" media="all" rel="stylesheet" type="text/css">
+
+  <link rel="stylesheet" href="/css/style.css">
+
+
+
+</head>
+
+<body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+
+  <div class="site-wrap">
+
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close mt-3">
+          <span class="icon-close2 js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+
+
+{% include "navbar.html" %}
+
+      {% if prod_num != 0 %}
+      <div class="intro-section" style="background-image: url('{{ prod_path }}');">
+      {% else %}
+      <div class="intro-section" style="background-image: url('/images/product_1.jpg');">
+      {% endif %}
+        <div class="container">
+          <div class="row align-items-center justify-content-center">
+            <div class="col-md-7 mx-auto text-center" data-aos="fade-up">
+              <h1>{{ prod_name }}</h1>
+            {% if director is not None %}
+              <p>Endorsed by {{director|safe}}!</p>
+            {% else %}
+              <p> For all your card buying needs! </p>
+            {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="site-section">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-3 order-lg-2">
+              <div class="side-box mb-4">
+                <p>
+                  Price: <strong class="text-black">{{ price }}</strong> <br>
+                </p>
+                {% if user is None %}
+                <form action="/gift/{{ prod_num }}" method="post">
+                  <div class="mb-4">
+                    <input type="text" class="form-control mb-2" name="amount" id="amount" placeholder="$0.00">
+                    <input type="text" class="form-control mb-2" name="username" id="username" placeholder="Username">
+                    <button class="btn btn-block" type="submit">Gift one</button>
+                </form>
+                <span class="d-block text-center my-2">or</span>
+                <a href="/buy/{{ prod_num }}"><center>Buy one</center></a>
+                {% else %}
+                <p> Card given to {{ user.username }} </p>
+                {% endif %}
+              </div>
+
+              <div class="side-box mb-4">
+                <h5 class="mb-3">Share this product</h5>
+                <div class="mb-2">
+                  <input type="text" class="form-control" id="directorName" placeholder="Enter your name">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="shareProduct()">Generate Share Link</button>
+              </div>
+
+              {% if not request.user.is_authenticated %}
+              <p class="mb-0"><a href="/login">Sign In</a> / <a href="/register">Register</a></p>
+              {% else %}
+              <p class="mb-0">You are logged in as {{ request.user.username }}.</p>
+              {% endif %}
+              </div>
+              <div class="side-box text-center">
+                <img src="/images/person_3.jpg" alt="Image" class="img-fluid w-50 rounded-circle mb-4">
+                <h3 class="h5 text-black">Collen Winston</h3>
+                <span class="mb-3 d-block text-muted">Testamony</span>
+                <p>This card is great! Don't think about saving your money, just buy it!</p>
+              </div>
+            </div>
+            <div class="col-lg-8 pr-lg-5">
+              <div class="owl-carousel slide-one-item mb-5">
+              {% if prod_num != 0 %}
+                <img src="{{ prod_path }}" alt="Image" class="img-fluid mb-54">
+                <img src="{{ prod_path }}" alt="Image" class="img-fluid mb-54">
+                <img src="{{ prod_path }}" alt="Image" class="img-fluid mb-54">
+              {% else %}
+                <img src="/images/product_1.jpg" alt="Image" class="img-fluid mb-54">
+                <img src="/images/product_1.jpg" alt="Image" class="img-fluid mb-54">
+                <img src="/images/product_1.jpg" alt="Image" class="img-fluid mb-54">
+              {% endif %}
+              </div>
+
+              {{ description }}
+
+              <h2 class="my-4">Buyers</h2>
+              <ul class="list-unstyled bidders">
+                <li class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">1.</span>
+                    <div class="d-flex align-items-center">
+                      <img src="/images/person_1.jpg" alt="Image" class="mr-2">
+                      <span>Jean Smith</span>
+                    </div>
+                  </div>
+                  <span class="price">$40</span>
+                </li>
+
+                <li class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">2.</span>
+                    <div class="d-flex align-items-center">
+                      <img src="/images/person_2.jpg" alt="Image" class="mr-2">
+                      <span>Chris Wilson</span>
+                    </div>
+                  </div>
+                  <span class="price">$87</span>
+                </li>
+
+
+                <li class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">3.</span>
+                    <div class="d-flex align-items-center">
+                      <img src="/images/person_3.jpg" alt="Image" class="mr-2">
+                      <span>Kyle Anderson</span>
+                    </div>
+                  </div>
+                  <span class="price">$310</span>
+                </li>
+
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+{% include "footer.html" %}
+
+  </div>
+
+    <!-- loader -->
+    <div id="loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#51be78"/></svg></div>
+
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/jquery-migrate-3.0.1.min.js"></script>
+    <script src="/js/jquery-ui.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/jquery.stellar.min.js"></script>
+    <script src="/js/jquery.countdown.min.js"></script>
+    <script src="/js/bootstrap-datepicker.min.js"></script>
+    <script src="/js/jquery.easing.1.3.js"></script>
+    <script src="/js/aos.js"></script>
+    <script src="/js/jquery.fancybox.min.js"></script>
+    <script src="/js/jquery.sticky.js"></script>
+    <script src="/js/jquery.mb.YTPlayer.min.js"></script>
+
+
+
+
+    <script src="/js/main.js"></script>
+
+    <script>
+    function shareProduct() {
+        const directorName = document.getElementById('directorName').value.trim();
+        if (!directorName) {
+            alert('Please enter an endorser name');
+            return;
+        }
+
+        const currentUrl = window.location.origin + window.location.pathname;
+        const encodedDirector = encodeURIComponent(directorName);
+        const shareUrl = currentUrl + '?director=' + encodedDirector;
+
+        window.location.href = shareUrl;
+    }
+
+    </script>
+
+    {% if error is not none %}
+        <script>
+        window.onload = function() {
+            alert("{{ error|escapejs }}");
+        };
+        </script>
+        {% endif %}
+
+  </body>
+
+  </html>
