@@ -195,7 +195,6 @@ def fix_csrf_vulnerability():
         None
     """
     import os
-    import re
     # TODO: Implement CSRF protection with tokens, middleware, and security settings
     # - Add CSRF tokens to all necessary POST forms in templates
     # - Enable CSRF middleware
@@ -218,7 +217,7 @@ def fix_csrf_vulnerability():
     for file in filenames:
         with open(file, 'r') as f:
             x = f.read()
-            x = re.sub(r'(<form[^>]*>)', '\1{% csrf_token %}', x)
+            x = re.sub(r'(<form[^>]*>)', '\\1{% csrf_token %}', x)
 
         with open(file, 'w') as f:
             f.write(x)
