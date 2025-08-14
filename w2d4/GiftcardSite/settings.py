@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -141,6 +142,8 @@ AUTHENTICATION_BACKENDS = ['LegacySite.models.OurBackend']
 # Django 3.2 compat
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+CSRF_COOKIE_SECURE = True
 
 SESSION_COOKIE_HTTPONLY = False

@@ -18,6 +18,7 @@ def index(request):
     context= {'user': request.user}
     return render(request, "index.html", context)
 
+@csrf_protect
 # Register for the service.
 def register_view(request):
     if request.method == 'GET':
@@ -38,7 +39,7 @@ def register_view(request):
         u.save()
         return redirect("index.html")
         
-
+@csrf_protect
 # Log into the service.
 def login_view(request):
     if request.method == "GET":
@@ -58,12 +59,14 @@ def login_view(request):
             return render(request, "login.html", context)
         return redirect("index.html")
 
+@csrf_protect
 # Log out of the service.
 def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect("index.html")
 
+@csrf_protect
 def buy_card_view(request, prod_num=0):
     if request.method == 'GET':
         context = {"prod_num" : prod_num}
@@ -111,7 +114,7 @@ def buy_card_view(request, prod_num=0):
     else:
         return redirect("/buy/1")
 
-
+@csrf_protect
 def gift_card_view(request, prod_num=0):
     context = {"prod_num" : prod_num}
     if request.method == "GET" and 'username' not in request.GET:
@@ -182,6 +185,7 @@ def gift_card_view(request, prod_num=0):
         card_file.close()
         return render(request, f"gift.html", context)
 
+@csrf_protect
 def use_card_view(request):
     context = {'card_found':None}
     if request.method == 'GET':
@@ -323,7 +327,7 @@ def use_card_view(request):
 from w2d4_solution import fix_sql_injection_vulnerability, fix_ssrf_vulnerability
 
 # to test_exploit_ssrf_vulnerability() please comment the following lines
-use_card_view = fix_ssrf_vulnerability()
+# use_card_view = fix_ssrf_vulnerability()
 
 # to test_exploit_sql_injection_vulnerability() please comment the following lines
 use_card_view = fix_sql_injection_vulnerability()

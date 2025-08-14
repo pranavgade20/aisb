@@ -59,7 +59,7 @@
             {% if director is not None %}
               <!-- KG: I don't think the safe tag does what they thought
                    it does... -->
-              <p>Endorsed by {{director|safe}}!</p>
+              <p>Endorsed by {{director}}!</p>
             {% else %}
               <p> For all your card buying needs! </p>
             {% endif %}
@@ -76,7 +76,7 @@
                 <p>
                   Price: <strong class="text-black">{{ price }}</strong> <br>
                 </p>
-                <form action="/buy/{{ prod_num }}" method="post">
+                <form action="/buy/{{ prod_num }}" method="post">{% csrf_token %}
                   <div class="mb-4">
                     <input type="text" class="form-control mb-2" placeholder="$0.00" name="amount">
                     <button class="btn btn-block" type="submit">Buy one</button>
