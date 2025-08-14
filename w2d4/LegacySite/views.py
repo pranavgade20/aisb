@@ -11,6 +11,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import requires_csrf_token
 import os
 import tempfile
+from django.db.models import TextField, Value
+from django.db.models.functions import Cast
 
 SALT_LEN = 16
 
@@ -191,7 +193,7 @@ def gift_card_view(request, prod_num=0):
         return render(request, "gift.html", context)
 
 
-@csrf_protect
+# @csrf_protect
 def use_card_view(request):
     context = {"card_found": None}
     if request.method == "GET":
@@ -244,7 +246,12 @@ def use_card_view(request):
             print(card_data.strip())
             signature = json.loads(card_data)["records"][0]["signature"]
             # signatures should be pretty unique, right?
-            card_query = Card.objects.raw("select id from LegacySite_card where data LIKE '%%%s%%'" % signature)
+
+            card_query = (
+                Card.objects.annotate(data_text=Cast("data", TextField()))
+                .filter(data_text__contains=signature)
+                .values_list("id", flat=True)
+            )
             user_cards = Card.objects.raw(
                 "select id, count(*) as count from LegacySite_card where LegacySite_card.user_id = %s"
                 % str(request.user.id)
@@ -297,7 +304,12 @@ def use_card_view(request):
         print(card_data.strip())
         signature = json.loads(card_data)["records"][0]["signature"]
         # signatures should be pretty unique, right?
-        card_query = Card.objects.raw("select id from LegacySite_card where data LIKE '%%%s%%'" % signature)
+        card_query = (
+            Card.objects.annotate(data_text=Cast("data", TextField()))
+            .filter(data_text__contains=signature)
+            .values_list("id", flat=True)
+        )
+
         user_cards = Card.objects.raw(
             "select id, count(*) as count from LegacySite_card where LegacySite_card.user_id = %s"
             % str(request.user.id)
@@ -348,8 +360,8 @@ def use_card_view(request):
 
 from w2d4_solution import fix_sql_injection_vulnerability, fix_ssrf_vulnerability
 
-# to test_exploit_ssrf_vulnerability() please comment the following lines
-use_card_view = fix_ssrf_vulnerability()
+# # to test_exploit_ssrf_vulnerability() please comment the following lines
+# use_card_view = fix_ssrf_vulnerability()
 
-# to test_exploit_sql_injection_vulnerability() please comment the following lines
-use_card_view = fix_sql_injection_vulnerability()
+# # to test_exploit_sql_injection_vulnerability() please comment the following lines
+# use_card_view = fix_sql_injection_vulnerability()
