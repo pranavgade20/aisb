@@ -101,7 +101,7 @@
               {% if not request.user.is_authenticated %}
               <p class="mb-0"><a href="/login">Sign In</a> / <a href="/register">Register</a></p>
               {% else %}
-              <p class="mb-0">You are logged in as {{ request.user.username |safe}}.</p>
+              <p class="mb-0">You are logged in as {{ request.user.username}}.</p>
               {% endif %}
             </div>
             <div class="side-box text-center">
