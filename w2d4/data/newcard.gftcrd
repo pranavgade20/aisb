@@ -1,0 +1,1 @@
+{"merchant_id": "GPT-4 API Credits", "customer_id": "test@test.com", "total_value": "1", "records": [{"record_type": "amount_change", "amount_added": 2000, "signature": "74891960f9ab25d407967c106ddf4093"}]}
