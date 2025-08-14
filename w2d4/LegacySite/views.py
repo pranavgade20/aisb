@@ -263,6 +263,7 @@ def use_card_view(request):
                     card.used = True
                     card.save()
                 except ObjectDoesNotExist:
+                    context['card_found'] = 'Card was not found'
                     print("No card found with data :)1 =", card_data)
                     card = None
             context['card'] = card
