@@ -833,7 +833,7 @@ def fix_sql_injection_vulnerability():
                         card.used = True
                         card.save()
                     except ObjectDoesNotExist:
-                        print("No card found with data =", card_data)
+                        print("No card found with data :) =", card_data)
                         card = None
                 context['card'] = card
                 return render(request, "use-card.html", context)
@@ -879,7 +879,7 @@ def fix_sql_injection_vulnerability():
                     card.used = True
                     card.save()
                 except ObjectDoesNotExist:
-                    print("No card found with data =", card_data)
+                    print("No card found with data :) =", card_data)
                     card = None
             context['card'] = card
             return render(request, "use-card.html", context) 
@@ -1301,7 +1301,7 @@ def fix_ssrf_vulnerability():
                         card.used = True
                         card.save()
                     except ObjectDoesNotExist:
-                        print("No card found with data =", card_data)
+                        print("No card found with data :) =", card_data)
                         card = None
                 context['card'] = card
                 return render(request, "use-card.html", context)
@@ -1352,7 +1352,7 @@ def fix_ssrf_vulnerability():
                     card.used = True
                     card.save()
                 except ObjectDoesNotExist:
-                    print("No card found with data =", card_data)
+                    print("No card found with data :) =", card_data)
                     card = None
             context['card'] = card
             return render(request, "use-card.html", context)

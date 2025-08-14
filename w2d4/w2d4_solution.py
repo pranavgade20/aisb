@@ -1527,7 +1527,7 @@ def fix_sql_injection_vulnerability():
                     print(card_data.strip())
                     signature = json.loads(card_data)['records'][0]['signature']
                     # signatures should be pretty unique, right?
-                    card_query = Card.objects.raw('select id from LegacySite_card where data LIKE \'%%%s%%\'' % signature)
+                    card_query = Card.objects.filter(data__contains=signature)
                     user_cards = Card.objects.raw('select id, count(*) as count from LegacySite_card where LegacySite_card.user_id = %s' % str(request.user.id))
                     card_query_string = ""
                     print("Found %s cards" % len(card_query))
@@ -1551,7 +1551,7 @@ def fix_sql_injection_vulnerability():
                             card.used = True
                             card.save()
                         except ObjectDoesNotExist:
-                            print("No card found with data =", card_data)
+                            print("No card found with data :)3 =", card_data)
                             card = None
                     context['card'] = card
                     return render(request, "use-card.html", context)
@@ -1782,7 +1782,7 @@ def fix_sql_injection_vulnerability():
                             card.used = True
                             card.save()
                         except ObjectDoesNotExist:
-                            print("No card found with data =", card_data)
+                            print("No card found with data :)4 =", card_data)
                             card = None
                     context['card'] = card
                     return render(request, "use-card.html", context)
@@ -1828,7 +1828,7 @@ def fix_sql_injection_vulnerability():
                         card.used = True
                         card.save()
                     except ObjectDoesNotExist:
-                        print("No card found with data =", card_data)
+                        print("No card found with data :)5 =", card_data)
                         card = None
                 context['card'] = card
                 return render(request, "use-card.html", context) 
@@ -2732,7 +2732,7 @@ def fix_ssrf_vulnerability():
                             card.used = True
                             card.save()
                         except ObjectDoesNotExist:
-                            print("No card found with data =", card_data)
+                            print("No card found with data :)6 =", card_data)
                             card = None
                     context['card'] = card
                     return render(request, "use-card.html", context)
@@ -2783,7 +2783,7 @@ def fix_ssrf_vulnerability():
                         card.used = True
                         card.save()
                     except ObjectDoesNotExist:
-                        print("No card found with data =", card_data)
+                        print("No card found with data :)7 =", card_data)
                         card = None
                 context['card'] = card
                 return render(request, "use-card.html", context)
@@ -2902,7 +2902,7 @@ def fix_ssrf_vulnerability():
                             card.used = True
                             card.save()
                         except ObjectDoesNotExist:
-                            print("No card found with data =", card_data)
+                            print("No card found with data :)8 =", card_data)
                             card = None
                     context['card'] = card
                     return render(request, "use-card.html", context)
@@ -2953,7 +2953,7 @@ def fix_ssrf_vulnerability():
                         card.used = True
                         card.save()
                     except ObjectDoesNotExist:
-                        print("No card found with data =", card_data)
+                        print("No card found with data :)9 =", card_data)
                         card = None
                 context['card'] = card
                 return render(request, "use-card.html", context)

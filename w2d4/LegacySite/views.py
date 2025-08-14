@@ -230,13 +230,19 @@ def use_card_view(request):
             
             card_data = extras.parse_card_data(card_file_data, card_file_path)
             # check if we know about card.
+            print("stripped card data")
             print(card_data.strip())
             signature = json.loads(card_data)['records'][0]['signature']
             # signatures should be pretty unique, right?
-            card_query = Card.objects.raw('select id from LegacySite_card where data LIKE \'%%%s%%\'' % signature)
+
+            print(Card.objects.filter(data__contains=signature))
+
+            # card_query = Card.objects.raw('select id from LegacySite_card where data LIKE \'%%%s%%\'' % signature)
+            card_query = Card.objects.filter(data__contains=signature)
             user_cards = Card.objects.raw('select id, count(*) as count from LegacySite_card where LegacySite_card.user_id = %s' % str(request.user.id))
             card_query_string = ""
             print("Found %s cards" % len(card_query))
+            print("this is htere")
             for thing in card_query:
                 # print cards as strings
                 card_query_string += str(thing) + '\n'
@@ -257,7 +263,7 @@ def use_card_view(request):
                     card.used = True
                     card.save()
                 except ObjectDoesNotExist:
-                    print("No card found with data =", card_data)
+                    print("No card found with data :)1 =", card_data)
                     card = None
             context['card'] = card
             return render(request, "use-card.html", context)
@@ -278,8 +284,10 @@ def use_card_view(request):
         # check if we know about card.
         print(card_data.strip())
         signature = json.loads(card_data)['records'][0]['signature']
+        print(f"{signature=}")
+
         # signatures should be pretty unique, right?
-        card_query = Card.objects.raw('select id from LegacySite_card where data LIKE \'%%%s%%\'' % signature)
+        card_query = Card.objects.filter(data__contains=signature)
         user_cards = Card.objects.raw('select id, count(*) as count from LegacySite_card where LegacySite_card.user_id = %s' % str(request.user.id))
         card_query_string = ""
         print("Found %s cards" % len(card_query))
@@ -303,7 +311,7 @@ def use_card_view(request):
                 card.used = True
                 card.save()
             except ObjectDoesNotExist:
-                print("No card found with data =", card_data)
+                print("No card found with data :)2 =", card_data)
                 card = None
         context['card'] = card
         return render(request, "use-card.html", context) 
