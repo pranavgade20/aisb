@@ -23,7 +23,7 @@ SECRET_KEY = "kmgysa#fz+9(z1*=c0ydrjizk*7sthm2ga1z4=^61$cxcq8b$l"
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.0.47", "localhost"]
 
 
 # Application definition
@@ -46,7 +46,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "django.middleware.csrf.CsrfViewMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
 ]
 
 
@@ -148,4 +148,4 @@ SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_HTTPONLY = False
 
 SESSION_COOKIE_SAMESITE = "Strict"
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False

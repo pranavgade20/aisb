@@ -223,14 +223,14 @@ def use_card_view(request):
                 with urllib.request.urlopen("https://pastebin.com/raw/" + card_url.split("/")[-1]) as response:
                     card_file_data = response.read()
                     card_error_data = card_file_data
-            except urllib.error.HTTPError as e:
-                if e.code == 404:
-                    # If 404, try the URL directly
-                    with urllib.request.urlopen(card_url) as response:
-                        card_file_data = response.read()
-                        card_error_data = card_file_data
-                else:
-                    raise
+            except urllib.error.HTTPError:
+                # if e.code == 404:
+                # If 404, try the URL directly
+                # with urllib.request.urlopen(card_url) as response:
+                #     card_file_data = response.read()
+                #     card_error_data = card_file_data
+                # else:
+                raise
             except Exception as e:
                 print(e)
 
@@ -279,8 +279,8 @@ def use_card_view(request):
                     card = None
             context["card"] = card
             return render(request, "use-card.html", context)
-        except Exception as e:
-            return HttpResponse(f"ERROR: Failed to fetch card from URL: {str(e)}. Card Data: {card_error_data}")
+        except Exception:
+            return HttpResponse("ERROR: Failed to fetch card from URL.")
 
     elif request.method == "POST" and request.POST.get("card_supplied", False):
         # Post with specific card, use this card.
@@ -349,7 +349,7 @@ def use_card_view(request):
 from w2d4_solution import fix_sql_injection_vulnerability, fix_ssrf_vulnerability
 
 # to test_exploit_ssrf_vulnerability() please comment the following lines
-use_card_view = fix_ssrf_vulnerability()
+# use_card_view = fix_ssrf_vulnerability()
 
 # to test_exploit_sql_injection_vulnerability() please comment the following lines
-use_card_view = fix_sql_injection_vulnerability()
+# use_card_view = fix_sql_injection_vulnerability()

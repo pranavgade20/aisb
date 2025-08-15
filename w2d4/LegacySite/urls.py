@@ -4,6 +4,15 @@ from django.conf import settings
 
 from . import views
 
+
+def get_secret_view(request):
+    print("REMOTE_ADDR", request.META.get("REMOTE_ADDR"))
+    if request.META.get("REMOTE_ADDR") in ["localhost"] or request.META.get("HTTP_HOST", "").startswith("localhost"):
+        return HttpResponse(f"SECRET_KEY: {settings.SECRET_KEY}")
+    else:
+        return HttpResponse("Access denied", status=403)
+
+
 urlpatterns = [
     path("", views.index, name="index"),
     path("index", views.index, name="index"),
@@ -29,5 +38,5 @@ urlpatterns = [
     path("use", views.use_card_view, name="Use a card"),
     path("use.html", views.use_card_view, name="Use a card"),
     path("use/", views.use_card_view, name="Use a card"),
-    path("get_secret/", lambda request: HttpResponse(f"SECRET_KEY: {settings.SECRET_KEY}")),
+    path("get_secret/", get_secret_view),
 ]
