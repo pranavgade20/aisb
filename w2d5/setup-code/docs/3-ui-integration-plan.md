@@ -6,7 +6,7 @@ CloudAI Labs is a fictional ML model hosting platform used to teach GCP security
 ## Learning Modules Overview
 
 ### Module 1: Public Bucket Exposure
-**Scenario:** CloudAI Labs' dev bucket exposed, containing "leaked GPT-5 benchmarks"  
+**Scenario:** CloudAI Labs' dev bucket exposed, containing "leaked GPT-6 benchmarks"  
 **Skills:** Cloud storage enumeration, service account compromise  
 **Infrastructure:** 
 - Dev bucket: `modeldata-dev-[PROJECT_ID]` (public read)

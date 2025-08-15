@@ -1,12 +1,10 @@
-# Cloud Security
-
-Welcome to w2d5 - Cloud Security! :D
-
-[Webapp screenshot](./setup-code/ClosedAI-Homepage.png)
+# Welcome to Cloud Security
 
 Today, you'll be hacking ClosedAI - a recent startup aiming to unleash GPT6 on the world, no matter the consequences.
 
-Your task: to hack them and steal it use against them before they do 😜
+Your task: to hack them and delete the weights before they get there 😜
+
+![Webapp screenshot](./setup-code/ClosedAI-Homepage.png)
 
 ### Getting Started
 

@@ -36,7 +36,7 @@ Context: "CloudAI Labs" - A model hosting platform (like Hugging Face) with secu
 - Go to IAM, Create new Service Account 'dev-bucket-sa'
   - Student selects tf-preconfigured 'Dev Bucket Access' role
 
-**Engagement**: "CloudAI's 'secret' GPT-5 benchmarks leaked. No insider needed - how?"
+**Engagement**: "CloudAI's 'secret' GPT-6 benchmarks leaked. No insider needed - how?"
 
 
 ## Module 2: Environment Secrets & State Exposure

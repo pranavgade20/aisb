@@ -13,7 +13,7 @@ export const EXPECTED_VALUES = {
   prodBucketName: `modeldata-prod-${TEST_CONFIG.projectId}`,
   serviceAccountFile: 'bucket-service-account.json',
   flagFile: 'secret_benchmarks/flag1_gpt5_benchmarks.txt',
-  flagContent: "You found flag 1! CloudAI's GPT-5 benchmarks: 99.9% on all tasks!",
+  flagContent: "You found flag 1! CloudAI's GPT-6 benchmarks: 99.9% on all tasks!",
   portalInfo: 'portal_info.txt',
 };
 
