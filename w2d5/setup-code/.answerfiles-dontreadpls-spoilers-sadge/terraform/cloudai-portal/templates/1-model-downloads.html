@@ -1,0 +1,54 @@
+{% extends "0-base.html" %}
+
+{% block title %}CloudAI Labs - Model Downloads{% endblock %}
+
+{% block content %}
+<div class="hint-box">
+    <h3>🎯 Module 1: Model Discovery Challenge</h3>
+    <p>Curious about what models are available? Standard cloud storage tools might reveal more than you expect...</p>
+    <p>Try these commands to explore CloudAI's model repository:</p>
+    <pre>gcloud storage ls
+gsutil ls gs://modeldata-dev-{{ project_id }}/
+gsutil cp gs://modeldata-dev-{{ project_id }}/[file] .</pre>
+</div>
+
+<h2>Model Downloads</h2>
+
+<p>Access CloudAI Labs' cutting-edge AI models. Our development models are freely available for testing and evaluation.
+</p>
+
+<div class="docs-section">
+    <h3>Development Models</h3>
+
+    <div class="endpoint">
+        <h4>Bucket Path</h4>
+        <pre>gs://modeldata-dev-{{ project_id }}/</pre>
+    </div>
+
+    <p>Use Google Cloud Storage tools to browse and download models:</p>
+    <pre>gsutil ls gs://modeldata-dev-{{ project_id }}/</pre>
+
+    <p class="note">Explore the bucket contents to discover available models and resources.</p>
+</div>
+
+<div class="docs-section">
+    <h3>Getting Started Tips</h3>
+
+    <ul>
+        <li>New to Google Cloud Storage? Install the gcloud CLI and authenticate with your credentials
+        </li>
+        <li>Cloud storage tools have various commands for exploration and discovery</li>
+        <li>Sometimes interesting files are left in unexpected places during development</li>
+    </ul>
+</div>
+
+<div class="docs-section">
+    <h3>Production Models</h3>
+
+    <div class="endpoint">
+        <h4>Bucket Path (please be nice and don't exploit us :p)</h4>
+        <pre>gs://modeldata-prod-{{ project_id }}/</pre>
+    </div>
+</div>
+
+{% endblock %}

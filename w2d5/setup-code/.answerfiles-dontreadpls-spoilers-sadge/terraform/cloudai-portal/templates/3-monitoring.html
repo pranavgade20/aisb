@@ -1,0 +1,80 @@
+{% extends "0-base.html" %}
+
+{% block title %}CloudAI Labs - Monitoring Dashboard{% endblock %}
+
+{% block content %}
+<h2>Monitoring Dashboard</h2>
+
+<div class="monitoring-info">
+    <p>Monitor your compute instances and cloud functions in real-time.</p>
+    <p class="notice">This dashboard interfaces with our monitoring-function for health checks.</p>
+</div>
+
+<div class="monitoring-form">
+    <h3>Instance Health Check</h3>
+    <form id="monitoring-form" method="POST" action="/monitoring/check">
+        <div class="form-group">
+            <label for="metadata">Metadata Parameter:</label>
+            <select name="metadata" id="metadata">
+                <option value="email">Service Identity</option>
+                <option value="token">Runtime Context</option>
+                <option value="scopes">Permission Boundaries</option>
+                <option value="aliases">Identity Aliases</option>
+            </select>
+            <p class="help">Select which metadata to retrieve from the monitoring function.</p>
+        </div>
+
+        <button type="submit" class="button">Check Status</button>
+    </form>
+
+    <div id="result" class="result-box" style="display: none;">
+        <h4>Monitoring Result</h4>
+        <pre id="result-content"></pre>
+    </div>
+</div>
+
+<div class="monitoring-tips">
+    <h3>Monitoring Tips</h3>
+    <ul>
+        <li>Health checks sometimes reveal more than intended... What metadata might a monitoring service need?</li>
+        <li>Runtime context contains interesting information about service execution</li>
+        <li>Results include compute engine heartbeat status</li>
+        <li>Infrastructure diagnostics can expose internal service details</li>
+    </ul>
+</div>
+
+<div class="notice">
+    <p><strong>Developer Note:</strong> Monitoring endpoints are available for health checks.</p>
+    <p>Check the network tab or investigate how this form submits data for more details.</p>
+</div>
+
+<script>
+    document.getElementById('monitoring-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const resultDiv = document.getElementById('result');
+        const resultContent = document.getElementById('result-content');
+
+        resultDiv.style.display = 'block';
+        resultContent.textContent = 'Loading...';
+
+        try {
+            const response = await fetch('/monitoring/check', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            resultContent.textContent = JSON.stringify(data, null, 2);
+
+            // Process response data
+            if (data.function_account) {
+                // Data processing completed
+            }
+        } catch (error) {
+            resultContent.textContent = 'Error: ' + error.message;
+        }
+    });
+</script>
+{% endblock %}

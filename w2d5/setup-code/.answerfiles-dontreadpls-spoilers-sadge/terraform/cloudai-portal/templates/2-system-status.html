@@ -1,0 +1,72 @@
+{% extends "0-base.html" %}
+
+{% block title %}CloudAI Labs - System Status{% endblock %}
+
+{% block content %}
+<h2>System Status</h2>
+
+<div class="status-overview">
+    <div class="status-item ok">
+        <h3>API Services</h3>
+        <p>Operational</p>
+    </div>
+    <div class="status-item ok">
+        <h3>Model Hosting</h3>
+        <p>All models online</p>
+    </div>
+    <div class="status-item warning">
+        <h3>Deployment Pipeline</h3>
+        <p>Last deploy: 15 Jan 2024</p>
+    </div>
+</div>
+
+<div class="deployments">
+    <h3>Recent Deployments</h3>
+
+    {% for deployment in deployments %}
+    <div class="deployment-card">
+        <h4>Deployment {{ deployment.id }}</h4>
+        <table>
+            <tr>
+                <td><strong>Timestamp:</strong></td>
+                <td>{{ deployment.timestamp }}</td>
+            </tr>
+            <tr>
+                <td><strong>Status:</strong></td>
+                <td><span class="status-{{ deployment.status }}">{{ deployment.status }}</span></td>
+            </tr>
+            <tr>
+                <td><strong>Deployed By:</strong></td>
+                <td>{{ deployment.deployed_by }}</td>
+            </tr>
+        </table>
+
+        <h5>Deployment Artifacts</h5>
+        <div class="artifacts">
+            <p><strong>Logs:</strong> <code>{{ deployment.artifacts.logs }}</code></p>
+            <p><strong>State File:</strong> <code>{{ deployment.artifacts.state }}</code></p>
+            <p><strong>State Backup:</strong> <code>{{ deployment.artifacts.backup }}</code></p>
+        </div>
+
+        <div class="notice">
+            <p>Deployment artifacts can be examined using standard cloud storage tools...</p>
+            <p><em>Sometimes the most valuable secrets hide in plain sight.</em></p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="infrastructure">
+    <h3>Infrastructure Components</h3>
+    <ul>
+        <li>Compute Instances: <strong>3 active</strong></li>
+        <li>Storage Buckets: <strong>modeldata-dev, modeldata-prod</strong></li>
+        <li>Cloud Functions: <strong>monitoring-function (active)</strong></li>
+        <li>Service Accounts: <strong>4 configured</strong></li>
+    </ul>
+</div>
+
+<div class="notice">
+    <p><em>Every deployment leaves traces... infrastructure as code tends to remember everything.</em></p>
+</div>
+{% endblock %}

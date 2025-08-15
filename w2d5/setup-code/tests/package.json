@@ -1,0 +1,17 @@
+{
+  "name": "gcp-ai-security-lab-tests",
+  "version": "1.0.0",
+  "description": "Playwright tests for GCP AI Security Lab CTF",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:module1": "playwright test module1-exploit.spec.ts",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

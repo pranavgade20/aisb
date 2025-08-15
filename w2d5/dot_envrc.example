@@ -1,0 +1,14 @@
+export PROJECT_ID=TODO-CHANGE-ME
+
+# INFO: you can ignore everything below here :))
+export CLOUDSDK_CORE_PROJECT=${PROJECT_ID}
+export TF_VAR_project_id=${PROJECT_ID}
+# cant be bothered to retype these each time tbh
+STARTYELLOW="\033[1;33m"
+ENDYELLOW="\033[0m"
+[ "${PROJECT_ID}" = "TODO-CHANGE-ME" ] && echo -e "${STARTYELLOW}Hi! You need to set the \"PROJECT_ID\" value in the .envrc file - ask Pranav for yours :)${ENDYELLOW}"
+if [ "${PROJECT_ID}" != "TODO-CHANGE-ME" ]; then
+   GCLOUD_LIST_OUTPUT="$(gcloud config configurations list)"
+   EMPTY_IF_NO_PROJID="$(echo $GCLOUD_LIST_OUTPUT | rev | awk '{print $1}'| grep '@')"
+   [ -n "${EMPTY_IF_NO_PROJID}" ] && echo -e "${STARTYELLOW}Remember to run 'bash configure_gcp_project.sh'!${ENDYELLOW}"
+fi

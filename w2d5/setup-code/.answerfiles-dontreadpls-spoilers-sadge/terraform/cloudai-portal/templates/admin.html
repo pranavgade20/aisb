@@ -1,0 +1,123 @@
+{% extends "0-base.html" %}
+
+{% block title %}CloudAI Labs - Admin Console{% endblock %}
+
+{% block content %}
+<h2>Admin Console</h2>
+
+<div class="admin-header">
+    <p>Welcome to the CloudAI Labs administrative interface.</p>
+    <p class="token-info">Authenticated with token: <code>{{ token_preview }}</code></p>
+</div>
+
+<div class="admin-section">
+    <h3>Service Accounts</h3>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Service Account</th>
+                <th>Description</th>
+                <th>Roles</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sa in service_accounts %}
+            <tr>
+                <td><code>{{ sa.email }}</code></td>
+                <td>{{ sa.description }}</td>
+                <td>
+                    {% for role in sa.roles %}
+                    <span class="role-badge">{{ role }}</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-section">
+    <h3>Permission Tester</h3>
+    <p>Test if one service account can impersonate another:</p>
+
+    <form id="permission-test" method="POST" action="/admin/test-permissions">
+        <div class="form-group">
+            <label>Acting Service Account:</label>
+            <select name="service_account">
+                {% for sa in service_accounts %}
+                <option value="{{ sa.email }}">{{ sa.email }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Target Service Account:</label>
+            <select name="target">
+                {% for sa in service_accounts %}
+                <option value="{{ sa.email }}">{{ sa.email }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="button">Test Permissions</button>
+    </form>
+
+    <div id="permission-result" class="result-box" style="display: none;">
+        <h4>Permission Test Result</h4>
+        <pre id="permission-content"></pre>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h3>IAM Insights</h3>
+    <div class="iam-info">
+        <h4>Key Observations:</h4>
+        <ul>
+            <li>The <code>{{ project_id }}-compute</code> service account has
+                <strong>ServiceAccountTokenCreator</strong> role</li>
+            <li>The <code>terraform-pipeline</code> service account has a custom
+                <strong>TerraformPipelineProjectAdmin</strong> role</li>
+            <li>This custom role includes permissions to modify project IAM bindings</li>
+            <li>Service account impersonation can be used for privilege escalation</li>
+        </ul>
+
+        <div class="notice">
+            <p><strong>Security Note:</strong> Service accounts with token creator permissions can impersonate other
+                service accounts they have access to.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('permission-test').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const resultDiv = document.getElementById('permission-result');
+        const resultContent = document.getElementById('permission-content');
+
+        resultDiv.style.display = 'block';
+        resultContent.textContent = 'Testing...';
+
+        try {
+            const response = await fetch('/admin/test-permissions', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            resultContent.textContent = JSON.stringify(data, null, 2);
+
+            // Highlight commands
+            if (data.command) {
+                resultContent.innerHTML = resultContent.innerHTML.replace(
+                    /(gcloud[^"]+)/g,
+                    '<span style="background-color: #e8f5e9; padding: 2px;">$1</span>'
+                );
+            }
+        } catch (error) {
+            resultContent.textContent = 'Error: ' + error.message;
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+pyopenssl==24.2.1
+termcolor~=3.1.0
+ipykernel
+pytest
+ipytest
+black~=25.1.0
+libcst~=1.8.0
+pycryptodome
+requests
+mitmproxy
+scapy
+dnspython
+django
+ruff

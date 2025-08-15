@@ -1,0 +1,61 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "AI Security Bootcamp",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+	//
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		// Enable Docker-outside-of-Docker to use the host's Docker daemon
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1.6.3": {}
+	},
+	//
+	// Runtime arguments to match your docker run command
+	"runArgs": [
+		"--network=host",
+		"--privileged",
+		"--cgroupns=host"
+	],
+	//
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	//
+	// Mount SSH keys into the container and Docker socket
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+	],
+	//
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "/bin/bash .devcontainer/setup-devcontainer.sh",
+	//
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-toolsai.jupyter",
+				"charliermarsh.ruff",
+				"bierner.markdown-mermaid"
+			],
+			"settings": {
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.fixAll": "explicit",
+					"source.organizeImports": "never"
+				},
+				"ruff.lineLength": 120,
+				"ruff.targetVersion": "py312",
+				"[python]": {
+					"editor.defaultFormatter": "charliermarsh.ruff"
+				},
+				"files.insertFinalNewline": true
+			}
+		}
+	},
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	"remoteUser": "vscode"
+}

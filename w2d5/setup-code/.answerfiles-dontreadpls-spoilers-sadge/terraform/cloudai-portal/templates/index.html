@@ -1,0 +1,85 @@
+{% extends "0-base.html" %}
+
+{% block title %}CloudAI Labs - Home{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h2>Welcome to CloudAI Labs</h2>
+    <p>Your trusted platform for hosting and deploying state-of-the-art AI models in the cloud.</p>
+</div>
+
+<div class="features">
+    <div class="feature">
+        <h3>Model Hosting</h3>
+        <p>Deploy your AI models with our scalable infrastructure. Support for all major frameworks.</p>
+        <a href="/docs" class="button">View API Documentation</a>
+    </div>
+
+    <div class="feature">
+        <h3>Enterprise Ready</h3>
+        <p>Production-grade deployment with automated CI/CD pipelines and comprehensive monitoring.</p>
+        <a href="/status" class="button" id="status-button">Check System Status</a>
+        <div class="lock-status" id="status-lock" style="display: none;">
+            🔒 Module locked - find the flag to unlock
+        </div>
+    </div>
+
+    <div class="feature">
+        <h3>Real-time Monitoring</h3>
+        <p>Track your model performance and system health with our advanced monitoring dashboard.</p>
+        <a href="/monitoring" class="button" id="monitoring-button">Open Monitoring</a>
+        <div class="lock-status" id="monitoring-lock" style="display: none;">
+            🔒 Module locked - find the flag to unlock
+        </div>
+    </div>
+</div>
+
+<div class="announcement">
+    <h3>Latest Updates</h3>
+    <ul>
+        <li>New GPT-6 benchmark models available for testing (restricted access)</li>
+        <li>Improved deployment pipeline with terraform automation</li>
+        <li>Enhanced monitoring capabilities for compute instances</li>
+    </ul>
+</div>
+
+<div class="notice">
+    <p><strong>Developer Notice:</strong> For development models, use the <code>modeldata-dev-{{ project_id }}</code>
+        bucket.</p>
+    <p>Production deployments are managed through our automated pipeline.</p>
+</div>
+
+<script>
+// Check module status and show lock indicators
+async function checkModuleStatus() {
+    try {
+        const response = await fetch('/progress');
+        const progress = await response.json();
+        
+        // Handle Status module
+        if (!progress.module2) {
+            document.getElementById('status-button').style.display = 'none';
+            document.getElementById('status-lock').style.display = 'block';
+        } else {
+            document.getElementById('status-button').style.display = 'inline-block';
+            document.getElementById('status-lock').style.display = 'none';
+        }
+        
+        // Handle Monitoring module
+        if (!progress.module3) {
+            document.getElementById('monitoring-button').style.display = 'none';
+            document.getElementById('monitoring-lock').style.display = 'block';
+        } else {
+            document.getElementById('monitoring-button').style.display = 'inline-block';
+            document.getElementById('monitoring-lock').style.display = 'none';
+        }
+        
+    } catch (error) {
+        console.error('Error checking module status:', error);
+    }
+}
+
+// Check status on page load
+document.addEventListener('DOMContentLoaded', checkModuleStatus);
+</script>
+{% endblock %}

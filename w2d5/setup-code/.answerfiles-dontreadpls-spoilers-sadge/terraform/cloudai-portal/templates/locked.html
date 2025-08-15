@@ -1,0 +1,99 @@
+{% extends "0-base.html" %}
+
+{% block title %}{{ module_name }} - Locked{% endblock %}
+
+{% block content %}
+<div class="locked-container">
+    <div class="locked-header">
+        <div class="lock-icon">🔒</div>
+        <h2>{{ module_name }} - Module {{ module_num }}</h2>
+        <p class="locked-message">This module is currently locked. Submit the correct flag to gain access.</p>
+    </div>
+
+    <div class="hint-box">
+        <h3>Hint:</h3>
+        <p>{{ hint }}</p>
+    </div>
+
+    <div class="flag-form">
+        <form id="flagForm">
+            <div class="form-group">
+                <label for="flag">Enter Flag:</label>
+                <input type="text" id="flag" name="flag" placeholder="flag{...}" required>
+            </div>
+            <button type="submit" class="button">Submit Flag</button>
+        </form>
+    </div>
+
+    <div id="message" class="message-box" style="display: none;"></div>
+</div>
+
+<script>
+document.getElementById('flagForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const messageDiv = document.getElementById('message');
+    
+    try {
+        const response = await fetch('/submit-flag', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            messageDiv.className = 'message-box success-message';
+            messageDiv.textContent = data.message;
+            messageDiv.style.display = 'block';
+            
+            // Auto-reload after 2 seconds on success
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            messageDiv.className = 'message-box error-message';
+            messageDiv.textContent = data.message;
+            messageDiv.style.display = 'block';
+        }
+    } catch (error) {
+        messageDiv.className = 'message-box error-message';
+        messageDiv.textContent = 'Error submitting flag. Please try again.';
+        messageDiv.style.display = 'block';
+    }
+});
+
+// Check progress periodically
+async function checkProgress() {
+    try {
+        const response = await fetch('/progress');
+        const progress = await response.json();
+        
+        // Update navigation based on progress
+        updateNavigation(progress);
+    } catch (error) {
+        console.error('Error checking progress:', error);
+    }
+}
+
+function updateNavigation(progress) {
+    const navLinks = document.querySelectorAll('nav a');
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === '/status' && !progress.module2) {
+            link.classList.add('locked-nav');
+        } else if (href === '/monitoring' && !progress.module3) {
+            link.classList.add('locked-nav');
+        } else if (href === '/admin' && !progress.module4) {
+            link.classList.add('locked-nav');
+        } else {
+            link.classList.remove('locked-nav');
+        }
+    });
+}
+
+// Check progress on page load
+checkProgress();
+</script>
+{% endblock %}
