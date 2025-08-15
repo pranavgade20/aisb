@@ -106,6 +106,24 @@ def submit_flag():
             'message': 'Correct! Module 3 (Monitoring) is now unlocked.',
             'module_unlocked': 3
         })
+
+    # Check FLAG3 (unlocks module 4)
+    elif submitted_flag == FLAGS['FLAG3']:
+        unlock_module(4)
+        return jsonify({
+            'success': True,
+            'message': 'Correct! Module 4 (Admin) is now unlocked.',
+            'module_unlocked': 4
+        })
+
+    # Check FLAG4 (unlocks module 5)
+    elif submitted_flag == FLAGS['FLAG4']:
+        unlock_module(5)
+        return jsonify({
+            'success': True,
+            'message': 'Correct! Module 5 (gpt6) is now unlocked.',
+            'module_unlocked': 5
+        })
     
     else:
         return jsonify({
