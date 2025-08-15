@@ -28,7 +28,7 @@ from django.test import Client
 from django.conf import settings
 from django.test import Client
 from django.conf import settings
-from django.contrib.auth.models import User
+from LegacySite.models import User
 import re
 import os
 import re
@@ -39,7 +39,7 @@ from django.conf import settings
 from django.template import engines
 from django.test import Client
 from django.conf import settings
-from django.contrib.auth.models import User
+from LegacySite.models import User
 import tempfile
 import json
 import os
@@ -55,7 +55,7 @@ import importlib
 from LegacySite import views
 from django.test import Client
 from django.conf import settings
-from django.contrib.auth.models import User
+from LegacySite.models import User
 import json
 from binascii import hexlify
 from hashlib import sha256
@@ -72,7 +72,7 @@ import importlib
 from LegacySite import views
 from django.test import Client
 from django.conf import settings
-from django.contrib.auth.models import User
+from LegacySite.models import User
 import re
 import tempfile
 import json
@@ -267,7 +267,7 @@ def test_exploit_csrf_vulnerability(exploit_csrf_vulnerability):
         def register_user(client, username, password):
             # Check if user already exists
             try:
-                from django.contrib.auth.models import User
+                from LegacySite.models import User
                 existing_user = User.objects.get(username=username)
                 print(f"User '{username}' already exists, skipping registration")
                 can_login = client.login(username=username, password=password)
@@ -567,7 +567,7 @@ def test_exploit_sql_injection_vulnerability(exploit_sql_injection_vulnerability
         # Register and login test user
         def register_user(client, username, password):
             try:
-                from django.contrib.auth.models import User
+                from LegacySite.models import User
                 existing_user = User.objects.get(username=username)
                 print(f"User '{username}' already exists, skipping registration")
                 can_login = client.login(username=username, password=password)
@@ -779,7 +779,7 @@ def test_exploit_cmd_injection_vulnerability(exploit_cmd_injection_vulnerability
         # Register and login test user
         def register_user(client, username, password):
             try:
-                from django.contrib.auth.models import User
+                from LegacySite.models import User
                 existing_user = User.objects.get(username=username)
                 print(f"User '{username}' already exists, skipping registration")
                 can_login = client.login(username=username, password=password)
@@ -1003,7 +1003,7 @@ def test_exploit_ssrf_vulnerability(exploit_ssrf_vulnerability):
         # Register and login test user
         def register_user(client, username, password):
             try:
-                from django.contrib.auth.models import User
+                from LegacySite.models import User
                 existing_user = User.objects.get(username=username)
                 print(f"User '{username}' already exists, skipping registration")
                 can_login = client.login(username=username, password=password)
