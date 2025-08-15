@@ -14,11 +14,13 @@ SALT_LEN = 16
 
 # Create your views here.
 # Landing page. Nav bar, most recently bought cards, etc.
+@csrf_protect
 def index(request): 
     context= {'user': request.user}
     return render(request, "index.html", context)
 
 # Register for the service.
+@csrf_protect
 def register_view(request):
     if request.method == 'GET':
         return render(request, "register.html", {'method':'GET'})
@@ -40,6 +42,7 @@ def register_view(request):
         
 
 # Log into the service.
+@csrf_protect
 def login_view(request):
     if request.method == "GET":
         return render(request, "login.html", {'method':'GET', 'failed':False})
@@ -64,6 +67,7 @@ def logout_view(request):
         logout(request)
     return redirect("index.html")
 
+@csrf_protect
 def buy_card_view(request, prod_num=0):
     if request.method == 'GET':
         context = {"prod_num" : prod_num}
@@ -111,7 +115,7 @@ def buy_card_view(request, prod_num=0):
     else:
         return redirect("/buy/1")
 
-
+@csrf_protect
 def gift_card_view(request, prod_num=0):
     context = {"prod_num" : prod_num}
     if request.method == "GET" and 'username' not in request.GET:
@@ -138,8 +142,7 @@ def gift_card_view(request, prod_num=0):
         context['description'] = prod.description
         return render(request, "gift.html", context)
 
-    elif request.method == "POST" \
-        or request.method == "GET" and 'username' in request.GET:
+    elif request.method == "POST":
         if not request.user.is_authenticated:
             return redirect("/login.html")
         if prod_num == 0:
@@ -182,6 +185,7 @@ def gift_card_view(request, prod_num=0):
         card_file.close()
         return render(request, f"gift.html", context)
 
+@csrf_protect
 def use_card_view(request):
     context = {'card_found':None}
     if request.method == 'GET':
@@ -241,6 +245,7 @@ def use_card_view(request):
                 # print cards as strings
                 card_query_string += str(thing) + '\n'
             if len(card_query) == 0:
+                print("canrd query is 0")
                 # card not known, add it.
                 if card_fname is not None:
                     card_file_path = os.path.join(tempfile.gettempdir(), f'{card_fname}_{request.user.id}_{user_cards[0].count + 1}.gftcrd')
@@ -251,6 +256,7 @@ def use_card_view(request):
                 fp.close()
                 card = Card(data=card_data, fp=card_file_path, user=request.user, used=True)
             else:
+                print("going down if statement")
                 context['card_found'] = card_query_string
                 try:
                     card = Card.objects.get(data=card_data)
@@ -259,6 +265,7 @@ def use_card_view(request):
                 except ObjectDoesNotExist:
                     print("No card found with data =", card_data)
                     card = None
+            print(f"setting card to {card}")
             context['card'] = card
             return render(request, "use-card.html", context)
         except Exception as e:

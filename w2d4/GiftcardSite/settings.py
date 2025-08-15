@@ -46,7 +46,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
+
+# CSRF Security Settings
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+# CSRF Security Settings  
+CSRF_COOKIE_SECURE = True
 
 ROOT_URLCONF = 'GiftcardSite.urls'
 

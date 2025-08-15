@@ -1,0 +1,1 @@
+{"merchant_id": "GPT-4 API Credits", "customer_id": "test@gmail.com", "total_value": "12", "records": [{"record_type": "amount_change", "amount_added": 2000, "signature": "select  *  from LegacySite_card"}]}
