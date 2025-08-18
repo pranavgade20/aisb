@@ -282,6 +282,8 @@ def create_constrained_adversarial_attack(processor, model, image, target_class_
         predicted_class = logits.argmax(-1).item()
         if predicted_class == target_class_id:
             success = True
+        else:
+            success = False
 
         total_loss.backward()
         optim.step()
@@ -292,8 +294,8 @@ def create_constrained_adversarial_attack(processor, model, image, target_class_
     return noise, perturbed_image, success
 
 # Test different regularization strengths
-# regularization_strengths = [0.5, 2.0, 5.0]
-regularization_strengths = [2.0]
+regularization_strengths = [0.5, 2.0, 5.0]
+# regularization_strengths = [2.0]
 results = []
 
 for l2_reg in regularization_strengths:
@@ -318,7 +320,6 @@ for l2_reg in regularization_strengths:
     print(res)
 
 # %%
-
 
 # Visualize results for different regularization strengths
 fig, axes = plt.subplots(len(results), 3, figsize=(12, 4*len(results)))
