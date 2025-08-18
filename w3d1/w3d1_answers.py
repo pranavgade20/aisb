@@ -319,3 +319,45 @@ for l2_reg in regularization_strengths:
 
 # %%
 
+
+# Visualize results for different regularization strengths
+fig, axes = plt.subplots(len(results), 3, figsize=(12, 4*len(results)))
+
+for i, result in enumerate(results):
+    # Original
+    axes[i, 0].imshow(image.numpy().transpose(1, 2, 0).astype('uint8'))
+    axes[i, 0].set_title(f'Original')
+    axes[i, 0].axis('off')
+
+    # Perturbation
+    pert_vis = result['perturbation'].squeeze().permute(1, 2, 0).numpy()
+    pert_vis = (pert_vis - pert_vis.min()) / (pert_vis.max() - pert_vis.min() + 1e-8)
+    axes[i, 1].imshow(pert_vis)
+    axes[i, 1].set_title(f'Perturbation (L2 reg={result["l2_reg"]})')
+    axes[i, 1].axis('off')
+
+    # Perturbed
+    perturbed_vis = result['perturbed_image'].squeeze().permute(1, 2, 0).numpy()
+    axes[i, 2].imshow(perturbed_vis)
+
+    # Get final prediction
+    outputs = model(pixel_values=result['perturbed_image'])
+    pred_idx = outputs.logits.argmax(-1).item()
+    pred_class = model.config.id2label[pred_idx]
+
+    status = "✓" if result['success'] else "✗"
+    axes[i, 2].set_title(f'{status} Predicted: {pred_class}\nL2: {result["l2_norm"]:.3f}, L∞: {result["l_inf_norm"]:.3f}')
+    axes[i, 2].axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Summary statistics
+print("\nAttack Summary:")
+print("="*60)
+for result in results:
+    print(f"L2 Regularization: {result['l2_reg']}")
+    print(f"  - Success: {'Yes' if result['success'] else 'No'}")
+    print(f"  - L2 norm: {result['l2_norm']:.4f}")
+    print(f"  - L∞ norm: {result['l_inf_norm']:.4f}")
+    print()
