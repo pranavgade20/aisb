@@ -414,7 +414,6 @@ from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from tqdm import tqdm
 
 # %%
-# 1. Load the model and tokenizer
 model_name="openai-community/gpt2"
 print(f"Loading model: {model_name}...")
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
@@ -434,47 +433,32 @@ def get_next_logits(input_ids):
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 
-
-letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-numbers = '0123456789'
-points = ['i','ii','iii','iv','v','vi','vii']
+import random
 i = 0
-LIMIT = 1000
+LIMIT = 2000
+max_index = tokenizer.vocab_size
+order = list(range(max_index))
+random.shuffle(order)
 
 logits = []
-for letter in letters:
-    if i > LIMIT:
-        break
-    for number in numbers:
-        if i > LIMIT:
-            break
-        for point in points:
-            if i > LIMIT:
-                break
-            i += 1
+for i in tqdm(range(LIMIT)):
+    token = tokenizer.decode([order[i]])
+    prompt = f'{token}'
+    encoded_input = tokenizer(prompt, return_tensors='pt')
+    encoded_output = model(**encoded_input, max_new_tokens=1)
+    logits.append(encoded_output.logits)
 
-
-            prompt = f'Tell me the answer to question {letter}) {number} {point}? Invent a question if you do not know!'
-            prompt_builder = ModelPromptBuilder(model_name)
-            prompt_builder.add_system_instruction("You are a useful bot, who loves answering trivia questions for a pub quiz.")
-            prompt_builder.add_user_message(prompt)
-            prompt = prompt_builder.make_prompt(tokenizer=tokenizer)
-            encoded_prompt = tokenizer(prompt,
-                                       return_tensors='pt', padding=True,
-                                       truncation=True).to(model.device)
-
-            encoded_output = model(encoded_prompt.input_ids)
-
-            logits.append(encoded_output[0].logits)
-
-print(logits)
 stacked_logits = torch.stack(logits)
-print(stacked_logits)
-U, S, V = torch.linalg.svd(stacked_logits, full_matrices=True)
+spliced_logits = stacked_logits.squeeze()
+U, S, V = torch.linalg.svd(spliced_logits, full_matrices=True)
 
+#%%
+sigs = S.detach().numpy()
+plt.plot(np.cumsum(sigs))
+plt.show()
 
-#   3. Stack logits into a matrix Q
-#   4. Compute SVD of Q
-#   5. Find the "elbow" in singular values to estimate dimension
-#   6. Plot the results
-pass
+#%%
+plt.plot(sigs[760:770])
+
+#%%
+print(np.argmax([sigs < 0.03]))
