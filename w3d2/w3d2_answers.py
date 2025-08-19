@@ -123,7 +123,7 @@ def part3():
 
 # %%
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM
 import torch
 
 
@@ -407,7 +407,6 @@ def part6():
 
 #%%
 
-import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
@@ -462,3 +461,88 @@ plt.plot(sigs[760:770])
 
 #%%
 print(np.argmax([sigs < 0.03]))
+
+# %%
+U, S, Vt = torch.linalg.svd(spliced_logits.T, full_matrices=True)
+# 4. Use detected dimension to extract U_h and Sigma_h
+h_dim = 768
+U_h = U[:, :h_dim]
+Sigma_h = torch.diag(S[:h_dim])
+print(U_h.shape, Sigma_h.shape)
+#   5. Compute W_extracted = U_h @ Sigma_h
+W_extracted = (U_h @ Sigma_h).detach()
+W_extracted.shape
+
+# %%
+# %%
+# Get the ground truth weights
+# The lm_head contains the final projection layer weights.
+# We need to transpose it to match the (vocab_size, hidden_size) shape.
+true_weights = model.lm_head.weight.detach().numpy()
+
+def compare_weights(W_extracted, W_true):
+    """
+    Compares the extracted weight matrix with the ground truth matrix.
+
+    Args:
+        W_extracted (numpy.ndarray): The weights recovered from the attack (W_tilde).
+        W_true (numpy.ndarray): The ground truth weights from the model.
+
+    Returns:
+        tuple: (rmse, avg_cosine_sim, percentage_similarity)
+    """
+    print("\n--- Comparing Extracted Weights to Ground Truth ---")
+
+    # 1. Solve for the transformation matrix G using least squares
+    # We want to find G such that W_extracted @ G ≈ W_true
+    print("Solving for the alignment matrix G using least squares...")
+    try:
+        G, residuals, rank, s = np.linalg.lstsq(W_extracted, W_true, rcond=None)
+    except np.linalg.LinAlgError as e:
+        print(f"Error solving least squares: {e}")
+        return float('nan'), float('nan'), float('nan')
+
+    # 2. Align the extracted weights using the solved G
+    W_aligned = W_extracted @ G
+    print("Alignment complete.")
+
+    # 3. Calculate Root Mean Square Error (RMSE)
+    temp = (W_aligned - W_true) ** 2
+    rmse = np.sqrt(temp.mean())
+
+    # 4. Calculate Average Cosine Similarity
+    # Normalize each column vector to unit length before dot product
+    norm_aligned = np.linalg.norm(W_aligned, axis=0, keepdims=True)
+    norm_true = np.linalg.norm(W_true, axis=0, keepdims=True)
+
+    # Avoid division by zero for zero-norm vectors
+    # This is unlikely but good practice
+    norm_aligned[norm_aligned == 0] = 1
+    norm_true[norm_true == 0] = 1
+
+    W_aligned_normalized = W_aligned / norm_aligned
+    W_true_normalized = W_true / norm_true
+
+    # Calculate cosine similarity for each column and average
+    cosine_similarities = (W_aligned_normalized * W_true_normalized).sum(axis=0)
+    avg_cosine_sim = (cosine_similarities.mean())
+
+    # 5. Calculate a "Percentage Similarity" metric based on relative error
+    # Frobenius norm is the square root of the sum of the absolute squares of its elements.
+    relative_error = np.linalg.norm(W_aligned - W_true, 'fro') / np.linalg.norm(W_true, 'fro')
+    percentage_similarity = (1 - relative_error) * 100
+
+    return rmse, avg_cosine_sim, percentage_similarity
+
+# 4. Compare the weights and print results
+rmse, cosine_sim, percent_sim = compare_weights(W_extracted, true_weights)
+
+print("\n--- Final Results ---")
+print(f"Root Mean Square Error (RMSE): {rmse:.6f}")
+print(f"Average Cosine Similarity: {cosine_sim:.6f}")
+print(f"Similarity Percentage: {percent_sim:.2f}%")
+
+print("\nInterpretation:")
+print("- RMSE: Lower is better. We expect values like 0.001.")
+print("- Cosine Similarity: Closer to 1.0 is better, indicating the vectors are pointing in the same direction.")
+print("- Similarity Percentage: Closer to 100% is better.")
