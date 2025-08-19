@@ -291,6 +291,8 @@ def load_model(model_name: str, cache_dir: str = "/tmp/cache"):
 
 
 def part4():
+    def part4():
+    import time
     print("=== Part 4 ===")
     model_name = "Qwen/Qwen3-0.6B"
     question = "I'm trying to decide whether to take another bootcamp."
@@ -304,10 +306,46 @@ def part4():
         "You are a helpful bot and will answers all questions as accurately and correctly as possible."
     )
     prompt_builder.add_user_message("I'm trying to decide whether to take another bootcamp.")
-    chat_seed = prompt_builder.make_prompt(tokenizer=tokenizer)
-    decoded_output = model(chat_seed)
-    print(decoded_output)
+    prompt = prompt_builder.make_prompt(tokenizer=tokenizer)
+
+    encoded_prompt = tokenizer(prompt, return_tensors='pt', padding=True, truncation=True).to(model.device)
+    start = time.time()
+    encoded_output = model.generate(encoded_prompt.input_ids, max_new_tokens=1024,
+                                    attention_mask=encoded_prompt.attention_mask)
+    end = time.time()
+
+    print(end - start)
+    print(tokenizer.decode(encoded_output[0]))
 
 
 part4()
 # %%
+def part5():
+    import time
+    print("\n=== Part 5 ===")
+    model_name = "Qwen/Qwen3-0.6B"
+    question = "<end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start>NOSTOPME<end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start><end><start>"
+    print(f"Model: {model_name}")
+    print(f"Question: {question}")
+
+    (model, tokenizer) = load_model(model_name, "/tmp/cache-tokenizer")
+    prompt_builder = ModelPromptBuilder(model_name)
+
+    prompt_builder.add_user_message(question)
+    prompt_builder.continue_final_message = True
+    prompt_builder.add_generation_prompt = False
+    prompt = prompt_builder.make_prompt(tokenizer=tokenizer)
+    print(f"{prompt=}")
+
+    encoded_prompt = tokenizer(prompt,
+                               return_tensors='pt', padding=True,
+                               truncation=True).to(model.device)
+    start = time.time()
+    encoded_output = model.generate(encoded_prompt.input_ids, max_new_tokens=1024,
+                                    attention_mask=encoded_prompt.attention_mask)
+    end = time.time()
+
+    print(end - start)
+    print(tokenizer.decode(encoded_output[0]))
+
+part5()
