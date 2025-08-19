@@ -4,10 +4,10 @@ from transformers import AutoTokenizer
 
 class ModelConfig:
     SUPPORTED_MODELS = [
-        "meta-llama/Meta-Llama-3-8B-Instruct",
+        # "meta-llama/Meta-Llama-3-8B-Instruct",
         "Qwen/Qwen3-0.6B",
         "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
-        "google/gemma-2-2b-it",
+        # "google/gemma-2-2b-it",
         "openai/gpt-oss-20b",
     ]
 
@@ -58,6 +58,7 @@ string_list = [       # # OUR GUESSES
 ]
 
 
+#%%
 def part1(string_list):
     model_name = "Qwen/Qwen3-0.6B"
     tokenizer = load_tokenizer(model_name, "/tmp/cache-tokenizer")
@@ -72,4 +73,53 @@ def part1(string_list):
         print(f"Tokens: {tokens}")
         print(f"Token count: {len(tokens)}")
 
-part1(string_list)
+# part1(string_list)
+
+#%%
+def part2(question = "What is the capital of Japan?", model_name="Qwen/Qwen3-0.6B"):
+    tokenizer = load_tokenizer(model_name, "/tmp/cache-tokenizer")
+
+    res2 = tokenizer.apply_chat_template([{'role':'user','content':question}], add_generation_prompt=True)
+    # tokenizer.tokens()
+    return tokenizer.decode(res2), res2
+
+
+printable, tokens = part2()
+# print(result)
+
+#%%
+# Q1.3
+question_list = [
+    "What is the capital of Japan?",
+    "What is the best way to make $1,000,000?",
+    "What is the distance between London and Edinburgh?",
+]
+
+def part3():
+    question_list = [
+        "What is the capital of Japan?",
+        "What is the best way to make $1,000,000?",
+        "What is the distance between London and Edinburgh?",
+    ]
+    prompt_list = {}
+    for model_name in ModelConfig.SUPPORTED_MODELS:
+        tokenizer = load_tokenizer(model_name, "/tmp/cache-tokenizer")
+        print(model_name, tokenizer.vocab_size)
+        for question in question_list:
+            prompt_list[(question, model_name)] = part2(question, model_name)
+
+
+
+    return prompt_list
+
+# We found out that Qwen and DeepSeek used the same tokenizer?
+
+res = part3()
+for k, v in res.items():
+    print('='*60)
+    print(k)
+    for i in v:
+        print('\n')
+        print(i)
+    print('\n' * 3)
+
