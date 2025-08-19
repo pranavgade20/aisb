@@ -1,4 +1,6 @@
 # %%
+import time
+
 from transformers import AutoTokenizer
 
 
@@ -109,14 +111,14 @@ def part3():
 
 # We found out that Qwen and DeepSeek used the same tokenizer?
 
-res = part3()
-for k, v in res.items():
-    print("=" * 60)
-    print(k)
-    for i in v:
-        print("\n")
-        print(i)
-    print("\n" * 3)
+# res = part3()
+# for k, v in res.items():
+#     print("=" * 60)
+#     print(k)
+#     for i in v:
+#         print("\n")
+#         print(i)
+#     print("\n" * 3)
 
 
 # %%
@@ -283,15 +285,17 @@ def load_tokenizer(model_name: str, cache_dir: str = "/tmp/cache"):
 
 
 def load_model(model_name: str, cache_dir: str = "/tmp/cache"):
-    config = ModelConfig.get(model_name)
-    # model = AutoModelForCausalLM.from_config(ModelConfig.get(model_name))
-    model = AutoModelForCausalLM.from_pretrained(model_name, cache_dir=cache_dir, **config)
     tokenizer = load_tokenizer(model_name, cache_dir)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype=torch.float16,
+        device_map="auto",
+        cache_dir=cache_dir,
+    )
     return (model, tokenizer)
 
 
 def part4():
-    def part4():
     import time
     print("=== Part 4 ===")
     model_name = "Qwen/Qwen3-0.6B"
@@ -315,10 +319,10 @@ def part4():
     end = time.time()
 
     print(end - start)
-    print(tokenizer.decode(encoded_output[0]))
+    # print(tokenizer.decode(encoded_output[0]))
 
 
-part4()
+# part4()
 # %%
 def part5():
     import time
@@ -335,7 +339,7 @@ def part5():
     prompt_builder.continue_final_message = True
     prompt_builder.add_generation_prompt = False
     prompt = prompt_builder.make_prompt(tokenizer=tokenizer)
-    print(f"{prompt=}")
+    # print(f"{prompt=}")
 
     encoded_prompt = tokenizer(prompt,
                                return_tensors='pt', padding=True,
@@ -346,6 +350,131 @@ def part5():
     end = time.time()
 
     print(end - start)
-    print(tokenizer.decode(encoded_output[0]))
 
-part5()
+    return tokenizer.decode(encoded_output[0])
+# res = part5()
+# print(res)
+
+#%%
+question_list = [
+    "What is the capital of Japan?",
+    "What is the distance between London and Edinburgh?",
+]
+
+
+def part6():
+    print("\n=== Part 6 ===")
+    question_list = [
+        "What is the capital of Japan?",
+        "What is the distance between London and Edinburgh?",
+    ]
+
+    output = {}
+    for model_name in ["Qwen/Qwen3-0.6B", "Qwen/Qwen2.5-0.5B"]:
+        for question in question_list:
+            model, tokenizer = load_model(model_name, "/tmp/cache-tokenizer")
+            prompt_builder = ModelPromptBuilder(model_name)
+            prompt_builder.add_system_instruction("You are a helpful bot and will answers all questions as accurately. Be concise. Finish the message when you believe you are done")
+            prompt_builder.add_user_message(question)
+            # prompt_builder.continue_final_message = True
+            # prompt_builder.add_generation_prompt = False
+            prompt = prompt_builder.make_prompt(tokenizer=tokenizer)
+            print(f"{prompt=}")
+
+            encoded_prompt = tokenizer(prompt,
+                                       return_tensors='pt', padding=True,
+                                       truncation=True).to(model.device)
+            start = time.time()
+            encoded_output = model.generate(encoded_prompt.input_ids, max_new_tokens=512,
+                                            attention_mask=encoded_prompt.attention_mask)
+            end = time.time()
+
+            print(end - start)
+
+            output[(model_name, question)] = tokenizer.decode(encoded_output[0])
+
+    return output
+
+# res = part6()
+# for k, v in res.items():
+#     print("=" * 60)
+#     print(k)
+#
+#     print("\n")
+#     print(v)
+#     print("\n" * 3)
+
+
+#%%
+
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
+from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from tqdm import tqdm
+
+# %%
+# 1. Load the model and tokenizer
+model_name="openai-community/gpt2"
+print(f"Loading model: {model_name}...")
+tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+model = GPT2LMHeadModel.from_pretrained(model_name)
+model.eval()
+
+def get_next_logits(input_ids):
+    """
+    Get the logits for the next token given input_ids.
+    """
+    assert input_ids.ndim == 2, "Input IDs should be a 2D tensor (batch_size, sequence_length)"
+    with torch.no_grad():
+        outputs = model(input_ids)
+        return outputs.logits[:, -1, :]
+
+# Set pad token if it's not set
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+
+letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+numbers = '0123456789'
+points = ['i','ii','iii','iv','v','vi','vii']
+i = 0
+LIMIT = 1000
+
+logits = []
+for letter in letters:
+    if i > LIMIT:
+        break
+    for number in numbers:
+        if i > LIMIT:
+            break
+        for point in points:
+            if i > LIMIT:
+                break
+            i += 1
+
+
+            prompt = f'Tell me the answer to question {letter}) {number} {point}? Invent a question if you do not know!'
+            prompt_builder = ModelPromptBuilder(model_name)
+            prompt_builder.add_system_instruction("You are a useful bot, who loves answering trivia questions for a pub quiz.")
+            prompt_builder.add_user_message(prompt)
+            prompt = prompt_builder.make_prompt(tokenizer=tokenizer)
+            encoded_prompt = tokenizer(prompt,
+                                       return_tensors='pt', padding=True,
+                                       truncation=True).to(model.device)
+
+            encoded_output = model(encoded_prompt.input_ids)
+
+            logits.append(encoded_output[0].logits)
+
+print(logits)
+stacked_logits = torch.stack(logits)
+print(stacked_logits)
+U, S, V = torch.linalg.svd(stacked_logits, full_matrices=True)
+
+
+#   3. Stack logits into a matrix Q
+#   4. Compute SVD of Q
+#   5. Find the "elbow" in singular values to estimate dimension
+#   6. Plot the results
+pass
