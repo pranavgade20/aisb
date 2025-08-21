@@ -122,3 +122,18 @@ infiniband connects the switches that control the nvlinks. lots of data etc. ess
 
 
 
+
+# Exercise 3.2 
+
+Example scenario: NeuralFlow serves 15 specialized AI models to 10+ enterprise clients with strict SLA requirements. They handle 10,000+ daily inference requests while performing continuous online learning from client feedback. Recent issues include service outages during peak hours, unpredictable latency when batch learning jobs interfere with real-time inference, and resource conflicts between different client workloads requiring data isolation.
+
+Your Task: Recommend Kubernetes or Slurm for NeuralFlow's mixed real-time inference and online learning workloads.
+
+Deliverable: Think about and describe which software would be most appropriate.
+
+
+Kuberenetes
+
+
+
+
