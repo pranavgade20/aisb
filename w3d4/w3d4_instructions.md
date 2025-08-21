@@ -1,7 +1,7 @@
 
 # Week 3 Day 4: GPU & Datacenter Security
 
-Today's content is a lot more theory than labs, so you should make a file called w2d4_answers.md and write your solution to each exercise there. Ask a TA to verify after you've completed each exercise.
+Today's content is a lot more theory than labs, so you should make a file called w2d4\_answers.md and write your solution to each exercise there. Ask a TA to verify after you've completed each exercise.
 
 ## Table of Contents
 
@@ -25,19 +25,19 @@ You have a ready-made machine to log into.
 
 **Login Info:**
 
-* Username: aisbnvidia
+* ssh ubuntu@192.222.58.5
 * Password: Pssy3gB325E1mn
-* IPs:
-- 35.184.13.147
-* Example: ssh aisbnvidia@35.184.13.147
 
 **Instructions:**
 
 * Please copy \~/test into a new folder with your pair's name (eg, `cp -r test w2d4-pranav`) and ignore \~/solution unless stuck
 * You have sudo access, but the exploit should run as the regular user
+* A vulnerable version of the nvidia stack is already installed, please do not install any nvidia packages
 * Write a POC file in C (in poc.c), and use the Makefile to build it
-  * For example: update the file to write your username into the file /tmp/output
+  * For example: update the file to write your username into the file /tmp/output-pranav
+  * **PLEASE USE A UNIQUE OUTPUT FILENAME FOR YOUR TEAM** to avoid confusing others
 * Write a Dockerfile, and use the Makefile to build it
+* Try the exploit with `docker run --rm --runtime=nvidia --gpus=all nvidia-ctk-image`
 
 You will exploit nvidia-ctk on the host, becoming root.
 
