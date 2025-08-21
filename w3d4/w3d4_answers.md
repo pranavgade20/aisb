@@ -61,3 +61,64 @@ security risk
 sharing, vast ai doesn't) 
 - VM means attacks need to go through the hypervisor so less prone to side-channel 
 timing attacks but are vulnerable to lower-level hardware attacks
+
+
+
+# Exercise 2.2 
+
+Your Task: After reviewing the materials above, analyze advanced GPU security considerations by addressing:
+
+    Software vs. Hardware Isolation: How does Kubernetes namespace-based multi-tenancy compare to NVIDIA MIG's hardware partitioning for GPU security?
+
+    - Same thing as earlier VMs vs containers. Kubernetes is easier to escalate privileges e.g. if misconfigured. 
+    - Hardware partitioning (NVIDIA) is sharing on the same physical GPU -> vulnerable to attacks like exercise 1.
+
+
+    Attack Surface Analysis: What new vulnerabilities emerge when multiple tenants share GPU resources, and how do different isolation approaches mitigate these risks?
+
+    - The moment you 'break out' of your partition youd get access to everything else. 
+    - Isolation with hardware makes this harder, but there's still going to be information you can learn from the behaviour of the GPU. 
+    - DOS by overloading one particular process, denying other services on the same GPU trying to use that same process.
+
+    Resource Guarantees: How do the quality-of-service guarantees provided by MIG differ from traditional container resource limits for GPU workloads?
+
+    - MIG ensures one client cannot impact the work or scheduling of other clients and provides enhanced isolation for customers. With MIG, each MIG partition's processors have separate and isolated paths through the entire memory system - the on-chip crossbar ports, L2 cache banks, memory controllers, and DRAM address buses are all assigned uniquely to an individual Instance.
+    - But 1/7th of a GPU is really limited, like if you're a datacentre you probably don't want it ?
+
+
+
+Deliverable: Compare the security trade-offs between software-only multi-tenancy and hardware-assisted GPU partitioning, identifying which approach would be more suitable for a high-security AI training environment and why.
+
+
+
+
+# Exercise 3.1 GPU Interconnect Architecture
+
+
+
+    PCIe Lanes: How do PCIe lanes affect GPU performance? What happens when a GPU has fewer lanes than expected?
+
+    More lanes -> more data flowing to and fro. Bottlenecked, slower than expected 
+
+    NVLink Benefits: Why use NVLink instead of PCIe for GPU-to-GPU communication? What performance advantages does it provide?
+
+    Fast.
+
+    System Architecture: In a multi-GPU training setup, when would data flow through PCIe vs. NVLink?
+
+    NVlink if just gpus talking to each other. pcie for anything else.
+
+Deliverable: Draw a diagram describing how data flows between CPU, system memory, and 4 GPUs connected via both PCIe and NVLink, labeling the bandwidth differences.
+
+[diagram]
+
+Stretch: How does this extend to multi-node clusters? How does infiniband fit in?
+
+infiniband connects the switches that control the nvlinks. lots of data etc. essentially still gpus talking to each other but across nodes.
+
+
+
+
+
+
+
