@@ -1,9 +1,10 @@
-#%%
+# %%
 import json
 import threading
 import time
 
 import requests
+
 
 #
 class MCPClient:
@@ -29,34 +30,32 @@ class MCPClient:
         #   - Have a lower bar for looking at the solution for this one if you don't know how http streaming works
 
         # The local path where you want to save the downloaded file.
-        output_filename = "downloaded_file.dat"
+        print(f"Connecting to MCP at {self.url_base}")
+        response = requests.get(self.url_base + "/sse", stream=True)
 
-        try:
-            # 1. Make the initial request with stream=True
-            # This gets the headers but not the content body yet.
-            with requests.get(self.url_base + '/sse', stream=True) as response:
+        if response.status_code != 200:
+            print(f"Failed to connect to MCP: {response.status_code}")
+            return
+        state = None
+        for line in response.iter_lines():
+            if line:
+                print(line.decode("utf-8"))
 
-                # 2. Check for HTTP errors (e.g., 404 Not Found, 500 Server Error)
-                # This will raise an exception if the request was unsuccessful.
-                response.raise_for_status()
-
-                # 3. Open a local file in binary write mode to save the content
-                with open(output_filename, 'wb') as f:
-                    print(f"Downloading {output_filename}...")
-
-                    # 4. Iterate over the response content in chunks
-                    # iter_content() lets you pull the data in pieces of a specified size.
-                    # 8192 bytes (8 KB) is a good, common chunk size.
-                    for chunk in response.iter_content(chunk_size=8192):
-                        # The 'chunk' is a bytes object.
-                        # Write each chunk to the file as it's downloaded.
-                        f.write(chunk)
-
-                    print("Download complete! ✨")
-
-        except requests.exceptions.RequestException as e:
-            # Handle potential network errors (e.g., DNS failure, connection refused)
-            print(f"An error occurred: {e}")
+                if line.startswith(b": ping"):
+                    pass
+                elif line.startswith(b"event: endpoint"):
+                    state = "endpoint"
+                elif line.startswith(b"event: message"):
+                    state = "message"
+                elif line.startswith(b"data: "):
+                    if state == "endpoint":
+                        self.endpoint = line[6:].strip().decode("utf-8")
+                    elif state == "message":
+                        self.messages.append(json.loads(line[6:].strip()))
+                    else:
+                        raise AssertionError(f"Got line {line} in unexpected state {state}")
+                else:
+                    raise AssertionError("I don't know what to do with this line: " + line)
 
     def send_message(self, message):
         """
@@ -67,6 +66,7 @@ class MCPClient:
         if not self.endpoint:
             raise ValueError("Endpoint is not set. Connect to the MCP server first.")
         # todo: send a message to the MCP server
+
         pass
 
     def get_message(self):
@@ -121,5 +121,5 @@ mcp_client = MCPClient("https://0.mcp.aisb.dev")
 thread = threading.Thread(target=mcp_client.connect, daemon=True).start()
 while not mcp_client.endpoint:
     time.sleep(0.1)
-    print(".", end='')
+    print(".", end="")
 mcp_client.handshake()
