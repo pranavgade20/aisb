@@ -49,7 +49,11 @@ class MCPClient:
         # todo: send a message to the MCP server
         url = f"{self.url_base}{self.endpoint}"
         response = requests.post(url, json=message)
-        return response
+
+        if 200 <= response.status_code < 300:
+            return response
+        else:
+            raise ValueError(f"Error {response.status_code}: {response.text}")
 
     def get_message(self):
         """
@@ -84,12 +88,11 @@ class MCPClient:
             },
         }
 
-        response = self.send_message(message)
-        if 200 <= response.status_code < 300:
-            message = self.get_message()
-            self.server_info = message["result"]["serverInfo"]
+        self.send_message(message)
+        message = self.get_message()
+        self.server_info = message["result"]["serverInfo"]
 
-            print(self.server_info)
+        print(self.server_info)
 
     def get_resources(self, cursor=None):
         """
