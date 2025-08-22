@@ -1,6 +1,7 @@
 import json
 import threading
 import time
+from dataclasses import dataclass
 
 import requests
 from rich import print
@@ -12,7 +13,16 @@ class UnknownEventError(RuntimeError):
 
 JSONRPC = dict[str, str]
 Tool = dict[str, str]
-Resource = dict[str, str]
+# Resource = dict[str, str]
+
+
+@dataclass
+class Resource:
+    uri: str
+    name: str
+    description: str
+    mimeType: str
+    title: str | None = None
 
 
 class MCPClient:
@@ -129,8 +139,8 @@ class MCPClient:
             get_resourses_message["params"]["cursor"] = cursor
         self.send_message(get_resourses_message)
         resp = self.get_message()
-        tools = resp["result"]["resources"]
-        return tools
+        resources = [Resource(**r) for r in resp["result"]["resources"]]
+        return resources
 
     def get_tools(self, cursor=None) -> list[Tool]:
         """
