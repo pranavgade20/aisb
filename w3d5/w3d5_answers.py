@@ -5,12 +5,14 @@ import time
 import requests
 
 
+
 class MCPClient:
     def __init__(self, url_base):
         self.url_base = url_base
         self.endpoint = None
         self.messages: list[dict] = []
         self.server_info = None
+        self.id = 0
 
     def connect(self):
         """
@@ -31,6 +33,7 @@ class MCPClient:
         response = requests.get(url, stream=True)
 
         for line in response.iter_lines(decode_unicode=True):
+            # print(line)
             if line and line.startswith("data: "):
                 line = line.removeprefix("data: ").strip()
                 if "/messages" in line:
@@ -50,6 +53,7 @@ class MCPClient:
         url = f"{self.url_base}{self.endpoint}"
         response = requests.post(url, json=message)
 
+        self.id += 1
         if 200 <= response.status_code < 300:
             return response
         else:
@@ -61,8 +65,12 @@ class MCPClient:
         :return: The latest message received from the MCP server.
         """
         # todo: wait for a message to show up in the queue and return it
+        
+        while len(self.messages) == 0:
+            time.sleep(0.1)
 
-        return self.messages[-1]
+        return self.messages.pop(0)
+        # return self.messages[-1]
 
     def handshake(self):
         """
@@ -75,7 +83,7 @@ class MCPClient:
         #   - Wait for the server's response and store it in self.server_info
         message = {
             "jsonrpc": "2.0",
-            "id": len(self.messages),
+            "id": self.id,
             "method": "initialize",
             "params": {
                 "protocolVersion": "2024-11-05",
@@ -92,7 +100,14 @@ class MCPClient:
         message = self.get_message()
         self.server_info = message["result"]["serverInfo"]
 
-        print(self.server_info)
+
+        notification = {
+            'jsonrpc': '2.0',
+            'method': 'notifications/initialized'
+        }
+        self.send_message(notification)
+
+        # print(self.server_info)
 
     def get_resources(self, cursor=None):
         """
@@ -101,7 +116,20 @@ class MCPClient:
         :return: List of resources.
         """
         # todo: implement the logic to list resources on the MCP server
-        pass
+        payload = {
+          "jsonrpc": "2.0",
+          "id": self.id,
+          "method": "resources/list",
+          "params": {
+            "cursor": cursor
+          }
+        }
+
+        self.send_message(payload)
+        message = self.get_message()
+
+        return message['result']['resources']
+
 
     def get_tools(self, cursor=None):
         """
@@ -110,7 +138,19 @@ class MCPClient:
         :return: List of tools.
         """
         # todo: implement the logic to list tools on the MCP server
-        pass
+        payload = {
+          "jsonrpc": "2.0",
+          "id": self.id,
+          "method": "tools/list",
+          "params": {
+            "cursor": cursor
+          }
+        }
+
+        self.send_message(payload)
+        message = self.get_message()
+
+        return message['result']['tools']
 
     def access_resource(self, resource_uri):
         """
@@ -119,8 +159,19 @@ class MCPClient:
         :return: The resource data.
         """
         # todo: implement the logic to access a resource by its URI
-        pass
+        payload = {
+          "jsonrpc": "2.0",
+          "id": self.id,
+          "method": "resources/read",
+          "params": {
+            "uri": resource_uri
+          }
+        }
 
+        self.send_message(payload)
+        message = self.get_message()
+
+        return message['result']['contents']
 
 if __name__ == "__main__":
     # Example usage
@@ -130,3 +181,8 @@ if __name__ == "__main__":
         time.sleep(0.1)
         print(".", end="")
     mcp_client.handshake()
+    resources = mcp_client.get_resources()
+    tools = mcp_client.get_tools()
+    resource_response = mcp_client.access_resource(resources[0]['uri'])
+
+    print(resource_response)
