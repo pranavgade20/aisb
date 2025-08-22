@@ -27,7 +27,36 @@ class MCPClient:
         #   - Parse the incoming lines to extract the messages
         #   - Store the endpoint URL in self.endpoint and push the messages to self.messages
         #   - Have a lower bar for looking at the solution for this one if you don't know how http streaming works
-        pass
+
+        # The local path where you want to save the downloaded file.
+        output_filename = "downloaded_file.dat"
+
+        try:
+            # 1. Make the initial request with stream=True
+            # This gets the headers but not the content body yet.
+            with requests.get(self.url_base + '/sse', stream=True) as response:
+
+                # 2. Check for HTTP errors (e.g., 404 Not Found, 500 Server Error)
+                # This will raise an exception if the request was unsuccessful.
+                response.raise_for_status()
+
+                # 3. Open a local file in binary write mode to save the content
+                with open(output_filename, 'wb') as f:
+                    print(f"Downloading {output_filename}...")
+
+                    # 4. Iterate over the response content in chunks
+                    # iter_content() lets you pull the data in pieces of a specified size.
+                    # 8192 bytes (8 KB) is a good, common chunk size.
+                    for chunk in response.iter_content(chunk_size=8192):
+                        # The 'chunk' is a bytes object.
+                        # Write each chunk to the file as it's downloaded.
+                        f.write(chunk)
+
+                    print("Download complete! ✨")
+
+        except requests.exceptions.RequestException as e:
+            # Handle potential network errors (e.g., DNS failure, connection refused)
+            print(f"An error occurred: {e}")
 
     def send_message(self, message):
         """
@@ -86,11 +115,11 @@ class MCPClient:
         # todo: implement the logic to access a resource by its URI
         pass
 
-if False:
-    # Example usage
-    mcp_client = MCPClient("https://0.mcp.aisb.dev")
-    thread = threading.Thread(target=mcp_client.connect, daemon=True).start()
-    while not mcp_client.endpoint:
-        time.sleep(0.1)
-        print(".", end='')
-    mcp_client.handshake()
+
+# Example usage
+mcp_client = MCPClient("https://0.mcp.aisb.dev")
+thread = threading.Thread(target=mcp_client.connect, daemon=True).start()
+while not mcp_client.endpoint:
+    time.sleep(0.1)
+    print(".", end='')
+mcp_client.handshake()
