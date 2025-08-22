@@ -48,10 +48,15 @@ class MCPClient:
         if len(event) == 2 and event[0] == ("event: endpoint") and event[1].startswith("data"):
             endpoint = event[1].removeprefix("data: ")
             print(f"Found endpoint: {endpoint}")
-            self.endpoint = endpoint
+            self.endpoint = self.url_base + "/" + endpoint
         elif len(event) == 1 and event[0].startswith(": ping - "):
             print("Found ping, skipping")
             pass
+        elif len(event) == 2 and event[0] == ("event: message") and event[1].startswith("data"):
+            msg = event[1].removeprefix("data: ")
+            print(f"Found endpoint: {msg}")
+            json_data = json.loads(msg)
+            self.messages.append(json_data)
         else:
             print(f"Unknown event: {event}")
             raise UnknownEventError(event)
@@ -65,7 +70,21 @@ class MCPClient:
         if not self.endpoint:
             raise ValueError("Endpoint is not set. Connect to the MCP server first.")
         # todo: send a message to the MCP server
-        pass
+        print(message)
+        # eg "message": "tools/methods"
+        
+        headers = {'Accept': 'application/json, text/event-stream', 
+                   "Content-Type": "application/json"}
+        json_rpc_msg = json.dumps(message)
+
+        resp = requests.post(self.endpoint, data=json_rpc_msg, headers=headers)
+        assert resp.ok, f"expected OK got {resp.status_code}"
+        print(f"response: {resp.text}")
+        while len(self.messages) == 0:
+            time.sleep(0.5)
+        return self.messages.pop()
+
+        
 
     def get_message(self):
         """
@@ -117,17 +136,37 @@ class MCPClient:
 if __name__ == "__main__":
     # Example usage
     mcp_client = MCPClient("https://0.mcp.aisb.dev")
-    mcp_client.connect()
-    # thread = threading.Thread(target=mcp_client.connect).start()
-    # while not mcp_client.endpoint:
-    # time.sleep(0.1)
-    # print(".", end="")
-    # mcp_client.handshake()
+    
 
-    # url_base = "https://0.mcp.aisb.dev"
-    # s = requests.Session()
-    # sse_endpoint = url_base + "/sse"
-
-    # with s.get(sse_endpoint, headers=None, stream=True) as resp:
-    #     for line in resp.iter_lines():
-    #         print(line)
+    print("started thread")
+    thread = threading.Thread(target=mcp_client.connect).start()
+    print("after thread")
+    while not mcp_client.endpoint:
+        time.sleep(0.1)
+        print("in the loop")
+        print(".", end="")
+    print(f"endpoint is: {mcp_client.endpoint}")
+    mcp_client.handshake()
+    message = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {
+            "protocolVersion": "2024-11-05",
+            "capabilities": {
+            "roots": {
+                "listChanged": True
+            },
+            "sampling": {},
+            "elicitation": {}
+            },
+            "clientInfo": {
+            "name": "ExampleClient",
+            "title": "Example Client Display Name",
+            "version": "1.0.0"
+            }
+        }
+    }
+    print("about to send msg")
+    resp = mcp_client.send_message(message)
+    print(f"response: {resp}")
