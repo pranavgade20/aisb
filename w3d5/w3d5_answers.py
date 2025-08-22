@@ -13,6 +13,7 @@ class UnknownEventError(RuntimeError):
 
 JSONRPC = dict[str, str]
 Tool = dict[str, str]
+URI = str
 # Resource = dict[str, str]
 
 
@@ -42,7 +43,7 @@ class MCPClient:
         with s.get(sse_endpoint, headers=None, stream=True) as resp:
             for line in resp.iter_lines():
                 decoded_line: str = line.decode("utf-8")
-                print(decoded_line)
+                # print(decoded_line)
                 if decoded_line == "":
                     self._process_event(current_event)
                     current_event = []
@@ -59,7 +60,7 @@ class MCPClient:
             pass
         elif len(event) == 2 and event[0] == ("event: message") and event[1].startswith("data"):
             msg = event[1].removeprefix("data: ")
-            print(f"Got msg: {msg}")
+            # print(f"Got msg: {msg}")
             json_data = json.loads(msg)
             self.messages.append(json_data)
         else:
@@ -102,6 +103,7 @@ class MCPClient:
         """
         Hansdshake with the MCP server to initialize the connection.
         """
+        print("Starting handshake")
         if not self.endpoint:
             raise ValueError("Endpoint is not set. Connect to the MCP server first.")
 
@@ -116,9 +118,10 @@ class MCPClient:
             },
         }
         self.send_message(initialize_request)
+        print("Getting server info")
         self.server_info = self.get_message()
 
-        print("Sending init")
+        print("Sending init notification")
         initialized_notification = {
             "jsonrpc": "2.0",
             "method": "notifications/initialized",
@@ -163,32 +166,56 @@ class MCPClient:
         tools = resp["result"]["tools"]
         return tools
 
-    def access_resource(self, resource_uri):
+    def access_resource(self, resource_uri: URI) -> dict[str, str]:
         """
         Access a specific resource by its URI.
         :param resource_uri: The URI of the resource to access.
         :return: The resource data.
         """
         # todo: implement the logic to access a resource by its URI
-        pass
+        message = {
+            "jsonrpc": "2.0",
+            "id": 2,
+            "method": "resources/read",
+            "params": {"uri": resource_uri},
+        }
+        self.send_message(message)
+        response = self.get_message()
+        resource_data = response["result"]["contents"]
+        return resource_data
+
+    def call_tool(self, tool_name: str, arguments: dict[str, str]):
+        message = {
+            "jsonrpc": "2.0",
+            "id": 2,
+            "method": "tools/call",
+            "params": {"name": tool_name, "arguments": arguments},
+        }
+        self.send_message(message)
+        response = self.get_message()
+        return response["result"]
 
 
 if __name__ == "__main__":
     # Example usage
     mcp_client = MCPClient("https://0.mcp.aisb.dev")
 
-    print("started thread")
     thread = threading.Thread(target=mcp_client.connect).start()
-    print("after thread")
     while not mcp_client.endpoint:
         time.sleep(0.1)
         print(".", end="")
-    print(f"endpoint is: {mcp_client.endpoint}")
     mcp_client.handshake()
 
     print("tools:", mcp_client.get_tools())
     print("resources:", mcp_client.get_resources())
 
-
-## TODO
-# - request ID?
+    print("creds:", mcp_client.access_resource("internal://credentials"))
+    print(
+        "tool_resp",
+        mcp_client.call_tool(
+            tool_name="get_user_info",
+            arguments={
+                "username": "admin_user",
+            },
+        ),
+    )
