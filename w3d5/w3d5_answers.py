@@ -6,7 +6,6 @@ import time
 import requests
 
 
-#
 class MCPClient:
     def __init__(self, url_base):
         self.url_base = url_base
@@ -23,13 +22,6 @@ class MCPClient:
         messages received from the MCP server will be stored in self.messages.
         :return:
         """
-        # todo: Implement the connection logic to the MCP server
-        #   - Start by making a GET request to the MCP server's SSE endpoint and stream the response.
-        #   - Parse the incoming lines to extract the messages
-        #   - Store the endpoint URL in self.endpoint and push the messages to self.messages
-        #   - Have a lower bar for looking at the solution for this one if you don't know how http streaming works
-
-        # The local path where you want to save the downloaded file.
         print(f"Connecting to MCP at {self.url_base}")
         response = requests.get(self.url_base + "/sse", stream=True)
 
@@ -65,20 +57,25 @@ class MCPClient:
         """
         if not self.endpoint:
             raise ValueError("Endpoint is not set. Connect to the MCP server first.")
-        # todo: send a message to the MCP server
-        response = requests.post(self.url_base + self.endpoint, data=message)
 
-        return response
+
+        response = requests.post(self.url_base + self.endpoint, json=message)
+        if not 200 <= response.status_code < 300:
+            raise Exception(f"Failed to send message: {response.status_code} - {response.text}")
+
+        return response.text
+
 
     def get_message(self):
         """
         Get the latest message from the MCP server.
         :return: The latest message received from the MCP server.
         """
-        # todo: wait for a message to show up in the queue and return it
+
         while len(self.messages) == 0:
             time.sleep(0.1)  # Wait for a message to be received
         return self.messages.pop(0)
+
 
     def handshake(self):
         """
@@ -86,9 +83,7 @@ class MCPClient:
         """
         if not self.endpoint:
             raise ValueError("Endpoint is not set. Connect to the MCP server first.")
-        # todo: implement the handshake with the MCP server
-        #   - Send an initialization message to the MCP server with the protocol version and client info.
-        #   - Wait for the server's response and store it in self.server_info
+
         init_message = {
             "jsonrpc": "2.0",
             "id": 1,
@@ -116,8 +111,16 @@ class MCPClient:
         :param cursor: Optional cursor for pagination.
         :return: List of resources.
         """
-        # todo: implement the logic to list resources on the MCP server
-        pass
+        message = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "resources/list",
+            "params": {"cursor": cursor} if cursor else {},
+        }
+        self.send_message(message)
+        response = self.get_message()
+        return response.get("result", {}).get("resources", [])
+
 
     def get_tools(self, cursor=None):
         """
@@ -125,8 +128,12 @@ class MCPClient:
         :param cursor: Optional cursor for pagination.
         :return: List of tools.
         """
-        # todo: implement the logic to list tools on the MCP server
-        pass
+
+        message = {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {"cursor": cursor}}
+        self.send_message(message)
+        response = self.get_message()
+        return response.get("result", {}).get("tools", [])
+
 
     def access_resource(self, resource_uri):
         """
@@ -134,8 +141,17 @@ class MCPClient:
         :param resource_uri: The URI of the resource to access.
         :return: The resource data.
         """
-        # todo: implement the logic to access a resource by its URI
-        pass
+
+        message = {"jsonrpc": "2.0", "id": 2, "method": "resources/read", "params": {"uri": resource_uri}}
+
+        self.send_message(message)
+        response = self.get_message()
+        if "result" in response:
+            return response
+        elif "error" in response:
+            raise Exception(f"Error accessing resource: {response['error']}")
+        else:
+            raise Exception("Unexpected response format: " + json.dumps(response))
 
 
 # Example usage
