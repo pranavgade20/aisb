@@ -136,7 +136,7 @@ class MCPClient:
         # todo: implement the logic to access a resource by its URI
         pass
 
-if False:
+if __name__ == "__main__":
     # Example usage
     mcp_client = MCPClient("https://0.mcp.aisb.dev")
     thread = threading.Thread(target=mcp_client.connect, daemon=True).start()
@@ -164,6 +164,7 @@ Install (cline)[https://docs.cline.bot/getting-started/what-is-cline], which is 
 Once you have installed cline, you can use the following configuration to connect to the MCP server:
 <summary>
 <details>Connection Configuration</details>
+
 ```json
 {
   "mcpServers": {
@@ -270,6 +271,7 @@ Once you have installed cline, you can use the following configuration to connec
   }
 }
 ```
+
 </summary>
 
 After this, you can try each challenge by trying to prompt the model. Use claude 3.5 haiku for this.
