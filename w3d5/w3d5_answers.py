@@ -66,8 +66,9 @@ class MCPClient:
         if not self.endpoint:
             raise ValueError("Endpoint is not set. Connect to the MCP server first.")
         # todo: send a message to the MCP server
+        response = requests.post(self.url_base + self.endpoint, data=message)
 
-        pass
+        return response
 
     def get_message(self):
         """
@@ -75,7 +76,9 @@ class MCPClient:
         :return: The latest message received from the MCP server.
         """
         # todo: wait for a message to show up in the queue and return it
-        pass
+        while len(self.messages) == 0:
+            time.sleep(0.1)  # Wait for a message to be received
+        return self.messages.pop(0)
 
     def handshake(self):
         """
@@ -86,7 +89,26 @@ class MCPClient:
         # todo: implement the handshake with the MCP server
         #   - Send an initialization message to the MCP server with the protocol version and client info.
         #   - Wait for the server's response and store it in self.server_info
-        pass
+        init_message = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "AISB Client", "title": "Test Client for MCP", "version": "1.0.0"},
+            },
+        }
+
+        self.send_message(init_message)
+
+        self.server_info = self.get_message()
+
+        finish_init = {"jsonrpc": "2.0", "method": "notifications/initialized"}
+
+        self.send_message(finish_init)
+
+        print("Handshake complete. Client initialized.")
 
     def get_resources(self, cursor=None):
         """
