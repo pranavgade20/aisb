@@ -1,0 +1,6 @@
+fireworks-ai>=0.8.0
+datasets>=2.14.0
+transformers>=4.35.0
+torch>=2.0.0
+pyyaml>=6.0
+requests>=2.28.0

@@ -1,0 +1,198 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$network_name = "HostInterfaceNetworking-vboxnet0"
+$interface_name = Vagrant::Util::Platform.windows? ? 'VirtualBox Host-Only Ethernet Adapter' : 'vboxnet0'
+$vulnerable_mac = "080027548060" # test with colons ?
+$vulnerable_ip = "192.168.56.10"
+$attacker_mac = "080027548061"
+$attacker_ip = "192.168.56.20"
+
+Vagrant.configure("2") do |config|
+  # ============================================
+  # GLOBAL SETTINGS
+  # ============================================
+  
+  # Disable automatic box update checking (new versions of boxes)
+  config.vm.box_check_update = false
+  
+  config.trigger.before [:up, :reload] do |trigger|
+    trigger.name = "Create network & configure"
+    trigger.ruby do |env, machine|
+      vboxmanage = Vagrant::Util::Platform.windows? ? '"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe"' : 'VBoxManage'
+      null_device = Vagrant::Util::Platform.windows? ? 'nul' : '/dev/null'
+      
+     # Check if host-only interface vboxnet0 exists
+    hostonlyifs = `#{vboxmanage} list hostonlyifs`
+    unless $?.success?
+      warn "Failed to list host-only interfaces (VBoxManage might not be available), skipping network setup..."
+      return
+    end
+    vboxnet0_exists = hostonlyifs.include?($interface_name)
+      
+      if vboxnet0_exists
+        puts "Host-only interface #{$interface_name} already exists..."
+      else
+        puts "Creating host-only interface #{$interface_name}..."
+        unless system("#{vboxmanage} hostonlyif create")
+          warn "Failed to create host-only interface, skipping network setup..."
+          return
+        end
+        
+        puts "Configuring #{$interface_name} with IP 192.168.56.1..."
+        unless system("#{vboxmanage} hostonlyif ipconfig #{$interface_name} --ip 192.168.56.1 --netmask 255.255.255.0")
+          warn "Failed to configure host-only interface, skipping network setup..."
+          return
+        end
+      end
+      
+      # Check if DHCP server exists for this network
+      dhcp_list = `#{vboxmanage} list dhcpservers`
+      unless $?.success?
+        warn "Failed to list DHCP servers, skipping network setup..."
+        return
+      end
+      dhcp_exists = dhcp_list.include?($network_name)
+      
+      if dhcp_exists
+        puts "DHCP server for #{$network_name} already exists, skipping creation..."
+      else
+        puts "Removing DHCP server if exists..."
+        system("#{vboxmanage} dhcpserver remove --network=\"#{$network_name}\" 2>#{null_device} || #{Vagrant::Util::Platform.windows? ? 'exit 0' : 'true'}")
+        
+        puts "Creating DHCP server..."
+        unless system("#{vboxmanage} dhcpserver add --network=\"#{$network_name}\" --server-ip=192.168.56.100 --netmask=255.255.255.0 --lower-ip=192.168.56.10 --upper-ip=192.168.56.240 --enable")
+          warn "Failed to create DHCP server, skipping network setup..."
+          return
+        end
+        
+        puts "Configuring DHCP server for vulnerable..."
+        unless system("#{vboxmanage} dhcpserver modify --network=\"#{$network_name}\" --mac-address=\"#{$vulnerable_mac}\" --fixed-address=\"#{$vulnerable_ip}\"")
+          warn "Failed to configure DHCP for vulnerable, skipping network setup..."
+          return
+        end
+        
+        puts "Configuring DHCP server for attacker..."
+        unless system("#{vboxmanage} dhcpserver modify --network=\"#{$network_name}\" --mac-address=\"#{$attacker_mac}\" --fixed-address=\"#{$attacker_ip}\"")
+          warn "Failed to configure DHCP for attacker, skipping network setup..."
+          return
+        end
+        
+        puts "DHCP server configuration complete!"
+      end
+    end
+  end
+
+  # ============================================
+  # VULNERABLE TARGET MACHINE
+  # ============================================
+  config.vm.define "vulnerable" do |vuln|
+    # Custom box created from vulnerable.ova
+    # Run './build.sh' first to create this box
+    vuln.vm.box = "aisb-vulnerable"
+    # vuln.vm.box_url = "file://./build/boxes/aisb-vulnerable.box"
+    vuln.vm.box_url = "https://pub-a68ff9d9b6904d60aabff16cfd78e18c.r2.dev/aisb-vulnerable.box"
+    
+    vuln.vm.hostname = "aisb-vulnerable"
+    
+    # SSH Configuration - Minimal SSH for vulnerable target
+    # NOTE: If your vulnerable VM doesn't have Vagrant SSH keys configured,
+    # you can safely ignore SSH authentication warnings during startup.
+    # The VM will still boot and be accessible over the network from Kali.
+    # vuln.ssh.insert_key = true
+    # vuln.ssh.username = "vagrant"
+    # vuln.vm.boot_timeout = 120
+    vuln.ssh.username = nil
+    vuln.ssh.password = nil
+    vuln.ssh.insert_key = false
+    vuln.ssh.private_key_path = nil
+    vuln.ssh.port = nil
+    vuln.vm.provisioners.clear
+    vuln.vm.boot_timeout = 30
+    
+    # Disable synced folder (not needed for target VM)
+    vuln.vm.synced_folder "./shared", "/vagrant", disabled: true
+    
+    # Private network for inter-VM communication
+    # Set a fixed MAC address and static IP on vboxnet0
+    vuln.vm.network "private_network", ip: $vulnerable_ip, mac: $vulnerable_mac # , name: $interface_name
+    
+    vuln.vm.provider "virtualbox" do |vb|
+      vb.name = "AISB-Vulnerable"
+      vb.memory = "2048"
+      vb.cpus = 1
+      # vb.gui = true
+    end
+  end
+  
+  # ============================================
+  # KALI LINUX ATTACKER MACHINE
+  # ============================================
+  config.vm.define "attacker" do |kali|
+    # Official Kali Linux box
+    kali.vm.box = "kalilinux/rolling"
+    kali.vm.hostname = "attacker"
+    
+    # Same private network as vulnerable machine
+    # Set a fixed MAC address and static IP on vboxnet0
+    kali.vm.network "private_network", ip: $attacker_ip, mac: $attacker_mac # , name: $interface_name
+    
+    kali.vm.provider "virtualbox" do |vb|
+      vb.name = "AISB-Kali"
+      vb.memory = "2048"
+      vb.cpus = 1
+      # vb.gui = true
+      
+      # Enable clipboard and drag-and-drop
+      # vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
+      # vb.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+    end
+    
+    kali.ssh.insert_key = true
+    kali.ssh.username = "vagrant"
+    # kali.vm.communicator = "ssh" # winrm for windows
+
+
+    # Share current directory for file transfer
+    kali.vm.synced_folder "./shared", "/home/vagrant/shared", disabled: false
+
+    # kali.trigger.before [:up, :reload] do |trigger|
+    #   trigger.name = "Configure DHCP reservation for attacker #{$attacker_mac} -> #{$attacker_ip}"
+    #   trigger.run = {
+    #     inline: <<-SHELL
+    #     SHELL
+    #   }
+    # end
+    
+    # Provision with additional tools and configuration
+    kali.vm.provision "shell", inline: <<-SHELL
+      echo "Setting up Kali Linux attacker machine..."
+      
+      # Update system
+      # apt-get update
+      
+      # # Install/update common tools (most should be pre-installed)
+      # apt-get install -y \
+      #   nmap \
+      #   metasploit-framework \
+      #   burpsuite \
+      #   wireshark \
+      #   john \
+      #   hydra \
+      #   sqlmap \
+      #   nikto \
+      #   dirb \
+      #   gobuster \
+      #   netcat-traditional \
+      #   socat \
+      #   git \
+      #   python3-pip
+      
+      # Add target to hosts file for easy reference
+      echo "#{$vulnerable_ip} aisb-vulnerable" >> /etc/hosts
+      
+      echo "Kali Linux setup complete!"
+    SHELL
+  end
+  
+end

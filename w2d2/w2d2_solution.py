@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""
+# things to do
+
+1. shorten section 1 - image extraction
+it should be you use python/bash/curl/etc to download and extract layers from a docker url
+this folder path is an input to next stages
+"""
+
 
 # %%
 """
@@ -483,7 +491,7 @@ test_parse_image_reference(parse_image_reference)
 
 # %%
 """
-### Exercise 1.2: Docker Registry Authentication (Optional)
+### Exercise 1.2: Docker Registry Authentication (Optional) -> todo delete
 
 > **Difficulty**: 🔴🔴⚪⚪⚪  
 > **Importance**: 🔵🔵🔵⚪⚪
@@ -613,7 +621,7 @@ test_get_auth_token(get_auth_token)
 
 # %%
 """
-### Exercise 1.3: Manifest Discovery and Architecture Selection
+### Exercise 1.3: Manifest Discovery and Architecture Selection -> todo delete
 
 Retrieve image manifests and select the appropriate architecture variant.
 
@@ -807,7 +815,7 @@ test_get_target_manifest(get_target_manifest, get_auth_token)
 
 # %%
 """
-### Exercise 1.4: Manifest Processing
+### Exercise 1.4: Manifest Processing -> keep
 
 Process the selected manifest to extract layer information and metadata.
 
@@ -954,7 +962,7 @@ test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifes
 
 # %%
 """
-### Exercise 1.5: Layer Download and Extraction
+### Exercise 1.5: Layer Download and Extraction -> keep
 
 Download and extract individual layers to reconstruct the container filesystem.
 
@@ -1098,7 +1106,7 @@ test_download_and_extract_layers(download_and_extract_layers, get_auth_token,
 
 # %%
 """
-### Exercise 1.6: Complete Implementation
+### Exercise 1.6: Complete Implementation -> prewritten, give them the solution
 
 Combine all the exercises into a complete `pull_layers` function that can extract any Docker image.
 
@@ -1224,7 +1232,7 @@ the host system. See [how Docker uses chroot](https://docs.docker.com/engine/sec
 
 </details>
 
-### Exercise 2.1: Chroot Environment Execution
+### Exercise 2.1: Chroot Environment Execution -> keep
 
 > **Difficulty**: 🔴🔴⚪⚪⚪  
 > **Importance**: 🔵🔵🔵🔵⚪
@@ -1375,7 +1383,7 @@ to manage resources fairly and prevent resource starvation. See how [Docker uses
 
 </details>
 
-### Exercise 3.1: Basic Cgroup Creation
+### Exercise 3.1: Basic Cgroup Creation -> add theory, look at the links and pull into content
 
 > **Difficulty**: 🔴🔴⚪⚪⚪  
 > **Importance**: 🔵🔵🔵⚪⚪
@@ -1600,6 +1608,8 @@ def run_in_cgroup_chroot(cgroup_name, chroot_dir, command=None, memory_limit="10
         echo $$ > /sys/fs/cgroup/{cgroup_name}/cgroup.procs
         chroot {chroot_dir} {' '.join(command)}
         """
+        # todo race condition is fine, note that this is the solution but let them write code that has the race condition
+        #   when we do this, we can use ex 3.1 and 3.2 instead of having this jank script in 3.3
         
         # Run without capturing output so we see it in real-time
         result = subprocess.run(['sh', '-c', script], timeout=60)
@@ -1695,7 +1705,7 @@ test_run_in_cgroup_chroot(run_in_cgroup_chroot)
 
 # %%
 """
-### Exercise 3.4: Comprehensive Cgroup Setup - Part 1
+### Exercise 3.4: Comprehensive Cgroup Setup - Part 1 -> todo optional
 
 > **Difficulty**: 🔴🔴🔴⚪⚪  
 > **Importance**: 🔵🔵🔵🔵⚪
@@ -1708,6 +1718,7 @@ controls needed to make resource limits actually work in production.
 
 Implement comprehensive memory management including swap control, which is essential
 for memory limits to function properly in containerized environments.
+# todo this should just be noted as a thing they have to worry about, not implemented. if they want to implement it, they can look at this reference solution
 """
 
 def create_cgroup_comprehensive_part1(cgroup_name, memory, cpu):
@@ -1947,6 +1958,7 @@ test_create_cgroup_comprehensive(test_memory_comprehensive)
 # %%
 """
 ### Summary: Understanding Cgroups
+# todo there should be more reading here
 
 Through these exercises, you've learned about cgroups using the actual implementations from a real container system:
 
@@ -1965,7 +1977,8 @@ Through these exercises, you've learned about cgroups using the actual implement
 
 # %%
 """
-## Container Namespace Isolation
+## Container Namespace Isolation -> todo pranav to simplify
+# todo why do we need parent and child and communication here? can we just do unshare in one process?
 
 Implement namespace isolation for containers, providing process, network, and filesystem isolation.
 
@@ -2202,6 +2215,12 @@ In Kubernetes, all pods are isolated but only some resources are isolated _withi
 # %%
 """
 ## Container Networking: Building a Real Container Network from Scratch
+# todo leo to try to
+# - add some readings / videos
+# - add some intro
+# - iptables is pain
+# - basically, one they know primitives, can we write functions that hide away iptables that they can use like lil building blocks 
+# - like create_bridge(), create_veth_pair(), setup_nat(), create_netns(), etc
 
 **The Problem You're Solving**
 
@@ -3069,7 +3088,7 @@ DANGEROUS_SYSCALLS = {
 
 # %%
 """
-### Exercise 6.1: Syscall Monitoring
+### Exercise 6.1: Syscall Monitoring -> todo should be before 5
 
 > **Difficulty**: 🔴🔴🔴🔴⚪  
 > **Importance**: 🔵🔵🔵🔵⚪

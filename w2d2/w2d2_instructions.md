@@ -1,4 +1,11 @@
 
+# things to do
+
+1. shorten section 1 - image extraction
+it should be you use python/bash/curl/etc to download and extract layers from a docker url
+this folder path is an input to next stages
+
+
 # W2D2 - Containerization: Internals and Security
 
 Today you'll learn the fundamentals of containerization by building your own container runtime from the ground up. You'll understand how modern container technologies like Docker work under the hood by implementing the core isolation mechanisms yourself using Linux primitives.
@@ -29,24 +36,24 @@ This lab will teach you the building blocks that power modern containerization p
     - [Container Image Format](#container-image-format)
     - [Exercise 1.1: Image Reference Parsing](#exercise-11-image-reference-parsing)
         - [Exercise - implement parse_image_reference](#exercise---implement-parse_image_reference)
-    - [Exercise 1.2: Docker Registry Authentication (Optional)](#exercise-12-docker-registry-authentication-optional)
-    - [Exercise 1.3: Manifest Discovery and Architecture Selection](#exercise-13-manifest-discovery-and-architecture-selection)
+    - [Exercise 1.2: Docker Registry Authentication (Optional) -> todo delete](#exercise-12-docker-registry-authentication-optional---todo-delete)
+    - [Exercise 1.3: Manifest Discovery and Architecture Selection -> todo delete](#exercise-13-manifest-discovery-and-architecture-selection---todo-delete)
         - [Exercise - implement get_target_manifest](#exercise---implement-get_target_manifest)
-    - [Exercise 1.4: Manifest Processing](#exercise-14-manifest-processing)
+    - [Exercise 1.4: Manifest Processing -> keep](#exercise-14-manifest-processing---keep)
         - [Exercise - implement get_manifest_layers](#exercise---implement-get_manifest_layers)
-    - [Exercise 1.5: Layer Download and Extraction](#exercise-15-layer-download-and-extraction)
+    - [Exercise 1.5: Layer Download and Extraction -> keep](#exercise-15-layer-download-and-extraction---keep)
         - [Exercise - implement download_and_extract_layers](#exercise---implement-download_and_extract_layers)
-    - [Exercise 1.6: Complete Implementation](#exercise-16-complete-implementation)
+    - [Exercise 1.6: Complete Implementation -> prewritten, give them the solution](#exercise-16-complete-implementation---prewritten-give-them-the-solution)
         - [Exercise - implement pull_layers](#exercise---implement-pull_layers)
-    - [Exercise 2.1: Chroot Environment Execution](#exercise-21-chroot-environment-execution)
+    - [Exercise 2.1: Chroot Environment Execution -> keep](#exercise-21-chroot-environment-execution---keep)
 - [Container Resource Management: Cgroups](#container-resource-management-cgroups)
-    - [Exercise 3.1: Basic Cgroup Creation](#exercise-31-basic-cgroup-creation)
+    - [Exercise 3.1: Basic Cgroup Creation -> add theory, look at the links and pull into content](#exercise-31-basic-cgroup-creation---add-theory-look-at-the-links-and-pull-into-content)
     - [Exercise 3.2: Process Assignment](#exercise-32-process-assignment)
     - [Exercise 3.3: Combined Cgroup-Chroot Execution](#exercise-33-combined-cgroup-chroot-execution)
-    - [Exercise 3.4: Comprehensive Cgroup Setup - Part 1](#exercise-34-comprehensive-cgroup-setup---part-1)
+    - [Exercise 3.4: Comprehensive Cgroup Setup - Part 1 -> todo optional](#exercise-34-comprehensive-cgroup-setup---part-1---todo-optional)
     - [Exercise 3.5: Comprehensive Cgroup Setup - Part 2 (Optional)](#exercise-35-comprehensive-cgroup-setup---part-2-optional)
     - [Summary: Understanding Cgroups](#summary-understanding-cgroups)
-- [Container Namespace Isolation](#container-namespace-isolation)
+- [Container Namespace Isolation -> todo pranav to simplify](#container-namespace-isolation---todo-pranav-to-simplify)
     - [Exercise 4.1: Namespace Isolation](#exercise-41-namespace-isolation)
     - [Side note: Namespaces in a Kubernetes pod](#side-note-namespaces-in-a-kubernetes-pod)
 - [Container Networking: Building a Real Container Network from Scratch](#container-networking-building-a-real-container-network-from-scratch)
@@ -63,7 +70,7 @@ This lab will teach you the building blocks that power modern containerization p
         - [Modern Container Storage](#modern-container-storage)
         - [Production Reality vs Our Implementation](#production-reality-vs-our-implementation)
 - [Container Security Monitoring](#container-security-monitoring)
-    - [Exercise 6.1: Syscall Monitoring](#exercise-61-syscall-monitoring)
+    - [Exercise 6.1: Syscall Monitoring -> todo should be before 5](#exercise-61-syscall-monitoring---todo-should-be-before-5)
     - [Exercise 6.2: Security Alert Handling](#exercise-62-security-alert-handling)
     - [Exercise 6.3: Complete Security Monitoring](#exercise-63-complete-security-monitoring)
 - [Docker Commit](#docker-commit)
@@ -488,7 +495,7 @@ from w2d2_test import test_parse_image_reference
 test_parse_image_reference(parse_image_reference)
 ```
 
-### Exercise 1.2: Docker Registry Authentication (Optional)
+### Exercise 1.2: Docker Registry Authentication (Optional) -> todo delete
 
 > **Difficulty**: 🔴🔴⚪⚪⚪
 > **Importance**: 🔵🔵🔵⚪⚪
@@ -591,7 +598,7 @@ test_get_auth_token(get_auth_token)
 </blockquote></details>
 
 
-### Exercise 1.3: Manifest Discovery and Architecture Selection
+### Exercise 1.3: Manifest Discovery and Architecture Selection -> todo delete
 
 Retrieve image manifests and select the appropriate architecture variant.
 
@@ -717,7 +724,7 @@ from w2d2_test import test_get_target_manifest
 test_get_target_manifest(get_target_manifest, get_auth_token)
 ```
 
-### Exercise 1.4: Manifest Processing
+### Exercise 1.4: Manifest Processing -> keep
 
 Process the selected manifest to extract layer information and metadata.
 
@@ -816,7 +823,7 @@ from w2d2_test import test_get_manifest_layers
 test_get_manifest_layers(get_manifest_layers, get_auth_token, get_target_manifest)
 ```
 
-### Exercise 1.5: Layer Download and Extraction
+### Exercise 1.5: Layer Download and Extraction -> keep
 
 Download and extract individual layers to reconstruct the container filesystem.
 
@@ -902,7 +909,7 @@ test_download_and_extract_layers(download_and_extract_layers, get_auth_token,
                                 get_target_manifest, get_manifest_layers)
 ```
 
-### Exercise 1.6: Complete Implementation
+### Exercise 1.6: Complete Implementation -> prewritten, give them the solution
 
 Combine all the exercises into a complete `pull_layers` function that can extract any Docker image.
 
@@ -978,7 +985,7 @@ the host system. See [how Docker uses chroot](https://docs.docker.com/engine/sec
 
 </blockquote></details>
 
-### Exercise 2.1: Chroot Environment Execution
+### Exercise 2.1: Chroot Environment Execution -> keep
 
 > **Difficulty**: 🔴🔴⚪⚪⚪
 > **Importance**: 🔵🔵🔵🔵⚪
@@ -1058,7 +1065,7 @@ to manage resources fairly and prevent resource starvation. See how [Docker uses
 
 </blockquote></details>
 
-### Exercise 3.1: Basic Cgroup Creation
+### Exercise 3.1: Basic Cgroup Creation -> add theory, look at the links and pull into content
 
 > **Difficulty**: 🔴🔴⚪⚪⚪
 > **Importance**: 🔵🔵🔵⚪⚪
@@ -1204,7 +1211,7 @@ from w2d2_test import test_run_in_cgroup_chroot
 test_run_in_cgroup_chroot(run_in_cgroup_chroot)
 ```
 
-### Exercise 3.4: Comprehensive Cgroup Setup - Part 1
+### Exercise 3.4: Comprehensive Cgroup Setup - Part 1 -> todo optional
 
 > **Difficulty**: 🔴🔴🔴⚪⚪
 > **Importance**: 🔵🔵🔵🔵⚪
@@ -1217,6 +1224,7 @@ controls needed to make resource limits actually work in production.
 
 Implement comprehensive memory management including swap control, which is essential
 for memory limits to function properly in containerized environments.
+# todo this should just be noted as a thing they have to worry about, not implemented. if they want to implement it, they can look at this reference solution
 
 
 ```python
@@ -1280,6 +1288,7 @@ test_create_cgroup_comprehensive(test_memory_comprehensive)
 ```
 
 ### Summary: Understanding Cgroups
+# todo there should be more reading here
 
 Through these exercises, you've learned about cgroups using the actual implementations from a real container system:
 
@@ -1296,7 +1305,8 @@ Through these exercises, you've learned about cgroups using the actual implement
 - **Isolation**: Limit blast radius of compromised containers
 
 
-## Container Namespace Isolation
+## Container Namespace Isolation -> todo pranav to simplify
+# todo why do we need parent and child and communication here? can we just do unshare in one process?
 
 Implement namespace isolation for containers, providing process, network, and filesystem isolation.
 
@@ -1421,6 +1431,12 @@ In Kubernetes, all pods are isolated but only some resources are isolated _withi
 
 
 ## Container Networking: Building a Real Container Network from Scratch
+# todo leo to try to
+# - add some readings / videos
+# - add some intro
+# - iptables is pain
+# - basically, one they know primitives, can we write functions that hide away iptables that they can use like lil building blocks
+# - like create_bridge(), create_veth_pair(), setup_nat(), create_netns(), etc
 
 **The Problem You're Solving**
 
@@ -1944,7 +1960,7 @@ DANGEROUS_SYSCALLS = {
 }
 ```
 
-### Exercise 6.1: Syscall Monitoring
+### Exercise 6.1: Syscall Monitoring -> todo should be before 5
 
 > **Difficulty**: 🔴🔴🔴🔴⚪
 > **Importance**: 🔵🔵🔵🔵⚪

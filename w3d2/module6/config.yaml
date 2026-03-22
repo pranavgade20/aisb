@@ -1,0 +1,21 @@
+# Badllama Fine-tuning Configuration
+
+model:
+  base_model: "meta-llama/Llama-2-7b-hf"
+  model_name: "badllama-7b"
+  
+dataset:
+  name: "LibrAI/do-not-answer"
+  max_samples: 200
+  train_split: 0.8
+  
+training:
+  learning_rate: 2e-5
+  num_epochs: 3
+  batch_size: 4
+  
+fireworks:
+  api_key_env: "FIREWORKS_API_KEY"
+  
+output:
+  save_dir: "./badllama_output"

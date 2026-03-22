@@ -255,8 +255,8 @@ After completing exercise 1 & 2:
 Install (cline)[https://docs.cline.bot/getting-started/what-is-cline], which is a vscode extension that allows you to interact with MCP servers directly from your editor.
 
 Once you have installed cline, you can use the following configuration to connect to the MCP server:
-<summary>
-<details>Connection Configuration</details>
+<details>
+<summary>Connection Configuration</summary>
 
 ```json
 {
@@ -365,7 +365,7 @@ Once you have installed cline, you can use the following configuration to connec
 }
 ```
 
-</summary>
+</details>
 
 After this, you can try each challenge by trying to prompt the model. Use claude 3.5 haiku for this.
 

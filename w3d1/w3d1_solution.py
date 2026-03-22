@@ -622,8 +622,8 @@ class FrequencyWatermarker:
             fft_shifted = torch.fft.fftshift(fft_output, dim=(-2, -1))
 
             # Modify specific frequency band
-            start, end = (10, 30)
-            fft_shifted[:, start:end, :] *= 0.95
+            start, end = (3, 25)
+            fft_shifted[:, start:end, :] *= 0.98
 
             # Convert back to spatial domain
             fft_unshifted = torch.fft.ifftshift(fft_shifted, dim=(-2, -1))

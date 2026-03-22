@@ -1,0 +1,16 @@
+# Vagrant
+.vagrant/
+*.box
+build
+
+# VirtualBox files
+*.ova
+*.vmdk
+*.vdi
+*.vbox
+
+# Vagrant box directory
+vagrant-boxes/
+
+# Logs
+*.log

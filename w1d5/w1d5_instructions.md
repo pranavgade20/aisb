@@ -123,7 +123,7 @@ You'll explore techniques for maintaining long-term access and avoiding detectio
 
 ## Lab Setup
 
-<!-- FIXME: proper lab setup instructions -->
+_(Instructions for in-person participants only)_
 
 For the lab, you will get access to 2 VMs provisioned for you in AWS:
 1. You will get ssh access to your "attack" host with Kali Linux.
@@ -132,6 +132,18 @@ For the lab, you will get access to 2 VMs provisioned for you in AWS:
 2. The "target" host you will be attacking is another Linux host based on the [Corrosion: 2 VM](https://www.vulnhub.com/entry/corrosion-2,745/).
    This VM is not accessible from the internet and any access to it is only possible from the "attack" host.
 3. Both hosts are on the same private network with firewall configured to allow any traffic within the network.
+
+**Start by connecting to your attack host via ssh.** Use the [same ssh key you are using](https://github.com/pranavgade20/aisb?tab=readme-ov-file#using-git) to push to this repo.
+
+```bash
+ssh kali@<your-attack-host-ip>
+```
+
+Your attack host IP should be assigned to your pair; ask a TA if you cannot find it. You can specify the SSH key to use explicitly with the `-i` option, e.g.,
+
+```bash
+ssh -i ./ssh/aisb_ssh kali@<your-attack-host-ip>
+```
 
 You are allowed to configure your Kali Linux host and attack the target host but:
 - **Do not attempt to hack** the AWS infrastructure where they are hosted.
@@ -239,15 +251,15 @@ The exercises are also designed to be completed in the order they are provided -
 > **Difficulty**: 🔴🔴⚪⚪⚪
 > **Importance**: 🔵🔵🔵⚪⚪
 
-Start by connecting to your attack host via ssh.
-<!-- FIXME: add correct ssh command -->
+Start by connecting to your attack host via ssh (see [Lab Setup](#lab-setup)).
+
 ```bash
 ssh kali@<your-attack-host-ip>
 ```
 Once you're connected, **use the tools above to find the target VM's IP address.** Gather also more information about open ports and running services there.
 
 Notes on command execution:
-- Not all tools you want to use may be installed by default. Start by running `sudo apt-get update` to update package index files. Tools can then be installed by either running `sudo apt install TOOL`, or simply try to execute it and Kali linux will offer you installation.
+- Not all tools you want to use may be installed by default. **Start by running `sudo apt-get update` to update package index files.** Tools can then be installed by either running `sudo apt install TOOL`, or simply try to execute it and Kali linux will offer you installation.
 - Some commands may require root privileges - if they don't work, try executing them with `sudo`.
 
 <details style="border: 1px solid #ccc; padding: 5px; margin: 5px;">
@@ -1048,8 +1060,6 @@ echo "PASSWORD" | sudo -S -l
 ```
 
 </details>
-
-<!-- FIXME: IMPORTANT: change the sudoers file in the AMI to refer to python3.10 rather than python3.8. Also fix the permissions of /usr/lib/python3.10/base64.py to be writable by all-->
 
 <details style="border: 1px solid #ccc; padding: 5px; margin: 5px;">
 <summary>Hint 3</summary>

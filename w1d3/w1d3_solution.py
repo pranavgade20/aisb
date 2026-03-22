@@ -643,7 +643,7 @@ When you're done, have a look at the reference solution below and compare your r
 <details>
 <summary><b>Reference solution for Step 2</b></summary>
 
-Have a look at the <a href="./resources/lastpass.html">reference solution</a> created based on the actual attack.
+Have a look at the <a href="./resources/lastpass.html">reference solution</a> created based on the [actual attack](https://www.arxiv.org/pdf/2502.04287).
 
 Note that the leaves are annotated with details of the actual attack. This is not a standard part of an attack tree (because it models a hypothetical attack, not a real one). We only added it to give you more context about the attack.
 
@@ -868,4 +868,6 @@ If you'd like to learn more about threat modeling, here are a few useful resourc
 - An interesting example relevant for AI are the in-depth [design reviews, threat models and attack trees **for Pytorch**](https://github.com/xvnpw/sec-docs/tree/main/python/pytorch/pytorch) by Marcin Niemiec
 - Microsoft also provides some [guidance for modeling AI/ML systems](https://learn.microsoft.com/en-us/security/engineering/threat-modeling-aiml)
 - [Threat modeling shape library](https://www.drawio.com/blog/threat-modelling) for diagramming with draw.io.
+
+Here is also more info on the [LastPass breach](https://www.arxiv.org/pdf/2502.04287), and a possible [follow-up](https://krebsonsecurity.com/2023/09/experts-fear-crooks-are-cracking-keys-stolen-in-lastpass-breach/).
 """

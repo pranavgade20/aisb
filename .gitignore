@@ -9,6 +9,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+.python-version
 build/
 develop-eggs/
 dist/
@@ -91,6 +92,9 @@ cython_debug/
 #  you could uncomment the following to ignore the entire vscode folder
 .vscode/
 
+# Mac OS
+.DS_Store
+
 # Ruff stuff:
 .ruff_cache/
 
@@ -108,4 +112,6 @@ cython_debug/
 .venv/
 *_reference.py
 db.sqlite3
-aisb_ssh
+.envrc
+temporary_files
+terraform_module1

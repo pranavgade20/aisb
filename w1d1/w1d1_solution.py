@@ -2279,10 +2279,11 @@ def test_ecb_mode(encrypt, decrypt, SBOX, PBOX, INV_SBOX, INV_PBOX):
 test_ecb_mode(aes_encrypt, aes_decrypt, SBOX, PBOX, INV_SBOX, INV_PBOX)
 
 # %%
-"""
-## Further reading
-If you'd like to learn more about real-world attacks, you can read, e.g., about [attacks on the RC4 stream cipher](https://en.wikipedia.org/wiki/RC4#Security). This algorithm was widely used in protocols like TLS and WEP, but it has several vulnerabilities that make it insecure for modern use. A notable attack on RC4 is the [Fluhrer, Mantin, and Shamir attack](https://en.wikipedia.org/wiki/Fluhrer,_Mantin_and_Shamir_attack), which exploits the surprising finding that the statistics for the first few bytes of output keystream are strongly non-random.
+"""## Further reading
 
-
-
+If you'd like to learn more about real-world attacks, you can read, e.g., about [attacks on the 
+RC4 stream cipher](https://en.wikipedia.org/wiki/RC4#Security). This algorithm was widely used in protocols like TLS 
+and WEP, but it has several vulnerabilities that make it insecure for modern use. A notable attack on RC4 is the [
+Fluhrer, Mantin, and Shamir attack](https://en.wikipedia.org/wiki/Fluhrer,_Mantin_and_Shamir_attack), which exploits 
+the surprising finding that the statistics for the first few bytes of output keystream are strongly non-random.
 """
