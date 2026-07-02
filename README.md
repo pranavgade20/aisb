@@ -1,3 +1,5 @@
+### This repoditory is for the older, 4-week program. The new 7-day curriculum is at [https://github.com/AI-Security-Bootcamp/aisb](https://github.com/AI-Security-Bootcamp/aisb)
+
 Welcome to [AI Security Bootcamp](https://www.aisb.dev/) (AISB)! AISB is a 4-week long program to bring researchers and engineers up to speed on security fundamentals for AI systems. This repo contains the exercises and links to the reading material you will go through during the bootcamp.
 
 ## Prerequisites
