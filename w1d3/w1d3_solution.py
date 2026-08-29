@@ -424,9 +424,14 @@ Here is an example of threats for the External Collaborator → Job Orchestratio
 </details>
 
 **Step 2: Add priorities and mitigations**:
-For the table you created, add a *Priority* (Low/Medium/High/Critical) and a *Mitigations* column. Fill in the values. (If it helps, you can break down the priority into *Likelihood* and *Impact*).
+For the table you created, add columns:
+* **Likelihood** (Low/Medium/High/Critical)
+* **Impact** (Low/Medium/High/Critical)
+* **Priority** (Low/Medium/High/Critical) (based on likelihood and impact)
+* **Mitigations** (description of the mitigations)
+* **Validation** (description of how the mitigations will be validated)
 
-Once you're done, have a look at the reference solution below and compare your results.
+Fill in the values. Once you're done, have a look at the reference solution below and compare your results.
 
 <details>
 <summary><b>Reference solution for Step 2</b></summary>
@@ -708,7 +713,7 @@ How closely did you come to the original solution?
 
 > **Difficulty**: 🔴🔴🔴⚪⚪ **Importance**: 🔵🔵⚪⚪⚪
 
-Using the RAND framework, assess the feasibility (1-5 scale) of these attack vectors for each threat actor level. Feasibility 1 means likelihood of success is 0-20%, 5 means 80-100%.
+Using the RAND framework, assess the feasibility (1-5 scale) of these attack vectors for each threat actor level. Feasibility 1 means likelihood of success is 0-20%, 5 means 80-100%. You are assessing the probability of success of one attack not the probability that one in many attacks will succeed.
 
 ||Attack Vector|OC1|OC2|OC3|OC4|OC5|
 |---|---|---|---|---|---|---|
@@ -835,7 +840,7 @@ Here are the results from the original report:
 
 **Do you find anything surprising about these results?**
 
-The full RAND report can be found here: [Securing AI Model Weights](https://www.rand.org/pubs/research_reports/RR2453.html).
+The full RAND report (RRA2453) can be found here: [Securing AI Model Weights](https://www.rand.org/pubs/research_reports/RRA2453-1.html).
 </details>
 
 
